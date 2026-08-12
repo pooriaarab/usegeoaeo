@@ -1,0 +1,44 @@
+name: Release
+
+# Staging channel  = npm dist-tag `next`, published on every merge to main (prerelease).
+# Production channel = npm dist-tag `latest`, published when a vX.Y.Z tag is pushed.
+# Both run the identical verify (typecheck + test + build) before publish — that is parity.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write # required for npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run verify
+
+      # Production: a pushed vX.Y.Z tag. package.json version must match the tag.
+      - name: Publish latest (production)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm publish --tag latest
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Staging: a merge to main. Publish a unique prerelease under `next`.
+      - name: Publish next (staging)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          BASE=$(node -p "require('./package.json').version")
+          npm version "${BASE}-next.${GITHUB_RUN_NUMBER}" --no-git-tag-version
+          npm publish --tag next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -15,11 +15,36 @@
     }
   },
   "files": ["dist"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pooriaarab/geoaeo.git"
+  },
+  "homepage": "https://usegeoaeo.com",
+  "bugs": "https://github.com/pooriaarab/geoaeo/issues",
+  "keywords": [
+    "seo",
+    "geo",
+    "aeo",
+    "generative-engine-optimization",
+    "answer-engine-optimization",
+    "llms-txt",
+    "structured-data",
+    "json-ld",
+    "webmcp",
+    "mcp",
+    "ai-search"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
     "lint": "tsc --noEmit --pretty false",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run test && npm run build",
+    "prepublishOnly": "npm run verify"
   },
   "engines": {
     "node": ">=20"
