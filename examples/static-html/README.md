@@ -28,9 +28,11 @@ This example ships fully optimized. `geoaeo audit .` scores the static files dir
 
 | Target | Score |
 |------|-------|
-| `examples/static-html` | 94 / 100 |
+| `examples/static-html` | 80 / 100 |
 
-The one open gap is per-page Markdown mirrors, which a multi-page site would add.
+It passes every technical and structured-data check. The open gaps are answerability
+signals a real content site adds: a dated/updated stamp, a named author, and Markdown
+mirrors.
 
 ## Files
 

@@ -1,13 +1,16 @@
 # geoaeo
 
-`geoaeo` creates the files that help answer engines find, quote, and use a site.
-It includes a CLI and an MCP server.
+`geoaeo` makes any app discoverable, quotable, and usable by AI answer engines and search —
+SEO, GEO, and AEO in one tool. It audits a site, scores it 0–100, and generates the files
+answer engines need. It ships a library, a CLI, and an MCP server, all at one version.
 
 ## Install
 
 ```bash
 npm install geoaeo
 ```
+
+The package name is unscoped: `geoaeo`, `geoaeo` (CLI), and `geoaeo-mcp` (MCP server).
 
 Create `geoaeo.config.ts` from [`geoaeo.config.example.ts`](./geoaeo.config.example.ts).
 The config holds the site facts used by every generator.
@@ -34,8 +37,9 @@ npx geoaeo init ./apps/website
 npx geoaeo init ./apps/website --force
 ```
 
-The command detects `next.config.*` and `src/app`. Other directories receive static files.
-Existing files stay unchanged unless you pass `--force`.
+The command detects the framework — Next.js, Astro, SvelteKit, Nuxt, or Remix — and writes
+the routes that emit each artifact. Other directories receive static files. Existing files
+stay unchanged unless you pass `--force`.
 
 ## Generate artifacts
 
@@ -46,10 +50,25 @@ npx geoaeo gen jsonld --type faq
 npx geoaeo gen webmcp
 npx geoaeo gen sitemap --output public/sitemap.xml
 npx geoaeo gen robots
+npx geoaeo gen ogimage --output public/og.svg
+npx geoaeo gen rss --output public/feed.xml
+npx geoaeo gen hreflang
+npx geoaeo gen mdmirror
 ```
 
-The generators use the same config as the generated Next.js routes.
-The JSON-LD generator supports `software`, `product`, `faq`, and `breadcrumb` kinds.
+The generators use the same config as the generated framework routes.
+The JSON-LD generator supports `software`, `product`, `faq`, `breadcrumb`, `organization`,
+`website`, `article`, `howto`, `person`, and `review` kinds.
+
+## Gate a build on the score
+
+Use `--ci` in a pipeline to fail when a site drops below a minimum score:
+
+```bash
+npx geoaeo audit https://example.com --ci --min-score 85
+```
+
+The command exits non-zero when the score is below the threshold.
 
 ## Humanize copy
 

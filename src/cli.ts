@@ -4,6 +4,7 @@ import { auditTarget, formatAuditReport } from './audit.js';
 import { PKG_NAME, VERSION } from './constants.js';
 import { initProject } from './commands/init.js';
 import { generateArtifact, type GeneratedArtifact } from './commands/gen.js';
+import type { JsonLdKind } from './generators/index.js';
 import { humanizeGlob } from './commands/humanize.js';
 
 const program = new Command();
@@ -14,9 +15,18 @@ program
   .command('audit <target>')
   .description('Audit a live URL or local site directory.')
   .option('--json', 'print JSON instead of the report')
-  .action(async (target: string, options: { json?: boolean }) => {
+  .option('--ci', 'exit non-zero when the score is below --min-score')
+  .option('--min-score <n>', 'minimum passing score for --ci', '90')
+  .action(async (target: string, options: { json?: boolean; ci?: boolean; minScore: string }) => {
     const report = await auditTarget(target);
     process.stdout.write(options.json ? `${JSON.stringify(report, null, 2)}\n` : `${formatAuditReport(report)}\n`);
+    if (options.ci) {
+      const min = Number(options.minScore);
+      if (report.score < min) {
+        process.stderr.write(`geoaeo: score ${report.score} is below the required ${min}\n`);
+        process.exitCode = 1;
+      }
+    }
   });
 
 program
@@ -32,11 +42,11 @@ program
   .command('gen <artifact>')
   .description('Generate one artifact from the local site config.')
   .option('-o, --output <file>', 'write to a file instead of stdout')
-  .option('--type <kind>', 'JSON-LD kind: software, product, faq, or breadcrumb', 'software')
+  .option('--type <kind>', 'JSON-LD kind: software, product, faq, breadcrumb, organization, website, article, howto, person, or review', 'software')
   .action(async (artifact: string, options: { output?: string; type: string }) => {
-    const allowed = ['llms', 'llms-full', 'jsonld', 'webmcp', 'sitemap', 'robots'];
+    const allowed = ['llms', 'llms-full', 'jsonld', 'webmcp', 'sitemap', 'robots', 'ogimage', 'rss', 'hreflang', 'mdmirror'];
     if (!allowed.includes(artifact)) throw new Error(`Unknown artifact: ${artifact}`);
-    const content = await generateArtifact(artifact as GeneratedArtifact, process.cwd(), options.type as 'software' | 'product' | 'faq' | 'breadcrumb');
+    const content = await generateArtifact(artifact as GeneratedArtifact, process.cwd(), options.type as JsonLdKind);
     if (options.output) {
       const { writeFile } = await import('node:fs/promises');
       await writeFile(options.output, content, 'utf8');

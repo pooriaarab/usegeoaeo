@@ -28,7 +28,7 @@ geoaeo audit .
 
 | Target | Score |
 |------|-------|
-| `examples/nextjs-app` (source dir) | 45 / 100 |
+| `examples/nextjs-app` (source dir) | 48 / 100 |
 
 Next.js generates its GEO/AEO artifacts at runtime — route handlers for `sitemap`, `robots`,
 `llms.txt`, JSON-LD, and the `.md` mirrors. A static source-dir audit cannot see runtime
