@@ -1,0 +1,62 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "template-queue-consumer",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-05-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  "send_email": [{ "name": "EMAIL" }],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "template-db",
+      "database_id": "local-template-db"
+    }
+  ],
+
+  "kv_namespaces": [
+    { "binding": "FLAGS", "id": "local-flags", "preview_id": "local-flags" }
+  ],
+
+  "queues": {
+    "consumers": [
+      {
+        "queue": "template-outbox",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5
+      }
+    ]
+  },
+
+  "vars": {
+    "ENVIRONMENT": "development"
+  },
+
+  "env": {
+    "production": {
+      "name": "template-queue-consumer",
+      "vars": { "ENVIRONMENT": "production" },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "template-db",
+          "database_id": "<D1_DB_ID>"
+        }
+      ],
+      "kv_namespaces": [
+        { "binding": "FLAGS", "id": "<FLAGS_KV_ID>" }
+      ],
+      "queues": {
+        "consumers": [
+          {
+            "queue": "template-outbox-prod",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5
+          }
+        ]
+      }
+    }
+  }
+}

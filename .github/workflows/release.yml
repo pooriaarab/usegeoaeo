@@ -1,30 +1,36 @@
 name: Release
 
-# Staging channel  = npm dist-tag `next`, published on every merge to main (prerelease).
-# Production channel = npm dist-tag `latest`, published when a vX.Y.Z tag is pushed.
-# Both run the identical verify (typecheck + test + build) before publish — that is parity.
+# Publishes the geoaeo package (packages/geoaeo).
+# Staging channel  = npm dist-tag `next`, on every merge to main (prerelease).
+# Production channel = npm dist-tag `latest`, when a vX.Y.Z tag is pushed.
+# Both run the same verify before publish.
 
 on:
   push:
     branches: [main]
     tags: ['v*']
 
-permissions:
-  contents: read
-  id-token: write # required for npm provenance
-
 jobs:
   publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/geoaeo
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
           registry-url: https://registry.npmjs.org
-      - run: npm ci
-      - run: npm run verify
+      - name: Install (workspace root)
+        working-directory: .
+        run: bun install --frozen-lockfile
+      - name: Verify
+        working-directory: .
+        run: bun run --filter geoaeo verify
 
       # Production: a pushed vX.Y.Z tag. package.json version must match the tag.
       - name: Publish latest (production)

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, world-class]
+    branches: [main, monorepo]
   pull_request:
 
 jobs:
@@ -10,15 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run build
-      - run: npm run test
-      - name: CLI smoke test
+          bun-version: 1.3.9
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run test
+      - name: geoaeo CLI smoke test
         run: |
-          node dist/cli.js --version
-          node dist/cli.js --help
+          node packages/geoaeo/dist/cli.js --version
+          node packages/geoaeo/dist/cli.js --help
