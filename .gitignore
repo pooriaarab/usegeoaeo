@@ -3,3 +3,11 @@ dist/
 coverage/
 .DS_Store
 
+
+# monorepo
+node_modules
+.turbo
+.open-next
+.next
+dist
+bun.lock.tmp
