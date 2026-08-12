@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "GEO and AEO artifacts for answer engines and agents",
   "type": "module",
+  "license": "MIT",
   "bin": {
     "geoaeo": "dist/cli.js",
     "geoaeo-mcp": "dist/mcp.js"
