@@ -1,15 +1,15 @@
-# aeoly
+# geoaeo
 
-`aeoly` creates the files that help answer engines find, quote, and use a site.
+`geoaeo` creates the files that help answer engines find, quote, and use a site.
 It includes a CLI and an MCP server.
 
 ## Install
 
 ```bash
-npm install aeoly
+npm install geoaeo
 ```
 
-Create `aeoly.config.ts` from [`aeoly.config.example.ts`](./aeoly.config.example.ts).
+Create `geoaeo.config.ts` from [`geoaeo.config.example.ts`](./geoaeo.config.example.ts).
 The config holds the site facts used by every generator.
 
 ## Quick start
@@ -17,21 +17,21 @@ The config holds the site facts used by every generator.
 Audit a live site:
 
 ```bash
-npx aeoly audit https://example.com
-npx aeoly audit https://example.com --json
+npx geoaeo audit https://example.com
+npx geoaeo audit https://example.com --json
 ```
 
 Audit a local build or source directory:
 
 ```bash
-npx aeoly audit ./apps/website
+npx geoaeo audit ./apps/website
 ```
 
 Scaffold a Next.js App Router site:
 
 ```bash
-npx aeoly init ./apps/website
-npx aeoly init ./apps/website --force
+npx geoaeo init ./apps/website
+npx geoaeo init ./apps/website --force
 ```
 
 The command detects `next.config.*` and `src/app`. Other directories receive static files.
@@ -40,12 +40,12 @@ Existing files stay unchanged unless you pass `--force`.
 ## Generate artifacts
 
 ```bash
-npx aeoly gen llms
-npx aeoly gen llms-full --output public/llms-full.txt
-npx aeoly gen jsonld --type faq
-npx aeoly gen webmcp
-npx aeoly gen sitemap --output public/sitemap.xml
-npx aeoly gen robots
+npx geoaeo gen llms
+npx geoaeo gen llms-full --output public/llms-full.txt
+npx geoaeo gen jsonld --type faq
+npx geoaeo gen webmcp
+npx geoaeo gen sitemap --output public/sitemap.xml
+npx geoaeo gen robots
 ```
 
 The generators use the same config as the generated Next.js routes.
@@ -56,13 +56,13 @@ The JSON-LD generator supports `software`, `product`, `faq`, and `breadcrumb` ki
 Run a report for Markdown and JSX files:
 
 ```bash
-npx aeoly humanize 'content/**/*.md' --check
+npx geoaeo humanize 'content/**/*.md' --check
 ```
 
 Rewrite prose in place:
 
 ```bash
-npx aeoly humanize 'src/**/*.tsx' --write
+npx geoaeo humanize 'src/**/*.tsx' --write
 ```
 
 The humanizer keeps YAML frontmatter, code fences, JSX tags, imports, class names, and expressions.
@@ -75,9 +75,9 @@ Use the stdio server in an MCP client such as Claude Code or Cursor:
 ```json
 {
   "mcpServers": {
-    "aeoly": {
+    "geoaeo": {
       "command": "npx",
-      "args": ["aeoly-mcp"]
+      "args": ["geoaeo-mcp"]
     }
   }
 }
@@ -88,7 +88,7 @@ The server exposes `audit`, `gen`, and `humanize` tools.
 You can also run it through the CLI:
 
 ```bash
-npx aeoly mcp
+npx geoaeo mcp
 ```
 
 ## Commands

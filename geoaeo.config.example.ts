@@ -1,4 +1,4 @@
-import { defineConfig } from 'aeoly';
+import { defineConfig } from 'geoaeo';
 
 export default defineConfig({
   siteName: 'Reply Kit',
