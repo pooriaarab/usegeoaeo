@@ -1,11 +1,11 @@
 {
-  "name": "aeoly",
+  "name": "geoaeo",
   "version": "0.1.0",
   "description": "GEO and AEO artifacts for answer engines and agents",
   "type": "module",
   "bin": {
-    "aeoly": "dist/cli.js",
-    "aeoly-mcp": "dist/mcp.js"
+    "geoaeo": "dist/cli.js",
+    "geoaeo-mcp": "dist/mcp.js"
   },
   "exports": {
     ".": {
