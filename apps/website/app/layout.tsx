@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cloudflare Master Template",
-  description: "Cloudflare-native full-stack template (OpenNext + D1 + R2 + KV + Queues + Better Auth)",
+  title: "geoaeo | SEO, GEO, and AEO for any site",
+  description: "Audit any site for search engines and AI answer engines. Score it 0 to 100, then generate llms.txt, sitemap, robots, JSON-LD, WebMCP, and Markdown mirrors. Free and open source (MIT).",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
