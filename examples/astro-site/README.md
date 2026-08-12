@@ -28,7 +28,7 @@ geoaeo audit .
 
 | Target | Score |
 |------|-------|
-| `examples/astro-site` (source dir) | 46 / 100 |
+| `examples/astro-site` (source dir) | 31 / 100 |
 
 Astro renders pages at build time. The `.astro` source holds the titles, meta tags, and
 JSON-LD, but they only appear in the HTML after `astro build`. A source-dir audit cannot see
