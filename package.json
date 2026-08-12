@@ -1,6 +1,6 @@
 {
   "name": "geoaeo",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "GEO and AEO artifacts for answer engines and agents",
   "type": "module",
   "license": "MIT",
@@ -15,7 +15,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pooriaarab/geoaeo.git"
@@ -36,8 +38,7 @@
     "ai-search"
   ],
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "tsup",
@@ -64,4 +65,3 @@
     "vitest": "^3.2.4"
   }
 }
-
