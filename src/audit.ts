@@ -73,11 +73,34 @@ function sourceHas(source: string, patterns: RegExp[]): boolean {
   return patterns.some(pattern => pattern.test(source));
 }
 
-function inspectPage(page: PageSnapshot) {
-  const source = page.source;
-  if (page.isHtml) {
+export interface PageSignals {
+  title: boolean;
+  description: boolean;
+  canonical: boolean;
+  og: boolean;
+  twitter: boolean;
+  jsonLd: boolean;
+  jsonLdTypes: string[];
+  h1: boolean;
+  earlyFaq: boolean;
+  // GEO/AEO answerability signals
+  directAnswer: boolean;
+  questionHeadings: boolean;
+  freshness: boolean;
+  author: boolean;
+  // deeper technical SEO signals
+  headingOrder: boolean;
+  imageAlt: boolean;
+  metaRobotsOk: boolean;
+  hreflang: boolean;
+}
+
+// Exported for tests. Analyze one page's source (rendered HTML or framework source).
+export function analyzePage(source: string, isHtml: boolean): PageSignals {
+  if (isHtml) {
     const $ = load(source);
     const visible = $.root().text();
+    const top = visible.slice(0, 3000);
     const jsonLdTypes = $('script[type="application/ld+json"]')
       .map((_, element) => $(element).text())
       .get()
@@ -89,6 +112,11 @@ function inspectPage(page: PageSnapshot) {
           return [];
         }
       });
+    const firstParagraph = $('p').first().text().trim();
+    const questionHeadings = $('h2, h3')
+      .toArray()
+      .some(element => $(element).text().trim().endsWith('?'));
+    const images = $('img').toArray();
     return {
       title: $('title').text().trim().length > 0,
       description: $('meta[name="description"]').attr('content')?.trim().length ? true : false,
@@ -99,6 +127,21 @@ function inspectPage(page: PageSnapshot) {
       jsonLdTypes,
       h1: $('h1').length > 0,
       earlyFaq: /\bfaq\b|frequently asked questions/i.test(visible.slice(0, 5000)),
+      directAnswer: firstParagraph.length >= 40 && firstParagraph.length <= 600,
+      questionHeadings,
+      freshness:
+        $('time').length > 0 ||
+        $('meta[property="article:published_time"], meta[property="og:updated_time"], meta[name="date"]').length > 0 ||
+        /(updated|published|last modified|posted)[^.]{0,40}\b20\d{2}\b/i.test(top) ||
+        jsonLdTypes.length > 0 && /"date(Published|Modified)"/i.test(source),
+      author:
+        !!$('meta[name="author"]').attr('content')?.trim() ||
+        $('[rel="author"], [itemprop="author"]').length > 0 ||
+        /"@type"\s*:\s*"Person"/i.test(source),
+      headingOrder: $('h1').length === 1 && $('h2').length >= 1,
+      imageAlt: images.length === 0 || images.every(element => ($(element).attr('alt') ?? '').trim().length > 0),
+      metaRobotsOk: !/noindex/i.test($('meta[name="robots"]').attr('content') ?? ''),
+      hreflang: $('link[rel="alternate"][hreflang]').length > 0,
     };
   }
   return {
@@ -111,7 +154,19 @@ function inspectPage(page: PageSnapshot) {
     jsonLdTypes: [...source.matchAll(/['"]@type['"]\s*:\s*['"]([^'"]+)['"]/gi)].map(match => match[1]),
     h1: sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
+    directAnswer: sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
+    questionHeadings: /<h[23][^>]*>[^<]*\?/i.test(source),
+    freshness: sourceHas(source, [/date(Published|Modified)/i, /<time[\s>]/i, /(updated|published|last modified)[^.]{0,40}\b20\d{2}\b/i]),
+    author: sourceHas(source, [/name=["']author["']/i, /rel=["']author["']/i, /itemprop=["']author["']/i, /"@type"\s*:\s*"Person"/i]),
+    headingOrder: sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<h2[\s>]/i]),
+    imageAlt: !/<img(?![^>]*\balt=)[^>]*>/i.test(source),
+    metaRobotsOk: !/noindex/i.test(source),
+    hreflang: /hreflang/i.test(source),
   };
+}
+
+function inspectPage(page: PageSnapshot): PageSignals {
+  return analyzePage(page.source, page.isHtml);
 }
 
 function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
@@ -125,19 +180,29 @@ function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
   const allPage = (predicate: (page: ReturnType<typeof inspectPage>) => boolean) => pageSignals.length > 0 && pageSignals.every(predicate);
   const jsonTypes = [...new Set(pageSignals.flatMap(page => page.jsonLdTypes))];
   const checks: AuditCheck[] = [
-    { id: 'llms', label: '/llms.txt', passed: /generateLlms|#\s+\S+/i.test(llms), weight: 10, details: 'Short site map is present.' },
-    { id: 'llms-full', label: '/llms-full.txt', passed: /generateLlmsFull|##\s+(What it is|Common questions)/i.test(llmsFull), weight: 10, details: 'Full site map is present.' },
-    { id: 'sitemap', label: '/sitemap.xml', passed: /<urlset|generateSitemap|sitemap\s*\(/i.test(sitemap), weight: 10, details: 'A sitemap artifact is present.' },
-    { id: 'robots', label: '/robots.txt', passed: /User-agent:|generateRobots/i.test(robots) && /Sitemap:|sitemap\s*:/i.test(robots), weight: 8, details: 'Robots policy includes a sitemap URL.' },
-    { id: 'title', label: 'Page titles', passed: allPage(page => page.title), weight: 6, details: 'Every inspected page has a title.' },
-    { id: 'description', label: 'Meta descriptions', passed: allPage(page => page.description), weight: 6, details: 'Every inspected page has a meta description.' },
-    { id: 'canonical', label: 'Canonical links', passed: allPage(page => page.canonical), weight: 6, details: 'Every inspected page has a canonical URL.' },
-    { id: 'open-graph', label: 'Open Graph tags', passed: anyPage(page => page.og), weight: 5, details: 'Open Graph tags are present.' },
-    { id: 'twitter', label: 'Twitter tags', passed: anyPage(page => page.twitter), weight: 4, details: 'Twitter card tags are present.' },
-    { id: 'json-ld', label: 'JSON-LD', passed: anyPage(page => page.jsonLd), weight: 10, details: jsonTypes.length ? `Types: ${jsonTypes.join(', ')}.` : 'No schema.org JSON-LD was found.' },
-    { id: 'webmcp', label: 'WebMCP manifest', passed: /generateWebmcp|"tools"|tools\s*[:=]/i.test(webmcp), weight: 8, details: 'A WebMCP-style tool manifest is present.' },
-    { id: 'markdown', label: 'Markdown mirrors', passed: snapshot.mirrors.length > 0, weight: 6, details: snapshot.mirrors.length ? `${snapshot.mirrors.length} mirror file(s) found.` : 'No page markdown mirrors were found.' },
-    { id: 'answer-first', label: 'Answer-first content', passed: anyPage(page => page.h1 && page.earlyFaq), weight: 11, details: 'An inspected page has an H1 and an early FAQ signal.' },
+    // Discovery artifacts (36)
+    { id: 'llms', label: '/llms.txt', passed: /generateLlms|#\s+\S+/i.test(llms), weight: 7, details: 'Short site map is present.' },
+    { id: 'llms-full', label: '/llms-full.txt', passed: /generateLlmsFull|##\s+(What it is|Common questions)/i.test(llmsFull), weight: 7, details: 'Full site map is present.' },
+    { id: 'sitemap', label: '/sitemap.xml', passed: /<urlset|generateSitemap|sitemap\s*\(/i.test(sitemap), weight: 7, details: 'A sitemap artifact is present.' },
+    { id: 'robots', label: '/robots.txt', passed: /User-agent:|generateRobots/i.test(robots) && /Sitemap:|sitemap\s*:/i.test(robots), weight: 5, details: 'Robots policy includes a sitemap URL.' },
+    { id: 'webmcp', label: 'WebMCP manifest', passed: /generateWebmcp|"tools"|tools\s*[:=]/i.test(webmcp), weight: 5, details: 'A WebMCP-style tool manifest is present.' },
+    { id: 'markdown', label: 'Markdown mirrors', passed: snapshot.mirrors.length > 0, weight: 5, details: snapshot.mirrors.length ? `${snapshot.mirrors.length} mirror file(s) found.` : 'No page markdown mirrors were found.' },
+    // Meta and structured data (36)
+    { id: 'title', label: 'Page titles', passed: allPage(page => page.title), weight: 4, details: 'Every inspected page has a title.' },
+    { id: 'description', label: 'Meta descriptions', passed: allPage(page => page.description), weight: 4, details: 'Every inspected page has a meta description.' },
+    { id: 'canonical', label: 'Canonical links', passed: allPage(page => page.canonical), weight: 4, details: 'Every inspected page has a canonical URL.' },
+    { id: 'open-graph', label: 'Open Graph tags', passed: anyPage(page => page.og), weight: 3, details: 'Open Graph tags are present.' },
+    { id: 'twitter', label: 'Twitter tags', passed: anyPage(page => page.twitter), weight: 2, details: 'Twitter card tags are present.' },
+    { id: 'json-ld', label: 'JSON-LD', passed: anyPage(page => page.jsonLd), weight: 8, details: jsonTypes.length ? `Types: ${jsonTypes.join(', ')}.` : 'No schema.org JSON-LD was found.' },
+    { id: 'hreflang', label: 'hreflang alternates', passed: anyPage(page => page.hreflang), weight: 3, details: 'Language alternates are declared.' },
+    { id: 'meta-robots', label: 'Indexable', passed: allPage(page => page.metaRobotsOk), weight: 3, details: 'No page is set to noindex.' },
+    { id: 'image-alt', label: 'Image alt text', passed: allPage(page => page.imageAlt), weight: 2, details: 'Every image has alt text.' },
+    { id: 'heading-order', label: 'Heading structure', passed: anyPage(page => page.headingOrder), weight: 3, details: 'A page has one H1 and section H2s.' },
+    // Answerability — GEO and AEO (28)
+    { id: 'answerability', label: 'Answer-first content', passed: anyPage(page => page.directAnswer && page.h1), weight: 10, details: 'A page opens with a concise, direct answer under a clear H1.' },
+    { id: 'qa-framing', label: 'Question framing', passed: anyPage(page => page.questionHeadings || page.earlyFaq), weight: 6, details: 'Content is framed as questions an engine can quote.' },
+    { id: 'freshness', label: 'Freshness signals', passed: anyPage(page => page.freshness), weight: 6, details: 'Pages show a published or updated date.' },
+    { id: 'author', label: 'Author and E-E-A-T', passed: anyPage(page => page.author), weight: 6, details: 'Pages name an author or organization.' },
   ];
   return checks.map(check => ({ ...check, details: check.passed ? check.details : `Missing: ${check.details.toLowerCase()}` }));
 }

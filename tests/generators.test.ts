@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { defineConfig } from '../src/config.js';
 import {
+  articleJsonLd,
   faqJsonLd,
   generateJsonLd,
   generateLlms,
@@ -8,6 +9,9 @@ import {
   generateRobots,
   generateSitemap,
   generateWebmcp,
+  howToJsonLd,
+  personJsonLd,
+  reviewJsonLd,
 } from '../src/generators/index.js';
 
 const config = defineConfig({
@@ -54,6 +58,71 @@ describe('artifact generators', () => {
     const output = faqJsonLd(config.faq ?? []);
     expect(output['@type']).toBe('FAQPage');
     expect((output.mainEntity as Array<Record<string, unknown>>)[0].name).toBe('Does it post automatically?');
+  });
+
+  it('generates Organization JSON-LD', () => {
+    const output = generateJsonLd(config, 'organization');
+    expect(output['@type']).toBe('Organization');
+    expect(output.name).toBe('Reply Kit');
+    expect(output.url).toBe('https://reply.example');
+  });
+
+  it('generates WebSite JSON-LD with a SearchAction', () => {
+    const output = generateJsonLd(config, 'website');
+    expect(output['@type']).toBe('WebSite');
+    expect(output.name).toBe('Reply Kit');
+    const action = output.potentialAction as Record<string, unknown>;
+    expect(action['@type']).toBe('SearchAction');
+    expect((action.target as Record<string, unknown>).urlTemplate).toBe(
+      'https://reply.example/search?q={search_term_string}'
+    );
+  });
+
+  it('generates Article JSON-LD', () => {
+    const output = articleJsonLd(config, {
+      headline: 'Ship faster replies',
+      authorName: 'Ada',
+      datePublished: '2026-01-01',
+    });
+    expect(output['@type']).toBe('Article');
+    expect(output.headline).toBe('Ship faster replies');
+    expect(output.datePublished).toBe('2026-01-01');
+    expect((output.author as Record<string, unknown>).name).toBe('Ada');
+  });
+
+  it('generates HowTo JSON-LD', () => {
+    const output = howToJsonLd(config, {
+      name: 'Draft a reply',
+      steps: ['Open the post', 'Pick a tone'],
+    });
+    expect(output['@type']).toBe('HowTo');
+    expect(output.name).toBe('Draft a reply');
+    expect((output.step as Array<Record<string, unknown>>)[0]).toEqual({
+      '@type': 'HowToStep',
+      position: 1,
+      text: 'Open the post',
+    });
+  });
+
+  it('generates Person JSON-LD', () => {
+    const output = personJsonLd(config, { name: 'Ada Lovelace', jobTitle: 'Engineer' });
+    expect(output['@type']).toBe('Person');
+    expect(output.name).toBe('Ada Lovelace');
+    expect(output.jobTitle).toBe('Engineer');
+    expect((output.worksFor as Record<string, unknown>)['@type']).toBe('Organization');
+  });
+
+  it('generates Review JSON-LD', () => {
+    const output = reviewJsonLd(config, {
+      authorName: 'Ada',
+      ratingValue: 4,
+      reviewBody: 'Saves an hour a day.',
+    });
+    expect(output['@type']).toBe('Review');
+    expect((output.itemReviewed as Record<string, unknown>).name).toBe('Reply Kit');
+    const rating = output.reviewRating as Record<string, unknown>;
+    expect(rating['@type']).toBe('Rating');
+    expect(rating.ratingValue).toBe(4);
   });
 
   it('generates a sitemap XML document', () => {
