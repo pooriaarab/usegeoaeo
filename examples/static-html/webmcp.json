@@ -1,0 +1,33 @@
+{
+  "name": "GeoWeather",
+  "description": "Weather forecasts and climate data for every location on Earth.",
+  "url": "https://geoweather.example.com",
+  "platforms": ["Web", "iOS", "Android"],
+  "tools": [
+    {
+      "name": "7-day forecast",
+      "description": "Get a seven-day weather forecast for any city.",
+      "url": "https://geoweather.example.com/tools/7-day-forecast"
+    },
+    {
+      "name": "Radar map",
+      "description": "Interactive precipitation radar for your region.",
+      "url": "https://geoweather.example.com/tools/radar-map"
+    },
+    {
+      "name": "Climate comparison",
+      "description": "Compare average temperatures and rainfall across cities.",
+      "url": "https://geoweather.example.com/tools/climate-comparison"
+    }
+  ],
+  "resources": [
+    {
+      "name": "llms",
+      "url": "https://geoweather.example.com/llms.txt"
+    },
+    {
+      "name": "llms-full",
+      "url": "https://geoweather.example.com/llms-full.txt"
+    }
+  ]
+}

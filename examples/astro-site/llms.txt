@@ -1,0 +1,19 @@
+# GeoWeather
+
+> Weather forecasts and climate data for every location on Earth.
+
+## Product
+
+GeoWeather is Weather forecasts and climate data for every location on Earth. It supports Web, iOS, Android.
+
+## Free tools
+
+- [7-day forecast](https://geoweather.example.com/tools/7-day-forecast): Get a seven-day weather forecast for any city.
+- [Radar map](https://geoweather.example.com/tools/radar-map): Interactive precipitation radar for your region.
+- [Climate comparison](https://geoweather.example.com/tools/climate-comparison): Compare average temperatures and rainfall across cities.
+
+## Plans
+
+- Free (USD 0): Current conditions and 3-day forecast.
+- Pro (USD 6): 7-day forecast, radar, and alerts.
+- Enterprise (USD 49): API access and custom integrations.
