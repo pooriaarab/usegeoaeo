@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "template-web",
+  "name": "usegeoaeo-website",
   "main": "../../../../.open-next/worker.js",
   "compatibility_date": "2025-05-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -10,81 +10,24 @@
     "directory": "../../../../.open-next/assets"
   },
   "observability": { "enabled": true },
-
-  "send_email": [{ "name": "EMAIL" }],
   "placement": { "mode": "smart" },
 
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "template-db",
-      "database_id": "local-template-db",
-      "migrations_dir": "../../src/db/migrations"
-    },
-    {
-      "binding": "NEXT_TAG_CACHE_D1",
-      "database_name": "template-tag-cache",
-      "database_id": "local-template-tag-cache",
-      "migrations_dir": "../../src/db/migrations"
-    }
-  ],
-
+  // Trimmed for a marketing site: only the OpenNext incremental cache (KV).
+  // Add D1 / R2 / Queues / Email back when accounts land.
   "kv_namespaces": [
-    { "binding": "NEXT_INC_CACHE_KV", "id": "local-dev-cache", "preview_id": "local-dev-cache" },
-    { "binding": "FLAGS", "id": "local-flags", "preview_id": "local-flags" }
+    { "binding": "NEXT_INC_CACHE_KV", "id": "local-dev-cache", "preview_id": "local-dev-cache" }
   ],
-
-  "r2_buckets": [
-    {
-      "binding": "UPLOADS",
-      "bucket_name": "template-uploads",
-      "preview_bucket_name": "template-uploads"
-    }
-  ],
-
-  "queues": {
-    "producers": [
-      { "binding": "OUTBOX_QUEUE", "queue": "template-outbox" }
-    ]
-  },
 
   "vars": {
-    "ENVIRONMENT": "development",
-    "EMAIL_FROM": "onboarding@localhost",
-    "EMAIL_REPLY_TO": "support@localhost"
+    "ENVIRONMENT": "development"
   },
 
   "env": {
     "production": {
-      "name": "template-web",
+      "name": "usegeoaeo-website",
       "vars": { "ENVIRONMENT": "production" },
-      "d1_databases": [
-        {
-          "binding": "DB",
-          "database_name": "template-db",
-          "database_id": "<D1_DB_ID>",
-          "migrations_dir": "../../src/db/migrations"
-        },
-        {
-          "binding": "NEXT_TAG_CACHE_D1",
-          "database_name": "template-tag-cache",
-          "database_id": "<D1_TAG_CACHE_ID>",
-          "migrations_dir": "../../src/db/migrations"
-        }
-      ],
-      "kv_namespaces": [
-        { "binding": "NEXT_INC_CACHE_KV", "id": "<KV_INC_CACHE_ID>" },
-        { "binding": "FLAGS", "id": "<FLAGS_KV_ID>" }
-      ],
-      "r2_buckets": [
-        {
-          "binding": "UPLOADS",
-          "bucket_name": "template-uploads-prod"
-        }
-      ],
-      "queues": {
-        "producers": [{ "binding": "OUTBOX_QUEUE", "queue": "template-outbox-prod" }]
-      }
+      "kv_namespaces": [{ "binding": "NEXT_INC_CACHE_KV", "id": "<KV_INC_CACHE_ID>" }],
+      "routes": [{ "pattern": "usegeoaeo.com", "custom_domain": true }]
     }
   }
 }
