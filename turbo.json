@@ -5,6 +5,7 @@
     "dev": { "cache": false, "persistent": true },
     "lint": {},
     "typecheck": { "dependsOn": ["^build"] },
-    "test": { "dependsOn": ["^build"] }
+    "test": { "dependsOn": ["^build"] },
+    "geoaeo#test": { "dependsOn": ["^build", "build"] }
   }
 }
