@@ -6,15 +6,27 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-12
+
+### Fixed
+
+- `--version` now derives from `package.json`, so the CLI version cannot drift.
+
+## [0.2.0] - 2026-08-12
+
 ### Added
 
+- Answerability scoring in `audit`: direct-answer detection, question framing, freshness,
+  and author/E-E-A-T, plus hreflang, heading structure, image alt, and indexability. The
+  audit now runs 20 weighted checks that sum to 100.
+- JSON-LD kinds: Organization, WebSite (with SearchAction), Article, HowTo, Person, Review.
+- Generators: OG image (SVG), RSS, hreflang block, and standalone Markdown mirror.
+- `init` scaffolds for Astro, SvelteKit, Nuxt, and Remix.
+- `audit --ci --min-score N` — exits non-zero below the threshold for pipelines.
 - Release parity: `next` (staging) and `latest` (production) npm channels, both gated by
   the same verify step. See `RELEASING.md`.
-- CI workflow: typecheck, test, build, and a CLI smoke run on every push and pull request.
-- `.claude` skill and agent, `CLAUDE.md`, and `AGENTS.md` for agent-driven use.
-- Per-harness setup docs under `docs/harnesses/`.
-- Examples under `examples/` for Next.js, Astro, and static HTML.
-- The GEO/AEO checklist, roadmap, and enhancements docs under `docs/`.
+- CI workflow, a CLI end-to-end test, a `LICENSE` (MIT), `.claude` skill and agent,
+  `CLAUDE.md`, `AGENTS.md`, per-harness docs, examples, and the GEO/AEO checklist.
 
 ### Changed
 
@@ -32,5 +44,7 @@ All notable changes to geoaeo are recorded here. The format follows
 - `humanize` — find and rewrite AI-writing tells in copy.
 - `geoaeo-mcp` — an MCP server exposing `audit`, `gen`, and `humanize`.
 
-[Unreleased]: https://github.com/pooriaarab/geoaeo/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/pooriaarab/geoaeo/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/pooriaarab/geoaeo/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/pooriaarab/geoaeo/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/pooriaarab/geoaeo/releases/tag/v0.1.0
