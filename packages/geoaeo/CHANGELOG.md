@@ -6,6 +6,16 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-13
+
+### Added
+
+- Audit checks for the agent-discovery frontier: MCP server card
+  (`/.well-known/mcp/server-card.json`), agent card (`/.well-known/agent-card.json`),
+  agent skills (`/.well-known/agent-skills/`), and API catalog (`/.well-known/api-catalog`).
+  Weights rebalanced so the 24 checks still sum to 100.
+
+
 ## [0.2.2] - 2026-08-12
 
 ### Fixed

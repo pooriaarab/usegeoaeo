@@ -184,34 +184,44 @@ function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
   const sitemap = snapshot.artifacts.get('sitemap.xml') ?? '';
   const robots = snapshot.artifacts.get('robots.txt') ?? '';
   const webmcp = snapshot.artifacts.get('webmcp') ?? '';
+  const mcpCard = snapshot.artifacts.get('mcp-card') ?? '';
+  const agentCard = snapshot.artifacts.get('agent-card') ?? '';
+  const agentSkills = snapshot.artifacts.get('agent-skills') ?? '';
+  const apiCatalog = snapshot.artifacts.get('api-catalog') ?? '';
   const pageSignals = snapshot.pages.map(inspectPage);
   const anyPage = (predicate: (page: ReturnType<typeof inspectPage>) => boolean) => pageSignals.some(predicate);
   const allPage = (predicate: (page: ReturnType<typeof inspectPage>) => boolean) => pageSignals.length > 0 && pageSignals.every(predicate);
   const jsonTypes = [...new Set(pageSignals.flatMap(page => page.jsonLdTypes))];
+  const has = (value: string) => value.trim().length > 0;
   const checks: AuditCheck[] = [
-    // Discovery artifacts (36)
-    { id: 'llms', label: '/llms.txt', passed: /generateLlms|#\s+\S+/i.test(llms), weight: 7, details: 'Short site map is present.' },
-    { id: 'llms-full', label: '/llms-full.txt', passed: /generateLlmsFull|##\s+(What it is|Common questions)/i.test(llmsFull), weight: 7, details: 'Full site map is present.' },
-    { id: 'sitemap', label: '/sitemap.xml', passed: /<urlset|generateSitemap|sitemap\s*\(/i.test(sitemap), weight: 7, details: 'A sitemap artifact is present.' },
-    { id: 'robots', label: '/robots.txt', passed: /User-agent:|generateRobots/i.test(robots) && /Sitemap:|sitemap\s*:/i.test(robots), weight: 5, details: 'Robots policy includes a sitemap URL.' },
-    { id: 'webmcp', label: 'WebMCP manifest', passed: /generateWebmcp|"tools"|tools\s*[:=]/i.test(webmcp), weight: 5, details: 'A WebMCP-style tool manifest is present.' },
-    { id: 'markdown', label: 'Markdown mirrors', passed: snapshot.mirrors.length > 0, weight: 5, details: snapshot.mirrors.length ? `${snapshot.mirrors.length} mirror file(s) found.` : 'No page markdown mirrors were found.' },
-    // Meta and structured data (36)
+    // Discovery artifacts (30)
+    { id: 'llms', label: '/llms.txt', passed: /generateLlms|#\s+\S+/i.test(llms), weight: 6, details: 'Short site map is present.' },
+    { id: 'llms-full', label: '/llms-full.txt', passed: /generateLlmsFull|##\s+(What it is|Common questions)/i.test(llmsFull), weight: 6, details: 'Full site map is present.' },
+    { id: 'sitemap', label: '/sitemap.xml', passed: /<urlset|generateSitemap|sitemap\s*\(/i.test(sitemap), weight: 6, details: 'A sitemap artifact is present.' },
+    { id: 'robots', label: '/robots.txt', passed: /User-agent:|generateRobots/i.test(robots) && /Sitemap:|sitemap\s*:/i.test(robots), weight: 4, details: 'Robots policy includes a sitemap URL.' },
+    { id: 'webmcp', label: 'WebMCP manifest', passed: /generateWebmcp|"tools"|tools\s*[:=]/i.test(webmcp), weight: 4, details: 'A WebMCP-style tool manifest is present.' },
+    { id: 'markdown', label: 'Markdown mirrors', passed: snapshot.mirrors.length > 0, weight: 4, details: snapshot.mirrors.length ? `${snapshot.mirrors.length} mirror file(s) found.` : 'No page markdown mirrors were found.' },
+    // Meta and structured data (32)
     { id: 'title', label: 'Page titles', passed: allPage(page => page.title), weight: 4, details: 'Every inspected page has a title.' },
     { id: 'description', label: 'Meta descriptions', passed: allPage(page => page.description), weight: 4, details: 'Every inspected page has a meta description.' },
-    { id: 'canonical', label: 'Canonical links', passed: allPage(page => page.canonical), weight: 4, details: 'Every inspected page has a canonical URL.' },
+    { id: 'canonical', label: 'Canonical links', passed: allPage(page => page.canonical), weight: 3, details: 'Every inspected page has a canonical URL.' },
     { id: 'open-graph', label: 'Open Graph tags', passed: anyPage(page => page.og), weight: 3, details: 'Open Graph tags are present.' },
     { id: 'twitter', label: 'Twitter tags', passed: anyPage(page => page.twitter), weight: 2, details: 'Twitter card tags are present.' },
-    { id: 'json-ld', label: 'JSON-LD', passed: anyPage(page => page.jsonLd), weight: 8, details: jsonTypes.length ? `Types: ${jsonTypes.join(', ')}.` : 'No schema.org JSON-LD was found.' },
+    { id: 'json-ld', label: 'JSON-LD', passed: anyPage(page => page.jsonLd), weight: 7, details: jsonTypes.length ? `Types: ${jsonTypes.join(', ')}.` : 'No schema.org JSON-LD was found.' },
     { id: 'hreflang', label: 'hreflang alternates', passed: anyPage(page => page.hreflang), weight: 3, details: 'Language alternates are declared.' },
-    { id: 'meta-robots', label: 'Indexable', passed: allPage(page => page.metaRobotsOk), weight: 3, details: 'No page is set to noindex.' },
-    { id: 'image-alt', label: 'Image alt text', passed: allPage(page => page.imageAlt), weight: 2, details: 'Every image has alt text.' },
+    { id: 'meta-robots', label: 'Indexable', passed: allPage(page => page.metaRobotsOk), weight: 2, details: 'No page is set to noindex.' },
+    { id: 'image-alt', label: 'Image alt text', passed: allPage(page => page.imageAlt), weight: 1, details: 'Every image has alt text.' },
     { id: 'heading-order', label: 'Heading structure', passed: anyPage(page => page.headingOrder), weight: 3, details: 'A page has one H1 and section H2s.' },
-    // Answerability — GEO and AEO (28)
-    { id: 'answerability', label: 'Answer-first content', passed: anyPage(page => page.directAnswer && page.h1), weight: 10, details: 'A page opens with a concise, direct answer under a clear H1.' },
-    { id: 'qa-framing', label: 'Question framing', passed: anyPage(page => page.questionHeadings || page.earlyFaq), weight: 6, details: 'Content is framed as questions an engine can quote.' },
+    // Answerability — GEO and AEO (26)
+    { id: 'answerability', label: 'Answer-first content', passed: anyPage(page => page.directAnswer && page.h1), weight: 9, details: 'A page opens with a concise, direct answer under a clear H1.' },
+    { id: 'qa-framing', label: 'Question framing', passed: anyPage(page => page.questionHeadings || page.earlyFaq), weight: 5, details: 'Content is framed as questions an engine can quote.' },
     { id: 'freshness', label: 'Freshness signals', passed: anyPage(page => page.freshness), weight: 6, details: 'Pages show a published or updated date.' },
     { id: 'author', label: 'Author and E-E-A-T', passed: anyPage(page => page.author), weight: 6, details: 'Pages name an author or organization.' },
+    // Agent interfaces — the AEO frontier (12)
+    { id: 'mcp-card', label: 'MCP server card', passed: has(mcpCard), weight: 4, details: 'An MCP server card is published at /.well-known/mcp/server-card.json.' },
+    { id: 'agent-card', label: 'Agent card', passed: has(agentCard), weight: 4, details: 'An agent card is published at /.well-known/agent-card.json.' },
+    { id: 'agent-skills', label: 'Agent skills', passed: has(agentSkills), weight: 2, details: 'An agent-skills index is published under /.well-known/agent-skills/.' },
+    { id: 'api-catalog', label: 'API catalog', passed: has(apiCatalog), weight: 2, details: 'An API catalog is published at /.well-known/api-catalog.' },
   ];
   return checks.map(check => ({ ...check, details: check.passed ? check.details : `Missing: ${check.details.toLowerCase()}` }));
 }
@@ -225,6 +235,17 @@ async function snapshotDirectory(directory: string): Promise<TargetSnapshot> {
       ? findArtifact(files, name) ?? findArtifact(files, 'webmcp')
       : findArtifact(files, name);
     artifacts.set(name === 'webmcp.json' ? 'webmcp' : name, await readOptional(file));
+  }
+  // Agent-discovery artifacts under .well-known/ (or a route that emits them).
+  const wellKnown: Array<[string, RegExp]> = [
+    ['mcp-card', /well-known\/mcp\/server-card\.json|well-known\/mcp\.json/i],
+    ['agent-card', /well-known\/agent-card\.json|well-known\/ai-plugin\.json/i],
+    ['agent-skills', /well-known\/agent-skills(\/index)?\.json/i],
+    ['api-catalog', /well-known\/api-catalog/i],
+  ];
+  for (const [key, pattern] of wellKnown) {
+    const file = files.find(candidate => pattern.test(candidate.replaceAll('\\', '/')));
+    artifacts.set(key, await readOptional(file));
   }
   const mirrors = files.filter(file => /\.md$|\.md\/route\.ts$/.test(file) && !/README|BUILD_BRIEF/i.test(file));
   const pages: PageSnapshot[] = [];
@@ -256,6 +277,10 @@ async function snapshotUrl(siteUrl: string): Promise<TargetSnapshot> {
     ['sitemap.xml', ['/sitemap.xml']],
     ['robots.txt', ['/robots.txt']],
     ['webmcp', ['/webmcp', '/webmcp.json']],
+    ['mcp-card', ['/.well-known/mcp/server-card.json', '/.well-known/mcp.json']],
+    ['agent-card', ['/.well-known/agent-card.json', '/.well-known/ai-plugin.json']],
+    ['agent-skills', ['/.well-known/agent-skills/index.json', '/.well-known/agent-skills.json']],
+    ['api-catalog', ['/.well-known/api-catalog']],
   ];
   const artifacts = new Map<string, string>();
   for (const [name, paths] of artifactPaths) {
