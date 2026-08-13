@@ -26,6 +26,23 @@ describe('answerability signals', () => {
     expect(signals.questionHeadings).toBe(false);
     expect(signals.author).toBe(false);
   });
+
+  it('reads @type from a @graph-wrapped JSON-LD block', () => {
+    const graph = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "Organization", name: "X" },
+        { "@type": "WebSite", name: "X" },
+      ],
+    });
+    const signals = analyzePage(
+      `<html><head><script type="application/ld+json">${graph}</script></head><body><h1>Hi</h1></body></html>`,
+      true
+    );
+    expect(signals.jsonLd).toBe(true);
+    expect(signals.jsonLdTypes).toContain("Organization");
+    expect(signals.jsonLdTypes).toContain("WebSite");
+  });
 });
 
 describe('audit scorer', () => {
