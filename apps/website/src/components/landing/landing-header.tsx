@@ -6,10 +6,11 @@ import { ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Features", href: "/#features" },
+  { label: "Docs", href: "/docs" },
+  { label: "Checklist", href: "/checklist" },
+  { label: "Tools", href: "/tools" },
+  { label: "FAQ", href: "/#faq" },
 ];
 
 export function LandingHeader() {
@@ -34,35 +35,31 @@ export function LandingHeader() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <div className="size-7 rounded-lg bg-foreground flex items-center justify-center">
-            <span className="text-background text-sm font-bold leading-none">
-              A
-            </span>
+            <span className="text-background text-sm font-bold leading-none">g</span>
           </div>
-          <span className="text-base font-semibold tracking-tight">
-            Acme
-          </span>
+          <span className="text-base font-semibold tracking-tight font-mono">geoaeo</span>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
-            <Link href="/login">Sign in</Link>
+            <a href="https://github.com/pooriaarab/usegeoaeo" target="_blank" rel="noreferrer">GitHub</a>
           </Button>
           <Button asChild size="sm">
-            <Link href="/login">
+            <Link href="/docs">
               Get started
               <ArrowRight />
             </Link>
@@ -75,11 +72,7 @@ export function LandingHeader() {
           className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground"
           aria-label="Toggle menu"
         >
-          {mobileOpen ? (
-            <X className="size-5" />
-          ) : (
-            <Menu className="size-5" />
-          )}
+          {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </div>
 
@@ -88,18 +81,18 @@ export function LandingHeader() {
         <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border px-5 pb-4">
           <nav className="flex flex-col gap-1 mb-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
                 className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </nav>
           <Button asChild size="sm" className="w-full">
-            <Link href="/login">
+            <Link href="/docs">
               Get started
               <ArrowRight />
             </Link>

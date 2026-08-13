@@ -1,57 +1,14 @@
 import Link from "next/link";
 import { Button } from "@template/ui/primitives/button";
 import { Check } from "lucide-react";
-import { cn } from "@template/ui/utils";
 
-const plans = [
-  {
-    name: "Starter",
-    price: "Free",
-    description: "For individuals and small projects",
-    features: [
-      "Up to 3 team members",
-      "1,000 API requests/month",
-      "Basic analytics",
-      "Community support",
-      "1 integration",
-    ],
-    cta: "Get started",
-    featured: false,
-  },
-  {
-    name: "Pro",
-    price: "$29",
-    period: "/month",
-    description: "For growing teams that need more power",
-    features: [
-      "Unlimited team members",
-      "100,000 API requests/month",
-      "Advanced analytics & reports",
-      "Priority support",
-      "Unlimited integrations",
-      "Custom themes",
-      "Audit logs",
-      "API key management",
-    ],
-    cta: "Start free trial",
-    featured: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    description: "For organizations with advanced needs",
-    features: [
-      "Everything in Pro",
-      "Unlimited API requests",
-      "SSO & SAML",
-      "Dedicated support",
-      "Custom SLAs",
-      "On-premise deployment",
-      "Advanced security controls",
-    ],
-    cta: "Contact sales",
-    featured: false,
-  },
+const features = [
+  "The full audit: 20 weighted checks, 0-100 score",
+  "Every generator: llms.txt, sitemap, robots, JSON-LD, WebMCP, RSS, Markdown mirrors",
+  "init scaffolds for Next.js, Astro, SvelteKit, Nuxt, Remix, and static HTML",
+  "MCP server for Claude, Cursor, and other agents",
+  "CI gate: audit --ci --min-score",
+  "No account, no telemetry, no paywall",
 ];
 
 export function PricingSection() {
@@ -63,64 +20,44 @@ export function PricingSection() {
             Pricing
           </p>
           <h2 className="text-fluid-xl sm:text-3xl font-bold tracking-tight mb-3">
-            Simple, transparent pricing
+            Free and open source
           </h2>
           <p className="text-muted-foreground text-fluid-sm sm:text-base">
-            Start free, upgrade when you need to. No hidden fees.
+            geoaeo is MIT licensed. Everything, for everyone, at no cost.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3 max-w-5xl mx-auto">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={cn(
-                "relative rounded-xl border p-6 sm:p-8 flex flex-col",
-                plan.featured
-                  ? "border-primary bg-card shadow-keystone"
-                  : "border-border bg-card",
-              )}
-            >
-              {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-primary-foreground text-xs font-medium px-3 py-1 rounded-full">
-                    Most popular
-                  </span>
-                </div>
-              )}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-1">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {plan.description}
-                </p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-3xl font-bold">{plan.price}</span>
-                  {plan.period && (
-                    <span className="text-sm text-muted-foreground">
-                      {plan.period}
-                    </span>
-                  )}
-                </div>
+        <div className="mx-auto max-w-md">
+          <div className="relative rounded-xl border border-primary bg-card p-6 sm:p-8 flex flex-col shadow-keystone">
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-1">geoaeo</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                The whole toolkit, open source.
+              </p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-bold">$0</span>
+                <span className="text-sm text-muted-foreground">/ forever</span>
               </div>
-              <ul className="space-y-3 mb-8 flex-1">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5">
-                    <Check className="size-4 text-success shrink-0 mt-0.5" />
-                    <span className="text-sm text-muted-foreground">
-                      {feature}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <Button
-                asChild
-                variant={plan.featured ? "default" : "outline"}
-                className="w-full"
-              >
-                <Link href="/login">{plan.cta}</Link>
+            </div>
+            <ul className="space-y-3 mb-8 flex-1">
+              {features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2.5">
+                  <Check className="size-4 text-success shrink-0 mt-0.5" />
+                  <span className="text-sm text-muted-foreground">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-col gap-2">
+              <Button asChild className="w-full">
+                <Link href="/docs">Read the docs</Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full">
+                <a href="https://github.com/pooriaarab/usegeoaeo" target="_blank" rel="noreferrer">
+                  Star on GitHub
+                </a>
               </Button>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

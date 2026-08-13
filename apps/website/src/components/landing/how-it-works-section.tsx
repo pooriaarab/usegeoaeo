@@ -1,26 +1,26 @@
-import { Layers, GitBranch, Rocket } from "lucide-react";
+import { Search, Wand2, Rocket } from "lucide-react";
 
 const steps = [
   {
     num: "01",
-    icon: Layers,
-    title: "Set up your workspace",
+    icon: Search,
+    title: "Audit",
     description:
-      "Create your project, invite your team, and connect your existing tools. Guided onboarding gets you running in under five minutes.",
+      "Run geoaeo audit on your URL or build. Get a 0-100 score and a ranked list of exactly what is missing for search, generative, and answer engines.",
   },
   {
     num: "02",
-    icon: GitBranch,
-    title: "Build and iterate",
+    icon: Wand2,
+    title: "Generate",
     description:
-      "Use the dashboard to manage users, track analytics, and configure integrations. Every change is logged and auditable.",
+      "geoaeo gen writes the files each gap needs: llms.txt, structured data, sitemaps, Markdown mirrors, and a WebMCP manifest, from one config.",
   },
   {
     num: "03",
     icon: Rocket,
-    title: "Scale with confidence",
+    title: "Gate and ship",
     description:
-      "Monitor performance, manage API keys, and control access. From prototype to production without changing tools.",
+      "Add geoaeo audit --ci --min-score to your pipeline so a regression fails the build. Ship knowing your site stays quotable.",
   },
 ];
 
@@ -33,7 +33,7 @@ export function HowItWorksSection() {
             How it works
           </p>
           <h2 className="text-fluid-xl sm:text-3xl font-bold tracking-tight mb-3">
-            Three steps to launch
+            Audit, generate, ship
           </h2>
         </div>
 

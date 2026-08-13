@@ -1,48 +1,48 @@
 import {
-  BarChart3,
-  Shield,
-  Zap,
-  Users,
-  Puzzle,
-  Palette,
+  Gauge,
+  FileText,
+  Braces,
+  Bot,
+  Sparkles,
+  Boxes,
 } from "lucide-react";
 
 const features = [
   {
-    icon: Zap,
-    title: "Lightning Fast",
+    icon: Gauge,
+    title: "Score any site 0-100",
     description:
-      "Built on Next.js with server components and edge functions. Every page loads instantly with zero configuration.",
+      "Audit a live URL or a local build across 20 weighted checks: answerability, structured data, crawlability, freshness, and E-E-A-T.",
   },
   {
-    icon: Puzzle,
-    title: "Powerful Integrations",
+    icon: FileText,
+    title: "Generate the AI files",
     description:
-      "Connect to Slack, GitHub, Stripe, and dozens more. Pre-built connectors get you running in minutes.",
+      "One command writes llms.txt, llms-full.txt, sitemaps, robots, RSS, and Markdown mirrors of your pages for agents to read.",
   },
   {
-    icon: Shield,
-    title: "Secure by Default",
+    icon: Braces,
+    title: "Structured data, done",
     description:
-      "Role-based access control, API key management, and full audit logs. Enterprise-grade security out of the box.",
+      "Ten JSON-LD kinds, including Organization, WebSite with SearchAction, Article, HowTo, and FAQ, ready to drop in.",
   },
   {
-    icon: BarChart3,
-    title: "Real-time Analytics",
+    icon: Bot,
+    title: "MCP server built in",
     description:
-      "Track usage, monitor performance, and understand your users with built-in dashboards and custom reports.",
+      "Run geoaeo as a Model Context Protocol server so Claude, Cursor, and other agents can audit and generate on demand.",
   },
   {
-    icon: Users,
-    title: "Team Collaboration",
+    icon: Sparkles,
+    title: "Answer-first content",
     description:
-      "Invite your team, assign roles, and work together. Activity feeds and notifications keep everyone in sync.",
+      "The humanizer strips AI-writing tells, and the audit rewards direct answers and question framing that engines quote.",
   },
   {
-    icon: Palette,
-    title: "Fully Customizable",
+    icon: Boxes,
+    title: "Works with your stack",
     description:
-      "8 color themes, 6 font families, and a modular component system. Make it yours without fighting the framework.",
+      "Scaffold artifacts into Next.js, Astro, SvelteKit, Nuxt, Remix, or plain static HTML. No lock-in, MIT licensed.",
   },
 ];
 
@@ -55,11 +55,11 @@ export function FeaturesSection() {
             Capabilities
           </p>
           <h2 className="text-fluid-xl sm:text-3xl font-bold tracking-tight mb-3">
-            Everything you need to build and scale
+            Everything an answer engine looks for
           </h2>
           <p className="text-muted-foreground text-fluid-sm sm:text-base">
-            From user management to analytics, integrations to security — a
-            complete toolkit for modern SaaS applications.
+            From the audit that finds the gaps to the generators that fill them,
+            geoaeo is the full toolkit for AI discoverability.
           </p>
         </div>
 

@@ -1,0 +1,29 @@
+# geoaeo
+
+> a free, open-source CLI, MCP server, and library that audits any site for SEO, GEO, and AEO, scores it 0-100, and generates llms.txt, sitemaps, JSON-LD, WebMCP, and Markdown mirrors.
+
+## What it is
+
+geoaeo is a free, open-source CLI, MCP server, and library that audits any site for SEO, GEO, and AEO, scores it 0-100, and generates llms.txt, sitemaps, JSON-LD, WebMCP, and Markdown mirrors..
+
+## Platforms
+
+- No platforms listed.
+
+## Plans
+
+- No plans listed.
+
+## Free tools
+
+- [Site audit](https://usegeoaeo.com/tools): Score any URL 0-100 for SEO, GEO, and AEO.
+- [llms.txt generator](https://usegeoaeo.com/tools): Generate an llms.txt for your site.
+- [JSON-LD generator](https://usegeoaeo.com/tools): Generate schema.org structured data.
+
+## Common questions
+
+Q: What are GEO and AEO?
+A: Generative Engine Optimization and Answer Engine Optimization: making a site easy for AI systems to find, quote, and cite.
+
+Q: Is geoaeo free?
+A: Yes. geoaeo is free and open source under the MIT license. Install it with npm install geoaeo.

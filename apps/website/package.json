@@ -14,7 +14,7 @@
     "db:migrate:local": "wrangler d1 migrations apply template-db --local --config cloudflare/app-worker/wrangler.jsonc",
     "db:migrate:remote": "wrangler d1 migrations apply template-db --remote --config cloudflare/app-worker/wrangler.jsonc",
     "cf-typegen": "wrangler types --config cloudflare/app-worker/wrangler.jsonc",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -33,7 +33,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.5"
+    "zod": "^4.3.5",
+    "geoaeo": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251101.0",

@@ -106,8 +106,17 @@ export function analyzePage(source: string, isHtml: boolean): PageSignals {
       .get()
       .flatMap(value => {
         try {
-          const parsed = JSON.parse(value) as { '@type'?: string | string[] };
-          return parsed['@type'] ? (Array.isArray(parsed['@type']) ? parsed['@type'] : [parsed['@type']]) : [];
+          const parsed = JSON.parse(value) as Record<string, unknown>;
+          // A script can hold a single node, an array of nodes, or a { "@graph": [...] } wrapper.
+          const nodes = Array.isArray(parsed)
+            ? parsed
+            : Array.isArray((parsed as { '@graph'?: unknown[] })['@graph'])
+              ? ((parsed as { '@graph': unknown[] })['@graph'])
+              : [parsed];
+          return nodes.flatMap(node => {
+            const type = (node as { '@type'?: string | string[] })?.['@type'];
+            return type ? (Array.isArray(type) ? type : [type]) : [];
+          });
         } catch {
           return [];
         }

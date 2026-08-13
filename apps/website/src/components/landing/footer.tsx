@@ -1,10 +1,12 @@
 import Link from "next/link";
 
 const footerLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Docs", href: "#" },
+  { label: "Docs", href: "/docs" },
+  { label: "Checklist", href: "/checklist" },
+  { label: "Examples", href: "/examples" },
+  { label: "Tools", href: "/tools" },
+  { label: "GitHub", href: "https://github.com/pooriaarab/usegeoaeo" },
+  { label: "npm", href: "https://www.npmjs.com/package/geoaeo" },
 ];
 
 export function Footer() {
@@ -13,15 +15,13 @@ export function Footer() {
       <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <div className="size-6 rounded-md bg-foreground flex items-center justify-center">
-            <span className="text-background text-xs font-bold leading-none">
-              A
-            </span>
+            <span className="text-background text-xs font-bold leading-none">g</span>
           </div>
           <span className="text-sm text-muted-foreground">
-            Acme &mdash; Modern SaaS Platform
+            geoaeo &mdash; SEO, GEO &amp; AEO for any app
           </span>
         </div>
-        <nav className="hidden sm:flex items-center gap-4">
+        <nav className="flex flex-wrap items-center justify-center gap-4">
           {footerLinks.map((link) => (
             <Link
               key={link.label}
@@ -33,7 +33,7 @@ export function Footer() {
           ))}
         </nav>
         <p className="text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Acme Inc. All rights reserved.
+          &copy; {new Date().getFullYear()} geoaeo &middot; MIT
         </p>
       </div>
     </footer>

@@ -11,9 +11,9 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Cloudflare Master Template — The platform for modern teams",
+  title: "geoaeo | Make any site quotable by AI answer engines",
   description:
-    "Build, deploy, and manage your applications with a unified Cloudflare-native full-stack template: OpenNext, D1, Better Auth, and more.",
+    "geoaeo audits any site for SEO, GEO, and AEO, scores it 0 to 100, and generates llms.txt, sitemap, robots, JSON-LD, WebMCP, and Markdown mirrors. CLI, MCP server, and library. Free and open source under the MIT license.",
 };
 
 function CTAFooter() {
@@ -21,14 +21,15 @@ function CTAFooter() {
     <section className="py-16 sm:py-24 px-5">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-fluid-xl sm:text-3xl font-bold tracking-tight mb-3">
-          Ready to get started?
+          Make your site answerable
         </h2>
         <p className="text-muted-foreground mb-6">
-          Start for free. Upgrade when you need to.
+          Install geoaeo and audit your first site in a minute. Free and open
+          source under the MIT license.
         </p>
         <Button asChild size="lg">
-          <Link href="/login">
-            Get started free
+          <Link href="/docs">
+            Get started
             <ArrowRight />
           </Link>
         </Button>
