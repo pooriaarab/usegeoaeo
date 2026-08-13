@@ -6,6 +6,19 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-08-12
+
+### Fixed
+
+- `audit` now reads `@type` from JSON-LD nodes inside a `@graph` wrapper, the common
+  real-world shape it previously missed.
+
+### Added
+
+- `robots.txt` now explicitly welcomes AI answer-engine crawlers (GPTBot, ClaudeBot,
+  PerplexityBot, Google-Extended, and more).
+
+
 ## [0.2.1] - 2026-08-12
 
 ### Fixed
