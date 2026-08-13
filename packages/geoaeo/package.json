@@ -1,6 +1,6 @@
 {
   "name": "geoaeo",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "GEO and AEO artifacts for answer engines and agents",
   "type": "module",
   "license": "MIT",
