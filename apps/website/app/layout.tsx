@@ -15,6 +15,8 @@ export const metadata: Metadata = {
     template: "%s | geoaeo",
   },
   description,
+  authors: [{ name: "Pooria Arab", url: "https://github.com/pooriaarab" }],
+  creator: "Pooria Arab",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -41,7 +43,9 @@ const jsonLd = {
       url: "https://usegeoaeo.com",
       name: "geoaeo",
       description,
+      datePublished: "2026-08-12",
       publisher: { "@id": "https://usegeoaeo.com/#org" },
+      author: { "@id": "https://usegeoaeo.com/#org" },
       potentialAction: {
         "@type": "SearchAction",
         target: "https://usegeoaeo.com/tools?url={search_term_string}",
