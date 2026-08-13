@@ -14,7 +14,7 @@
     "db:migrate:local": "wrangler d1 migrations apply template-db --local --config cloudflare/app-worker/wrangler.jsonc",
     "db:migrate:remote": "wrangler d1 migrations apply template-db --remote --config cloudflare/app-worker/wrangler.jsonc",
     "cf-typegen": "wrangler types --config cloudflare/app-worker/wrangler.jsonc",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test"
   },
   "dependencies": {
