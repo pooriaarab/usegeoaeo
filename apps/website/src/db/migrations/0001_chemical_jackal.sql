@@ -1,1 +1,0 @@
-ALTER TABLE `auth_account` ADD `password` text(4000);

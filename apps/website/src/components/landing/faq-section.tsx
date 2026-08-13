@@ -5,34 +5,34 @@ import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
-    question: "What is this template for?",
+    question: "What are GEO and AEO?",
     answer:
-      "This is a production-ready Next.js admin dashboard template. It includes authentication, user management, a full design system, data tables, settings pages, and more — everything you need to ship a SaaS product.",
+      "GEO is Generative Engine Optimization and AEO is Answer Engine Optimization. They are the practice of making your site easy for AI systems like ChatGPT, Claude, Perplexity, and Google AI to find, quote, and cite, the way SEO does for classic search. geoaeo covers all three: SEO, GEO, and AEO.",
   },
   {
-    question: "What tech stack does it use?",
+    question: "What does geoaeo actually do?",
     answer:
-      "Next.js on Cloudflare Workers via OpenNext, TypeScript, Tailwind CSS v4, shadcn/ui (@template/ui), Better Auth on D1 for sessions, Drizzle over Cloudflare D1, R2 for uploads, KV for flags/cache, Queues + Cron Workers for background work, Turnstile for bots, and bun as the package manager. Design tokens use OKLCh for precise theming.",
+      "It audits any site 0-100 across 20 weighted checks, then generates the files answer engines need: llms.txt, llms-full.txt, sitemaps, robots, JSON-LD structured data, a WebMCP manifest, and Markdown mirrors of your pages. It also humanizes copy and runs as an MCP server.",
   },
   {
-    question: "Can I customize the design?",
+    question: "Does it work with my framework?",
     answer:
-      "Absolutely. The template ships with 8 color themes (Nord, Dracula, Catppuccin, GitHub, Solarized, Rose Pine, Tokyo Night) and 6 font families. All colors use semantic tokens, so switching themes is instant and consistent.",
+      "Yes. geoaeo init scaffolds the right routes for Next.js, Astro, SvelteKit, Nuxt, and Remix, and writes static files for plain HTML sites. The audit works on a live URL or a local build directory, whatever you use.",
   },
   {
-    question: "Is it suitable for production use?",
+    question: "How do I use it with Claude, Cursor, or another agent?",
     answer:
-      "Yes. It includes middleware-based route protection, API key management, audit logging, role-based access control patterns, and comprehensive error handling. The architecture is designed to scale from prototype to production.",
+      "geoaeo ships an MCP server (geoaeo-mcp) that exposes audit, gen, and humanize as tools. Point your agent at it and it can score and fix a site on demand. The docs have a setup page for each harness.",
   },
   {
-    question: "How does the DataTable work?",
+    question: "Is it free?",
     answer:
-      "The DataTable is built on TanStack Table with virtualization for large datasets, column sorting, filtering, resizing, reordering, row selection with bulk actions, persistent settings via localStorage, and a display popover for grouping and ordering.",
+      "Yes. geoaeo is free and open source under the MIT license. Install it with npm install geoaeo. There is no account, no paywall, and no telemetry.",
   },
   {
-    question: "Can I use a different auth provider?",
+    question: "Can I gate my CI on the score?",
     answer:
-      "This template ships Better Auth with a D1 adapter (edge-native). The app obtains the session via Better Auth helpers rather than Firebase. You can still introduce another provider, but D1/Workers compatibility must be verified — that is the intentional Cloudflare baseline, not a leftover Firebase path.",
+      "Yes. Run geoaeo audit --ci --min-score 85 in your pipeline and the command exits non-zero when the score drops below your threshold, so a regression fails the build.",
   },
 ];
 
