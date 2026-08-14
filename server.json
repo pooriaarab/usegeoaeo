@@ -1,29 +1,22 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "io.github.pooriaarab/usegeoaeo",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.pooriaarab/geoaeo",
   "description": "stdio MCP that audits sites and generates GEO/AEO artifacts.",
+  "version": "0.3.1",
   "repository": {
     "url": "https://github.com/pooriaarab/usegeoaeo",
-    "source": "github",
-    "subfolder": "packages/geoaeo"
+    "source": "github"
   },
-  "version": "0.3.0",
-  "websiteUrl": "https://usegeoaeo.com",
   "packages": [
     {
-      "registry_type": "npm",
-      "registry_base_url": "https://registry.npmjs.org",
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "geoaeo",
-      "version": "0.3.0",
-      "runtime_hint": "npx",
-      "transport": {
-        "type": "stdio"
-      },
-      "package_arguments": [
-        {
-          "type": "positional",
-          "value": "mcp"
-        }
+      "version": "0.3.1",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "npx",
+      "packageArguments": [
+        { "type": "positional", "valueHint": "subcommand", "value": "mcp" }
       ]
     }
   ]
