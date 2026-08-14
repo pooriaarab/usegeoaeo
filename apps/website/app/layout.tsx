@@ -57,7 +57,16 @@ const jsonLd = {
       name: "geoaeo",
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Node.js",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      offers: {
+        "@type": "Offer",
+        name: "geoaeo open source",
+        price: "0",
+        priceCurrency: "USD",
+        availability: "https://schema.org/InStock",
+        url: "https://www.npmjs.com/package/geoaeo",
+        description:
+          "Free and open-source under the MIT license. Install with npm i geoaeo. Hosted tools at https://usegeoaeo.com/tools are free. No paid tier.",
+      },
       description,
     },
   ],
