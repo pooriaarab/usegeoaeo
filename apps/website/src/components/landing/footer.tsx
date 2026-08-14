@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "../brand/logo";
 
 const footerLinks = [
   { label: "Docs", href: "/docs" },
@@ -14,9 +15,7 @@ export function Footer() {
     <footer className="border-t border-border py-8 px-5">
       <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
-          <div className="size-6 rounded-md bg-foreground flex items-center justify-center">
-            <span className="text-background text-xs font-bold leading-none">g</span>
-          </div>
+          <LogoMark className="size-6" />
           <span className="text-sm text-muted-foreground">
             geoaeo &mdash; SEO, GEO &amp; AEO for any app
           </span>

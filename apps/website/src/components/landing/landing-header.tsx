@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LogoMark } from "../brand/logo";
 import { Button } from "@template/ui/primitives/button";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -33,10 +34,8 @@ export function LandingHeader() {
     >
       <div className="mx-auto max-w-6xl flex items-center justify-between px-5 h-14 sm:h-16">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="size-7 rounded-lg bg-foreground flex items-center justify-center">
-            <span className="text-background text-sm font-bold leading-none">g</span>
-          </div>
+        <Link href="/" aria-label="geoaeo home" className="flex items-center gap-2.5 shrink-0">
+          <LogoMark className="size-7" />
           <span className="text-base font-semibold tracking-tight font-mono">geoaeo</span>
         </Link>
 
