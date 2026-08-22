@@ -1,24 +1,51 @@
 # geoaeo
 
-> a free, open-source CLI, MCP server, and library that audits any site for SEO, GEO, and AEO, scores it 0-100, and generates llms.txt, sitemaps, JSON-LD, WebMCP, and Markdown mirrors.
+> Free, open-source CLI, MCP server, and library that audits any site 0-100 for SEO, GEO, and AEO and generates llms.txt, sitemaps, JSON-LD, WebMCP, and Markdown mirrors.
 
 ## What it is
 
-geoaeo is a free, open-source CLI, MCP server, and library that audits any site for SEO, GEO, and AEO, scores it 0-100, and generates llms.txt, sitemaps, JSON-LD, WebMCP, and Markdown mirrors..
+geoaeo makes any app discoverable, quotable, and usable by AI answer engines and search — SEO, GEO, and AEO in one tool. It audits a live URL or local site directory, scores it 0-100 across 20 weighted checks (answerability, structured data, llms.txt, crawlability, freshness, E-E-A-T), and generates the files answer engines read. It ships a library, a CLI, and an MCP server at one version.
 
-## Platforms
+## Docs
 
-- No platforms listed.
+- [Install](https://usegeoaeo.com/docs/install): `npm install geoaeo`, `npx geoaeo init`, `geoaeo.config.ts`
+- [CLI reference](https://usegeoaeo.com/docs/cli): `audit <url|dir>`, `init`, `gen <artifact>`, `humanize`, `mcp`
+- [MCP server](https://usegeoaeo.com/docs/mcp): `npx geoaeo-mcp` over stdio, tools `audit`, `gen`, `humanize`
+- [Harnesses](https://usegeoaeo.com/docs): Claude Code, Cursor, Windsurf, Codex, Gemini CLI, GitHub Copilot, Continue setup
+- [GEO/AEO checklist](https://usegeoaeo.com/checklist): 20 checks with fixes
+- [Examples](https://usegeoaeo.com/examples): static-html 80, nextjs-app 48, astro-site 46
+- [Docs index](https://usegeoaeo.com/docs)
 
-## Plans
+## API
 
-- No plans listed.
+geoaeo is an npm library, not a hosted API:
 
-## Free tools
+- Library: `import { auditTarget, generateLlms, humanizeText } from 'geoaeo'`
+- npm: https://www.npmjs.com/package/geoaeo
+- GitHub: https://github.com/pooriaarab/usegeoaeo
+- MCP: `npx geoaeo-mcp` (bin `geoaeo-mcp`, also `npx geoaeo mcp`) over stdio
+
+## Pricing
+
+Free and open-source under the MIT license. `npm i geoaeo`. Hosted tools at https://usegeoaeo.com/tools are free. No paid tier.
+
+## Tools
 
 - [Site audit](https://usegeoaeo.com/tools): Score any URL 0-100 for SEO, GEO, and AEO.
 - [llms.txt generator](https://usegeoaeo.com/tools): Generate an llms.txt for your site.
 - [JSON-LD generator](https://usegeoaeo.com/tools): Generate schema.org structured data.
+
+## Agents
+
+- [agents.md](https://usegeoaeo.com/agents.md): guide for AI agents that discover, evaluate, or use geoaeo
+- [WebMCP](https://usegeoaeo.com/webmcp.json): machine-readable tools manifest
+- [agent-card](https://usegeoaeo.com/.well-known/agent-card.json): A2A-style agent card
+
+## More
+
+- [sitemap.xml](https://usegeoaeo.com/sitemap.xml)
+- [robots.txt](https://usegeoaeo.com/robots.txt)
+- [llms.txt](https://usegeoaeo.com/llms.txt)
 
 ## Common questions
 
@@ -26,4 +53,10 @@ Q: What are GEO and AEO?
 A: Generative Engine Optimization and Answer Engine Optimization: making a site easy for AI systems to find, quote, and cite.
 
 Q: Is geoaeo free?
-A: Yes. geoaeo is free and open source under the MIT license. Install it with npm install geoaeo.
+A: Yes. Free and open source under the MIT license. Install it with `npm install geoaeo`.
+
+Q: Does it work with my framework?
+A: Yes. `npx geoaeo init` detects Next.js, Astro, SvelteKit, Nuxt, and Remix and writes App Router routes or static files. Any other site gets static artifacts.
+
+Q: What does audit check?
+A: 20 weighted checks for answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T. Run `npx geoaeo audit <url|dir>` for the score and gap list.
