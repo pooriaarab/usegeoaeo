@@ -5,8 +5,9 @@ import "./globals.css";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+// 150 characters. The previous one ran to 186 and Google cut it mid-list.
 const description =
-  "Audit any site for search engines and AI answer engines. Score it 0 to 100, then generate llms.txt, sitemap, robots, JSON-LD, WebMCP, and Markdown mirrors. Free and open source (MIT).";
+  "Audit any site for search and AI answer engines, score it 0 to 100, then generate llms.txt, sitemap, robots, JSON-LD, WebMCP, and Markdown mirrors.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://usegeoaeo.com"),
@@ -24,8 +25,29 @@ export const metadata: Metadata = {
     siteName: "geoaeo",
     title: "geoaeo | SEO, GEO, and AEO for any site",
     description,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "geoaeo — audit any site for search and AI answer engines",
+      },
+    ],
   },
-  twitter: { card: "summary_large_image", title: "geoaeo", description },
+  twitter: {
+    card: "summary_large_image",
+    title: "geoaeo",
+    description,
+    images: ["/og-image.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  manifest: "/site.webmanifest",
 };
 
 const jsonLd = {
