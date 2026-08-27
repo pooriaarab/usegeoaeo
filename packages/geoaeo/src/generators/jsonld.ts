@@ -194,20 +194,28 @@ export function reviewJsonLd(
   };
 }
 
+function createBreadcrumbItems(config: SiteConfig): Array<{ name: string; url: string }> {
+  const base = [{ name: config.siteName, url: config.siteUrl }];
+  if (config.tools.length === 0) return base;
+  return [...base, { name: config.tools[0].name, url: absoluteUrl(config.siteUrl, config.tools[0].url) }];
+}
+
+function getJsonLdRenderer(kind: JsonLdKind): (config: SiteConfig) => Record<string, unknown> {
+  const renderers: Record<JsonLdKind, (config: SiteConfig) => Record<string, unknown>> = {
+    software: softwareApplicationJsonLd,
+    product: productJsonLd,
+    faq: config => faqJsonLd(config.faq ?? []),
+    breadcrumb: config => breadcrumbJsonLd(createBreadcrumbItems(config)),
+    organization: organizationJsonLd,
+    website: webSiteJsonLd,
+    article: config => articleJsonLd(config),
+    howto: config => howToJsonLd(config),
+    person: config => personJsonLd(config),
+    review: config => reviewJsonLd(config),
+  };
+  return renderers[kind] ?? softwareApplicationJsonLd;
+}
+
 export function generateJsonLd(config: SiteConfig, kind: JsonLdKind = 'software'): Record<string, unknown> {
-  if (kind === 'product') return productJsonLd(config);
-  if (kind === 'faq') return faqJsonLd(config.faq ?? []);
-  if (kind === 'breadcrumb') {
-    return breadcrumbJsonLd([
-      { name: config.siteName, url: config.siteUrl },
-      ...(config.tools.length ? [{ name: config.tools[0].name, url: absoluteUrl(config.siteUrl, config.tools[0].url) }] : []),
-    ]);
-  }
-  if (kind === 'organization') return organizationJsonLd(config);
-  if (kind === 'website') return webSiteJsonLd(config);
-  if (kind === 'article') return articleJsonLd(config);
-  if (kind === 'howto') return howToJsonLd(config);
-  if (kind === 'person') return personJsonLd(config);
-  if (kind === 'review') return reviewJsonLd(config);
-  return softwareApplicationJsonLd(config);
+  return getJsonLdRenderer(kind)(config);
 }

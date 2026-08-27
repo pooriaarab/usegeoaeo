@@ -11,13 +11,16 @@ export interface HumanizeResult {
   findings: HumanizeFinding[];
 }
 
-function applyRule(
-  text: string,
-  findings: HumanizeFinding[],
-  rule: string,
-  pattern: RegExp,
-  replacement: string | ((...matches: string[]) => string)
-): string {
+interface ApplyRuleOptions {
+  text: string;
+  findings: HumanizeFinding[];
+  rule: string;
+  pattern: RegExp;
+  replacement: string | ((...matches: string[]) => string);
+}
+
+function applyRule(options: ApplyRuleOptions): string {
+  const { text, findings, rule, pattern, replacement } = options;
   return text.replace(pattern, (...matches) => {
     const before = matches[0];
     const after = typeof replacement === 'function' ? replacement(...matches) : before.replace(pattern, replacement);
@@ -39,12 +42,12 @@ function sentenceCaseHeading(heading: string): string {
 }
 
 function rewriteHeadings(text: string, findings: HumanizeFinding[]): string {
-  let output = applyRule(text, findings, 'sentence-case-heading', /^(#{1,6}\s+)([^\n]+)$/gm, (...matches) => {
+  let output = applyRule({ text, findings, rule: 'sentence-case-heading', pattern: /^(#{1,6}\s+)([^\n]+)$/gm, replacement: (...matches) => {
     return `${matches[1]}${sentenceCaseHeading(matches[2])}`;
-  });
-  output = applyRule(output, findings, 'sentence-case-heading', /(<h[1-6][^>]*>)([^<]+)(<\/h[1-6]>)/gi, (...matches) => {
+  } });
+  output = applyRule({ text: output, findings, rule: 'sentence-case-heading', pattern: /(<h[1-6][^>]*>)([^<]+)(<\/h[1-6]>)/gi, replacement: (...matches) => {
     return `${matches[1]}${sentenceCaseHeading(matches[2])}${matches[3]}`;
-  });
+  } });
   return output;
 }
 
@@ -63,39 +66,39 @@ function restore(masked: string, blocks: string[]): string {
 
 function transformVisible(text: string, findings: HumanizeFinding[]): string {
   let output = text;
-  output = applyRule(output, findings, 'curly-quotes', /[“”]/g, '"');
-  output = applyRule(output, findings, 'curly-apostrophe', /[‘’]/g, "'");
-  output = applyRule(output, findings, 'em-dash-range', /(\b\d+)\s*—\s*(\d+\b)/g, '$1 to $2');
-  output = applyRule(output, findings, 'em-dash', /\s*—\s*/g, ', ');
-  output = applyRule(output, findings, 'negative-parallelism', /It(?:'s| is) not just [^,.!?]+,\s*it(?:'s| is)\s+([^.!?]+)/gi, '$1');
-  output = applyRule(output, findings, 'copula-avoidance', /\b(?:serves|stands|functions|acts) as\b/gi, 'is');
-  output = applyRule(output, findings, 'copula-avoidance', /\bboasts\b/gi, 'has');
-  output = applyRule(output, findings, 'filler', /\bin order to\b/gi, 'to');
-  output = applyRule(output, findings, 'filler', /\bat the end of the day,?\s*/gi, '');
-  output = applyRule(output, findings, 'filler', /\bit(?:'s| is) important to note that\s*/gi, '');
-  output = applyRule(output, findings, 'rule-of-three', /\b(innovative|intuitive|powerful),\s*(\w+),\s*and\s+(\w+)\b/gi, '$1 and $2');
-  output = applyRule(output, findings, 'fake-depth', /,?\s*(?:highlighting|underscoring|emphasizing|ensuring|reflecting|symbolizing|showcasing|contributing to|fostering|cultivating)\s+[^.!?]+/gi, '');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bseamless(?:ly)?\b/gi, 'simple');
-  output = applyRule(output, findings, 'ai-vocabulary', /\brobust\b/gi, 'strong');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bleverage\b|\bleveraging\b/gi, 'use');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bvibrant\b/gi, 'lively');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bshowcase\b|\bshowcasing\b/gi, 'show');
-  output = applyRule(output, findings, 'ai-vocabulary', /\belevate\b/gi, 'improve');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bunlock\b/gi, 'allow');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bdeep dive\b/gi, 'detailed look');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bstreamline\b|\bstreamlined\b/gi, 'simplify');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bempower\b/gi, 'help');
-  output = applyRule(output, findings, 'ai-vocabulary', /\btestament\b/gi, 'proof');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bpivotal\b/gi, 'important');
-  output = applyRule(output, findings, 'ai-vocabulary', /\b(?:abstract )?landscape\b/gi, 'area');
-  output = applyRule(output, findings, 'ai-vocabulary', /\btapestry\b/gi, 'mix');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bfoster\b|\bfostering\b/gi, 'support');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bcomprehensive\b/gi, 'full');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bcrucial\b/gi, 'important');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bdelve\b/gi, 'examine');
-  output = applyRule(output, findings, 'ai-vocabulary', /\bnavigate\b/gi, 'handle');
-  output = applyRule(output, findings, 'ai-vocabulary', /\brealm\b/gi, 'area');
-  output = applyRule(output, findings, 'hype-closer', /(?:The future looks bright[^.!?]*[.!?]|Exciting times lie ahead[^.!?]*[.!?])/gi, '');
+  output = applyRule({ text: output, findings, rule: 'curly-quotes', pattern: /[“”]/g, replacement: '"' });
+  output = applyRule({ text: output, findings, rule: 'curly-apostrophe', pattern: /[‘’]/g, replacement: "'" });
+  output = applyRule({ text: output, findings, rule: 'em-dash-range', pattern: /(\b\d+)\s*—\s*(\d+\b)/g, replacement: '$1 to $2' });
+  output = applyRule({ text: output, findings, rule: 'em-dash', pattern: /\s*—\s*/g, replacement: ', ' });
+  output = applyRule({ text: output, findings, rule: 'negative-parallelism', pattern: /It(?:'s| is) not just [^,.!?]+,\s*it(?:'s| is)\s+([^.!?]+)/gi, replacement: '$1' });
+  output = applyRule({ text: output, findings, rule: 'copula-avoidance', pattern: /\b(?:serves|stands|functions|acts) as\b/gi, replacement: 'is' });
+  output = applyRule({ text: output, findings, rule: 'copula-avoidance', pattern: /\bboasts\b/gi, replacement: 'has' });
+  output = applyRule({ text: output, findings, rule: 'filler', pattern: /\bin order to\b/gi, replacement: 'to' });
+  output = applyRule({ text: output, findings, rule: 'filler', pattern: /\bat the end of the day,?\s*/gi, replacement: '' });
+  output = applyRule({ text: output, findings, rule: 'filler', pattern: /\bit(?:'s| is) important to note that\s*/gi, replacement: '' });
+  output = applyRule({ text: output, findings, rule: 'rule-of-three', pattern: /\b(innovative|intuitive|powerful),\s*(\w+),\s*and\s+(\w+)\b/gi, replacement: '$1 and $2' });
+  output = applyRule({ text: output, findings, rule: 'fake-depth', pattern: /,?\s*(?:highlighting|underscoring|emphasizing|ensuring|reflecting|symbolizing|showcasing|contributing to|fostering|cultivating)\s+[^.!?]+/gi, replacement: '' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bseamless(?:ly)?\b/gi, replacement: 'simple' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\brobust\b/gi, replacement: 'strong' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bleverage\b|\bleveraging\b/gi, replacement: 'use' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bvibrant\b/gi, replacement: 'lively' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bshowcase\b|\bshowcasing\b/gi, replacement: 'show' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\belevate\b/gi, replacement: 'improve' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bunlock\b/gi, replacement: 'allow' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bdeep dive\b/gi, replacement: 'detailed look' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bstreamline\b|\bstreamlined\b/gi, replacement: 'simplify' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bempower\b/gi, replacement: 'help' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\btestament\b/gi, replacement: 'proof' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bpivotal\b/gi, replacement: 'important' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\b(?:abstract )?landscape\b/gi, replacement: 'area' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\btapestry\b/gi, replacement: 'mix' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bfoster\b|\bfostering\b/gi, replacement: 'support' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bcomprehensive\b/gi, replacement: 'full' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bcrucial\b/gi, replacement: 'important' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bdelve\b/gi, replacement: 'examine' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\bnavigate\b/gi, replacement: 'handle' });
+  output = applyRule({ text: output, findings, rule: 'ai-vocabulary', pattern: /\brealm\b/gi, replacement: 'area' });
+  output = applyRule({ text: output, findings, rule: 'hype-closer', pattern: /(?:The future looks bright[^.!?]*[.!?]|Exciting times lie ahead[^.!?]*[.!?])/gi, replacement: '' });
   const cleaned = output.replace(/[ \t]{2,}/g, ' ').replace(/ +([,.!?])/g, '$1');
   // Re-capitalize the first word when a leading filler removal left it lowercase.
   return cleaned.replace(/^(\s*)([a-z])/, (_m, ws, ch) => ws + ch.toUpperCase());
