@@ -94,8 +94,8 @@ function handleElementNode(node: HTMLElement, text: string): string {
   if (node.dataset.urlValue) return text + node.dataset.urlValue;
   if (node.tagName === 'BR') return text + '\n';
   if (node.tagName === 'DIV' || node.tagName === 'P') {
-    const prefix = text.length > 0 && !text.endsWith('\n') ? '\n' : '';
-    return prefix + text + extractRawText(node);
+    const separator = text.length > 0 && !text.endsWith('\n') ? '\n' : '';
+    return text + separator + extractRawText(node);
   }
   return text;
 }
