@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { Command, X } from "lucide-react";
-import { cn } from "../utils";
+import * as React from 'react';
+import { Command, X } from 'lucide-react';
+import { cn } from '../utils';
 
-const transformOriginStyle = { transformOrigin: "bottom center" } as const;
+const transformOriginStyle = { transformOrigin: 'bottom center' } as const;
 
 export interface BottomBulkActionsBarProps {
   count: number;
@@ -35,9 +35,7 @@ function SelectionSection({
       >
         <span className="font-semibold">{count}</span>
         &nbsp;
-        <span className="hidden sm:inline">
-          {count === 1 ? itemNameSingular : itemNamePlural}
-        </span>
+        <span className="hidden sm:inline">{count === 1 ? itemNameSingular : itemNamePlural}</span>
         <span className="inline sm:hidden">selected</span>
       </button>
       <button
@@ -52,16 +50,39 @@ function SelectionSection({
   );
 }
 
-export function BottomBulkActionsBar({
+function BarContent({
   count,
   onClear,
   onActionsClick,
-  itemNameSingular = "item",
-  itemNamePlural = "items",
-  className,
+  itemNameSingular = 'item',
+  itemNamePlural = 'items',
 }: BottomBulkActionsBarProps) {
-  const [isVisible, setIsVisible] = React.useState(false);
+  return (
+    <div className="inline-flex items-center gap-0 bg-background rounded-lg border border-border shadow-lg w-full max-w-[400px] sm:w-auto sm:max-w-none">
+      <SelectionSection
+        count={count}
+        onClear={onClear}
+        itemNameSingular={itemNameSingular}
+        itemNamePlural={itemNamePlural}
+      />
+      <div className="h-[22px] w-px bg-border" />
+      <div className="flex items-center px-3 py-2">
+        <button
+          type="button"
+          onClick={onActionsClick}
+          aria-label="Open command menu"
+          className="flex items-center gap-2 text-sm font-medium hover:text-foreground/80 transition-colors"
+        >
+          <Command className="h-4 w-4" aria-hidden="true" />
+          <span>Actions</span>
+        </button>
+      </div>
+    </div>
+  );
+}
 
+function useDelayedVisible(count: number) {
+  const [isVisible, setIsVisible] = React.useState(false);
   React.useEffect(() => {
     if (count > 0) {
       const timer = setTimeout(() => setIsVisible(true), 10);
@@ -69,40 +90,36 @@ export function BottomBulkActionsBar({
     }
     setIsVisible(false);
   }, [count]);
+  return isVisible;
+}
 
+export function BottomBulkActionsBar({
+  count,
+  onClear,
+  onActionsClick,
+  itemNameSingular = 'item',
+  itemNamePlural = 'items',
+  className,
+}: BottomBulkActionsBarProps) {
+  const isVisible = useDelayedVisible(count);
   if (count === 0) return null;
-
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-center pb-6 px-4 transition-[transform,opacity] duration-200 ease-in-out md:pb-4",
-        isVisible
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 translate-y-4 pointer-events-none",
+        'fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-center pb-6 px-4 transition-[transform,opacity] duration-200 ease-in-out md:pb-4',
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
         className,
       )}
       style={transformOriginStyle}
     >
-      <div className="inline-flex items-center gap-0 bg-background rounded-lg border border-border shadow-lg w-full max-w-[400px] sm:w-auto sm:max-w-none">
-        <SelectionSection
-          count={count}
-          onClear={onClear}
-          itemNameSingular={itemNameSingular}
-          itemNamePlural={itemNamePlural}
-        />
-        <div className="h-[22px] w-px bg-border" />
-        <div className="flex items-center px-3 py-2">
-          <button
-            type="button"
-            onClick={onActionsClick}
-            aria-label="Open command menu"
-            className="flex items-center gap-2 text-sm font-medium hover:text-foreground/80 transition-colors"
-          >
-            <Command className="h-4 w-4" aria-hidden="true" />
-            <span>Actions</span>
-          </button>
-        </div>
-      </div>
+      <BarContent
+        count={count}
+        onClear={onClear}
+        onActionsClick={onActionsClick}
+        itemNameSingular={itemNameSingular}
+        itemNamePlural={itemNamePlural}
+        className={className}
+      />
     </div>
   );
 }

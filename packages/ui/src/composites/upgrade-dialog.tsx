@@ -21,10 +21,10 @@
  * ```
  */
 
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "../primitives/button";
+import { useState } from 'react';
+import { Button } from '../primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../primitives/dialog";
+} from '../primitives/dialog';
 
 export interface UpgradePlanOption {
   id: string;
@@ -50,11 +50,34 @@ interface UpgradeDialogProps {
   onSelectPlan: (planId: string) => void | Promise<void>;
 }
 
+function PlanCard({
+  plan,
+  pendingId,
+  onSelect,
+}: {
+  plan: UpgradePlanOption;
+  pendingId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div key={plan.id} className="flex items-center justify-between rounded-md border border-border p-4">
+      <div className="flex flex-col">
+        <span className="font-medium">{plan.name}</span>
+        <span className="text-sm text-muted-foreground">{plan.price}</span>
+        {plan.description ? <span className="mt-1 text-xs text-muted-foreground">{plan.description}</span> : null}
+      </div>
+      <Button onClick={() => onSelect(plan.id)} disabled={pendingId !== null}>
+        {pendingId === plan.id ? 'Redirecting...' : 'Choose'}
+      </Button>
+    </div>
+  );
+}
+
 export function UpgradeDialog({
   open,
   onOpenChange,
-  title = "Upgrade your plan",
-  description = "Pick a plan to unlock more capacity and features.",
+  title = 'Upgrade your plan',
+  description = 'Pick a plan to unlock more capacity and features.',
   plans,
   onSelectPlan,
 }: UpgradeDialogProps) {
@@ -78,34 +101,11 @@ export function UpgradeDialog({
         </DialogHeader>
         <div className="flex flex-col gap-3">
           {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className="flex items-center justify-between rounded-md border border-border p-4"
-            >
-              <div className="flex flex-col">
-                <span className="font-medium">{plan.name}</span>
-                <span className="text-sm text-muted-foreground">{plan.price}</span>
-                {plan.description ? (
-                  <span className="mt-1 text-xs text-muted-foreground">
-                    {plan.description}
-                  </span>
-                ) : null}
-              </div>
-              <Button
-                onClick={() => handleSelect(plan.id)}
-                disabled={pendingId !== null}
-              >
-                {pendingId === plan.id ? "Redirecting..." : "Choose"}
-              </Button>
-            </div>
+            <PlanCard key={plan.id} plan={plan} pendingId={pendingId} onSelect={handleSelect} />
           ))}
         </div>
         <DialogFooter>
-          <Button
-            variant="ghost"
-            onClick={() => onOpenChange(false)}
-            disabled={pendingId !== null}
-          >
+          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={pendingId !== null}>
             Cancel
           </Button>
         </DialogFooter>
