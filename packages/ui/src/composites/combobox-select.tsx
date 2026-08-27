@@ -84,16 +84,37 @@ function ComboboxList({
   );
 }
 
-export function ComboboxSelect({
-  value,
-  onValueChange,
-  options,
-  placeholder = 'Select…',
-  searchPlaceholder = 'Search…',
-  emptyText = 'No results.',
-  className,
+function ComboboxTrigger({
+  selected,
+  placeholder,
+  open,
+  listboxId,
   disabled,
-}: ComboboxSelectProps) {
+  className,
+}: {
+  selected?: ComboboxOption;
+  placeholder: string;
+  open: boolean;
+  listboxId: string;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <Button
+      variant="outline"
+      role="combobox"
+      aria-expanded={open}
+      aria-controls={listboxId}
+      disabled={disabled}
+      className={cn('justify-between h-9 text-sm font-normal', className)}
+    >
+      <SelectedLabel selected={selected} placeholder={placeholder} />
+      <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
+    </Button>
+  );
+}
+
+function useComboboxState(value: string, options: ComboboxOption[], onValueChange: (v: string) => void) {
   const [open, setOpen] = React.useState(false);
   const listboxId = React.useId();
   const selected = options.find((o) => o.value === value);
@@ -104,20 +125,31 @@ export function ComboboxSelect({
     },
     [onValueChange],
   );
+  return { open, setOpen, listboxId, selected, handleSelect };
+}
+
+export function ComboboxSelect({
+  value,
+  onValueChange,
+  options,
+  placeholder = 'Select…',
+  searchPlaceholder = 'Search…',
+  emptyText = 'No results.',
+  className,
+  disabled,
+}: ComboboxSelectProps) {
+  const { open, setOpen, listboxId, selected, handleSelect } = useComboboxState(value, options, onValueChange);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          aria-controls={listboxId}
+        <ComboboxTrigger
+          selected={selected}
+          placeholder={placeholder}
+          open={open}
+          listboxId={listboxId}
           disabled={disabled}
-          className={cn('justify-between h-9 text-sm font-normal', className)}
-        >
-          <SelectedLabel selected={selected} placeholder={placeholder} />
-          <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
-        </Button>
+          className={className}
+        />
       </PopoverTrigger>
       <PopoverContent
         className="w-[--radix-popover-trigger-width] p-0"

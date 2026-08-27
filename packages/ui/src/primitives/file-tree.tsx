@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronRightIcon, FolderIcon, FolderOpenIcon, FileIcon } from 'lucide-react';
 import { cn } from '../utils';
+import { FileTreeNode } from './file-tree-node';
 
 export interface FileTreeItem {
   id: string;
@@ -88,7 +88,7 @@ function handleEnterSpace(opts: {
   opts.onSelect(selected.item);
 }
 
-export function FileTree({ items, selectedId, onSelect, onContextMenu, className }: FileTreeProps) {
+function useFileTreeState(items: FileTreeItem[], selectedId?: string) {
   const [expandedIds, setExpandedIds] = React.useState<Set<string>>(() => {
     const initial = new Set<string>();
     if (selectedId) expandPathTo(items, selectedId, initial);
@@ -104,6 +104,12 @@ export function FileTree({ items, selectedId, onSelect, onContextMenu, className
       return next;
     });
   }, []);
+  return { expandedIds, focusedId, setFocusedId, visibleItems, toggleExpand };
+}
+
+export function FileTree({ items, selectedId, onSelect, onContextMenu, className }: FileTreeProps) {
+  const { expandedIds, focusedId, setFocusedId, visibleItems, toggleExpand } = useFileTreeState(items, selectedId);
+
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
       const currentIndex = visibleItems.findIndex((v) => v.item.id === focusedId);
@@ -144,160 +150,6 @@ export function FileTree({ items, selectedId, onSelect, onContextMenu, className
   );
 }
 
-interface FileTreeNodeProps {
-  item: FileTreeItem;
-  depth: number;
-  selectedId?: string;
-  focusedId?: string;
-  expandedIds: Set<string>;
-  onSelect: (item: FileTreeItem) => void;
-  onToggleExpand: (id: string) => void;
-  onFocus: (id: string) => void;
-  onContextMenu?: (item: FileTreeItem, e: React.MouseEvent) => void;
-}
-
-function FileTreeNodeButton({
-  item,
-  depth,
-  isSelected,
-  isFocused,
-  isExpanded,
-  isDirectory,
-  Icon,
-  onClick,
-  onContextMenu,
-}: {
-  item: FileTreeItem;
-  depth: number;
-  isSelected: boolean;
-  isFocused: boolean;
-  isExpanded: boolean;
-  isDirectory: boolean;
-  Icon: React.ComponentType<{ className?: string }>;
-  onClick: () => void;
-  onContextMenu: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      data-focused={isFocused || undefined}
-      data-selected={isSelected || undefined}
-      className={cn(
-        'flex w-full items-center gap-1.5 rounded-md px-2 py-1 text-left text-sm transition-colors',
-        'hover:bg-accent/50',
-        'outline-none data-[focused]:ring-1 data-[focused]:ring-ring',
-        isSelected ? 'bg-accent text-accent-foreground font-medium' : 'text-foreground/80',
-      )}
-      style={{ paddingLeft: `${depth * 16 + 8}px` }}
-    >
-      {isDirectory ? (
-        <ChevronRightIcon
-          className={cn(
-            'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150',
-            isExpanded && 'rotate-90',
-          )}
-        />
-      ) : (
-        <span className="h-3.5 w-3.5 shrink-0" />
-      )}
-      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-      <span className="truncate">{item.name}</span>
-    </button>
-  );
-}
-
-function FileTreeChildren({
-  item,
-  depth,
-  selectedId,
-  focusedId,
-  expandedIds,
-  onSelect,
-  onToggleExpand,
-  onFocus,
-  onContextMenu,
-}: FileTreeNodeProps) {
-  if (!item.children) return null;
-  return (
-    <div role="group">
-      {item.children.map((child) => (
-        <FileTreeNode
-          key={child.id}
-          item={child}
-          depth={depth + 1}
-          selectedId={selectedId}
-          focusedId={focusedId}
-          expandedIds={expandedIds}
-          onSelect={onSelect}
-          onToggleExpand={onToggleExpand}
-          onFocus={onFocus}
-          onContextMenu={onContextMenu}
-        />
-      ))}
-    </div>
-  );
-}
-
-function FileTreeNode({
-  item,
-  depth,
-  selectedId,
-  focusedId,
-  expandedIds,
-  onSelect,
-  onToggleExpand,
-  onFocus,
-  onContextMenu,
-}: FileTreeNodeProps) {
-  const isDirectory = item.type === 'directory';
-  const isExpanded = expandedIds.has(item.id);
-  const isSelected = item.id === selectedId;
-  const isFocused = item.id === focusedId;
-  const Icon = item.icon ?? getDefaultIcon(item, isExpanded);
-  const handleClick = () => {
-    onFocus(item.id);
-    if (isDirectory) onToggleExpand(item.id);
-    onSelect(item);
-  };
-  const handleContextMenu = (e: React.MouseEvent) => {
-    onContextMenu?.(item, e);
-  };
-  return (
-    <div role="treeitem" aria-expanded={isDirectory ? isExpanded : undefined} aria-selected={isSelected}>
-      <FileTreeNodeButton
-        item={item}
-        depth={depth}
-        isSelected={isSelected}
-        isFocused={isFocused}
-        isExpanded={isExpanded}
-        isDirectory={isDirectory}
-        Icon={Icon}
-        onClick={handleClick}
-        onContextMenu={handleContextMenu}
-      />
-      {isDirectory && isExpanded && (
-        <FileTreeChildren
-          item={item}
-          depth={depth}
-          selectedId={selectedId}
-          focusedId={focusedId}
-          expandedIds={expandedIds}
-          onSelect={onSelect}
-          onToggleExpand={onToggleExpand}
-          onFocus={onFocus}
-          onContextMenu={onContextMenu}
-        />
-      )}
-    </div>
-  );
-}
-
-function getDefaultIcon(item: FileTreeItem, isExpanded: boolean) {
-  if (item.type === 'directory') return isExpanded ? FolderOpenIcon : FolderIcon;
-  return FileIcon;
-}
 interface VisibleEntry {
   item: FileTreeItem;
   depth: number;

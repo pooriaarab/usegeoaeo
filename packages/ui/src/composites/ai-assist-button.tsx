@@ -3,14 +3,16 @@
 import * as React from 'react';
 import { Sparkles } from 'lucide-react';
 import { Button } from '../primitives/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
-import { Input } from '../primitives/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../primitives/popover';
 import { cn } from '../utils';
+import { AiAssistPopoverContent } from './ai-assist-popover-content';
+import type { AiAssistPreset } from './ai-assist-popover-content';
 
-export interface AiAssistPreset {
-  label: string;
-  value: string;
-}
+export type { AiAssistPreset } from './ai-assist-popover-content';
 
 interface AiAssistButtonProps {
   presets: AiAssistPreset[];
@@ -18,71 +20,6 @@ interface AiAssistButtonProps {
   loading?: boolean;
   disabled?: boolean;
   className?: string;
-}
-
-function PresetList({
-  presets,
-  onPresetClick,
-  loading,
-}: {
-  presets: AiAssistPreset[];
-  onPresetClick: (value: string) => void;
-  loading: boolean;
-}) {
-  return (
-    <div className="flex flex-wrap gap-1">
-      {presets.map((preset) => (
-        <button
-          key={preset.value}
-          type="button"
-          className="text-[11px] px-2 py-1 rounded-md bg-muted hover:bg-accent text-foreground transition-colors"
-          onClick={() => onPresetClick(preset.value)}
-          disabled={loading}
-        >
-          {preset.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function CustomInputRow({
-  value,
-  onChange,
-  onSubmit,
-  loading,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  onSubmit: () => void;
-  loading: boolean;
-}) {
-  return (
-    <div className="flex gap-1.5">
-      <Input
-        placeholder="Custom instructions..."
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            onSubmit();
-          }
-        }}
-        className="h-7 text-xs flex-1"
-        disabled={loading}
-      />
-      <Button
-        type="button"
-        size="sm"
-        className="h-7 px-2 text-xs"
-        onClick={onSubmit}
-        disabled={!value.trim() || loading}
-      >
-        Go
-      </Button>
-    </div>
-  );
 }
 
 function doSingleClick(
@@ -110,18 +47,21 @@ function doDoubleClick(
   if (presets.length > 0) onGenerate(presets[0].value);
 }
 
-export function AiAssistButton({
-  presets,
-  onGenerate,
-  loading = false,
-  disabled = false,
-  className,
-}: AiAssistButtonProps) {
+function useCleanupTimer(timerRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>) {
+  React.useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, [timerRef]);
+}
+
+function useAiAssistState(
+  presets: AiAssistPreset[],
+  onGenerate: (v: string) => void,
+  loading: boolean,
+  disabled: boolean,
+) {
   const [open, setOpen] = React.useState(false);
   const [customInstruction, setCustomInstruction] = React.useState('');
   const clickCount = React.useRef(0);
   const clickTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  useCleanupTimer(clickTimer);
   const handleClick = React.useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -132,7 +72,6 @@ export function AiAssistButton({
     },
     [presets, onGenerate, loading, disabled],
   );
-
   const handlePresetClick = React.useCallback(
     (value: string) => {
       setOpen(false);
@@ -141,7 +80,6 @@ export function AiAssistButton({
     },
     [onGenerate],
   );
-
   const handleCustomSubmit = React.useCallback(() => {
     const trimmed = customInstruction.trim();
     if (!trimmed) return;
@@ -149,13 +87,27 @@ export function AiAssistButton({
     onGenerate(trimmed);
     setCustomInstruction('');
   }, [customInstruction, onGenerate]);
+  return {
+    open, setOpen, customInstruction, setCustomInstruction, handleClick, handlePresetClick, handleCustomSubmit,
+  };
+}
 
-  React.useEffect(
-    () => () => {
-      if (clickTimer.current) clearTimeout(clickTimer.current);
-    },
-    [],
-  );
+export function AiAssistButton({
+  presets,
+  onGenerate,
+  loading = false,
+  disabled = false,
+  className,
+}: AiAssistButtonProps) {
+  const {
+    open,
+    setOpen,
+    customInstruction,
+    setCustomInstruction,
+    handleClick,
+    handlePresetClick,
+    handleCustomSubmit,
+  } = useAiAssistState(presets, onGenerate, loading, disabled);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -179,12 +131,12 @@ export function AiAssistButton({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-64 p-3 space-y-2.5">
-        <p className="text-xs font-medium text-muted-foreground">AI Assist</p>
-        <PresetList presets={presets} onPresetClick={handlePresetClick} loading={loading} />
-        <CustomInputRow
-          value={customInstruction}
-          onChange={setCustomInstruction}
-          onSubmit={handleCustomSubmit}
+        <AiAssistPopoverContent
+          presets={presets}
+          customInstruction={customInstruction}
+          setCustomInstruction={setCustomInstruction}
+          handlePresetClick={handlePresetClick}
+          handleCustomSubmit={handleCustomSubmit}
           loading={loading}
         />
       </PopoverContent>

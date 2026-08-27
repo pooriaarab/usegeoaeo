@@ -1,12 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { Table2, LayoutGrid, Network, ArrowUpDown, Layers, Settings2, Calendar, GitBranch } from 'lucide-react';
-import { cn } from '../utils';
+import { Settings2 } from 'lucide-react';
 import { Button } from '../primitives/button';
 import { Switch } from '../primitives/switch';
 import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
 import { ComboboxSelect, type ComboboxOption } from './combobox-select';
+import { ViewTypeTabs } from './view-type-tabs';
+import { GroupingOrderingSection } from './grouping-ordering-section';
 
 export type ViewType = 'list' | 'board' | 'graph' | 'calendar' | 'org';
 
@@ -55,7 +56,10 @@ export function useDisplaySettings(
       try {
         localStorage.setItem(
           `display-settings:${pageKey}`,
-          JSON.stringify({ ...next, visibleProperties: Array.from(next.visibleProperties) }),
+          JSON.stringify({
+            ...next,
+            visibleProperties: Array.from(next.visibleProperties),
+          }),
         );
       } catch {
         // localStorage may be unavailable — silently ignore
@@ -78,130 +82,6 @@ interface DisplayPopoverProps {
   enableCalendarView?: boolean;
   enableOrgView?: boolean;
   extraToggles?: React.ReactNode;
-}
-
-function ViewTypeTabs({
-  view,
-  update,
-  flags,
-}: {
-  view: ViewType;
-  update: (patch: Partial<DisplaySettings>) => void;
-  flags: { board: boolean; graph: boolean; calendar: boolean; org: boolean };
-}) {
-  return (
-    <div className="flex items-center gap-1 border-b p-3">
-      <Button
-        variant={view === 'list' ? 'secondary' : 'ghost'}
-        size="sm"
-        className="h-7 gap-1.5 text-xs"
-        onClick={() => update({ view: 'list' })}
-      >
-        <Table2 className="h-3.5 w-3.5" /> List
-      </Button>
-      {flags.board && (
-        <Button
-          variant={view === 'board' ? 'secondary' : 'ghost'}
-          size="sm"
-          className="h-7 gap-1.5 text-xs"
-          onClick={() => update({ view: 'board' })}
-        >
-          <LayoutGrid className="h-3.5 w-3.5" /> Board
-        </Button>
-      )}
-      {flags.graph && (
-        <Button
-          variant={view === 'graph' ? 'secondary' : 'ghost'}
-          size="sm"
-          className="h-7 gap-1.5 text-xs"
-          onClick={() => update({ view: 'graph' })}
-        >
-          <Network className="h-3.5 w-3.5" /> Graph
-        </Button>
-      )}
-      {flags.calendar && (
-        <Button
-          variant={view === 'calendar' ? 'secondary' : 'ghost'}
-          size="sm"
-          className="h-7 gap-1.5 text-xs"
-          onClick={() => update({ view: 'calendar' })}
-        >
-          <Calendar className="h-3.5 w-3.5" /> Calendar
-        </Button>
-      )}
-      {flags.org && (
-        <Button
-          variant={view === 'org' ? 'secondary' : 'ghost'}
-          size="sm"
-          className="h-7 gap-1.5 text-xs"
-          onClick={() => update({ view: 'org' })}
-        >
-          <GitBranch className="h-3.5 w-3.5" /> Org
-        </Button>
-      )}
-    </div>
-  );
-}
-
-function GroupingOrderingSection({
-  settings,
-  update,
-  groupingOptions,
-  orderingOptions,
-}: {
-  settings: DisplaySettings;
-  update: (patch: Partial<DisplaySettings>) => void;
-  groupingOptions: ComboboxOption[];
-  orderingOptions: ComboboxOption[];
-}) {
-  return (
-    <div className="space-y-2.5 border-b p-3">
-      <div className="flex items-center gap-2">
-        <div className="flex min-w-[90px] items-center gap-1.5 text-xs text-muted-foreground">
-          <Layers className="h-3.5 w-3.5" /> Grouping
-        </div>
-        <ComboboxSelect
-          value={settings.grouping}
-          onValueChange={(v) => update({ grouping: v })}
-          options={groupingOptions}
-          className="flex-1"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="flex min-w-[90px] items-center gap-1.5 text-xs text-muted-foreground">
-          <Layers className="h-3.5 w-3.5" /> Sub-grouping
-        </div>
-        <ComboboxSelect
-          value={settings.subGrouping}
-          onValueChange={(v) => update({ subGrouping: v })}
-          options={groupingOptions}
-          className="flex-1"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <div className="flex min-w-[90px] items-center gap-1.5 text-xs text-muted-foreground">
-          <ArrowUpDown className="h-3.5 w-3.5" /> Ordering
-        </div>
-        <ComboboxSelect
-          value={settings.ordering}
-          onValueChange={(v) => update({ ordering: v })}
-          options={orderingOptions}
-          className="flex-1"
-        />
-        <Button
-          variant="outline"
-          size="icon-xs"
-          className="h-8 w-8 shrink-0"
-          onClick={() => update({ orderDirection: settings.orderDirection === 'asc' ? 'desc' : 'asc' })}
-          aria-label="Toggle sort direction"
-        >
-          <ArrowUpDown
-            className={cn('h-3.5 w-3.5 transition-transform', settings.orderDirection === 'desc' && 'rotate-180')}
-          />
-        </Button>
-      </div>
-    </div>
-  );
 }
 
 function GraphConnections({
@@ -300,6 +180,56 @@ function DisplayPropertiesSection({
   );
 }
 
+function PopoverHeader({
+  settings,
+  update,
+  groupingOptions,
+  orderingOptions,
+  flags,
+  isGroupingVisible,
+  isGraph,
+}: {
+  settings: DisplaySettings;
+  update: (p: Partial<DisplaySettings>) => void;
+  groupingOptions: ComboboxOption[];
+  orderingOptions: ComboboxOption[];
+  flags: { board: boolean; graph: boolean; calendar: boolean; org: boolean };
+  isGroupingVisible: boolean;
+  isGraph: boolean;
+}) {
+  return (
+    <>
+      <ViewTypeTabs view={settings.view} update={update} flags={flags} />
+      {isGroupingVisible && (
+        <GroupingOrderingSection
+          settings={settings}
+          update={update}
+          groupingOptions={groupingOptions}
+          orderingOptions={orderingOptions}
+        />
+      )}
+      {isGraph && <GraphConnections settings={settings} update={update} />}
+    </>
+  );
+}
+
+function usePopoverState(
+  settings: DisplaySettings,
+  onSettingsChange: (s: DisplaySettings) => void,
+  flags: { board: boolean; graph: boolean; calendar: boolean; org: boolean },
+) {
+  const update = (patch: Partial<DisplaySettings>) => onSettingsChange({ ...settings, ...patch });
+  const toggleProperty = (id: string) => {
+    const next = new Set(settings.visibleProperties);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    update({ visibleProperties: next });
+  };
+  const isGroupingVisible = settings.view !== 'graph' && settings.view !== 'org';
+  const isGraph = settings.view === 'graph';
+  return { update, toggleProperty, isGroupingVisible, isGraph, flags };
+}
+
 export function DisplayPopover({
   settings,
   onSettingsChange,
@@ -313,15 +243,8 @@ export function DisplayPopover({
   enableOrgView = false,
   extraToggles,
 }: DisplayPopoverProps) {
-  const update = (patch: Partial<DisplaySettings>) => onSettingsChange({ ...settings, ...patch });
-  const toggleProperty = (id: string) => {
-    const next = new Set(settings.visibleProperties);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    update({ visibleProperties: next });
-  };
-  const isGroupingVisible = settings.view !== 'graph' && settings.view !== 'org';
-  const isGraph = settings.view === 'graph';
+  const flags = { board: enableBoardView, graph: enableGraphView, calendar: enableCalendarView, org: enableOrgView };
+  const { update, toggleProperty, isGroupingVisible, isGraph } = usePopoverState(settings, onSettingsChange, flags);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -330,20 +253,15 @@ export function DisplayPopover({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[320px] p-0" align="end">
-        <ViewTypeTabs
-          view={settings.view}
+        <PopoverHeader
+          settings={settings}
           update={update}
-          flags={{ board: enableBoardView, graph: enableGraphView, calendar: enableCalendarView, org: enableOrgView }}
+          groupingOptions={groupingOptions}
+          orderingOptions={orderingOptions}
+          flags={flags}
+          isGroupingVisible={isGroupingVisible}
+          isGraph={isGraph}
         />
-        {isGroupingVisible && (
-          <GroupingOrderingSection
-            settings={settings}
-            update={update}
-            groupingOptions={groupingOptions}
-            orderingOptions={orderingOptions}
-          />
-        )}
-        {isGraph && <GraphConnections settings={settings} update={update} />}
         <OptionsSection settings={settings} update={update} extraToggles={extraToggles} />
         <DisplayPropertiesSection
           displayProperties={displayProperties}
