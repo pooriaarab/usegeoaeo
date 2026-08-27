@@ -1,0 +1,21 @@
+{
+  "name": "geoaeo",
+  "short_name": "geoaeo",
+  "description": "Get your app cited by AI answer engines. geoaeo audits any site for SEO, GEO and AEO, scores it 0 to 100, and generates the files they read.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#14181c",
+  "background_color": "#fbfcfd",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
