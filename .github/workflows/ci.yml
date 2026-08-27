@@ -9,6 +9,19 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Shared turbo remote cache. Turbo already skips a task whose inputs have not
+# changed; without a remote cache the only place it can look the previous result
+# up is the local .turbo directory, which a fresh cloud runner never has.
+#
+# TURBO_API and TURBO_TEAM are repository variables, not secrets. A worker URL
+# and a team name are not sensitive, and keeping them visible means a
+# misconfigured cache shows up in the logs rather than silently falling back to
+# local-only.
+env:
+  TURBO_API: ${{ vars.TURBO_API }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
 jobs:
   verify:
     runs-on: ubicloud-standard-2
