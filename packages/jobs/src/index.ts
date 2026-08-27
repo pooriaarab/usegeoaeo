@@ -1,4 +1,4 @@
-export interface QueueMessageContract<Type extends string = string, Payload = any> {
+export interface QueueMessageContract<Type extends string = string, Payload = unknown> {
   type: Type;
   id: string; // Used as the required idempotency key field (e.g., UUID or CUID)
   payload: Payload;
@@ -18,7 +18,7 @@ export interface JobDemoPayload {
 }
 
 export interface OutboxDrainPayload {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type EmailSendJob = QueueMessageContract<"email.send", EmailSendPayload>;
