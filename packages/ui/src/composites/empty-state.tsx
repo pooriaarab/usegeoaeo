@@ -26,6 +26,28 @@ const variantDefaults: Record<EmptyStateVariant, { icon: LucideIcon; iconClass: 
   info: { icon: Inbox, iconClass: 'text-info' },
 };
 
+function getIconClass(sm: boolean, iconClass: string) {
+  if (sm) return 'text-muted-foreground/40';
+  return iconClass;
+}
+
+function getActionButton(action: EmptyStateProps['action']) {
+  if (!action) return null;
+  if (action.href && !action.onClick) {
+    const href = action.href;
+    return (
+      <Button asChild className="mt-4" variant="outline">
+        <Link href={href}>{action.label}</Link>
+      </Button>
+    );
+  }
+  return (
+    <Button className="mt-4" variant="outline" onClick={action.onClick}>
+      {action.label}
+    </Button>
+  );
+}
+
 export function EmptyState({
   icon,
   title,
@@ -38,23 +60,17 @@ export function EmptyState({
   const defaults = variantDefaults[variant];
   const Icon = icon ?? defaults.icon;
   const sm = size === 'sm';
-
   return (
     <div className={cn('flex flex-col items-center justify-center text-center', sm ? 'py-10' : 'p-12', className)}>
-      <Icon className={cn(sm ? 'h-5 w-5 mb-2' : 'h-12 w-12 mb-4', sm ? 'text-muted-foreground/40' : defaults.iconClass)} aria-hidden="true" />
+      <Icon
+        className={cn(sm ? 'h-5 w-5 mb-2' : 'h-12 w-12 mb-4', getIconClass(sm, defaults.iconClass))}
+        aria-hidden="true"
+      />
       <h3 className={cn(sm ? 'text-sm font-medium text-muted-foreground' : 'text-lg font-semibold')}>{title}</h3>
-      <p className={cn('text-muted-foreground max-w-md', sm ? 'text-xs mt-1 opacity-70' : 'text-sm mt-2')}>{description}</p>
-      {action && (
-        action.href && !action.onClick ? (
-          <Button asChild className="mt-4" variant="outline">
-            <Link href={action.href}>{action.label}</Link>
-          </Button>
-        ) : (
-          <Button className="mt-4" variant="outline" onClick={action.onClick}>
-            {action.label}
-          </Button>
-        )
-      )}
+      <p className={cn('text-muted-foreground max-w-md', sm ? 'text-xs mt-1 opacity-70' : 'text-sm mt-2')}>
+        {description}
+      </p>
+      {getActionButton(action)}
     </div>
   );
 }
