@@ -1,21 +1,30 @@
 import { writeFile } from 'node:fs/promises';
 import { loadSiteConfig } from './load-config.js';
 import { generateHreflang, generateJsonLd, generateLlms, generateLlmsFull, generateMdmirror, generateOgimage, generateRobots, generateRss, generateSitemap, generateWebmcp, type JsonLdKind } from '../generators/index.js';
+import type { SiteConfig } from '../config.js';
 
 export type GeneratedArtifact = 'llms' | 'llms-full' | 'jsonld' | 'webmcp' | 'sitemap' | 'robots' | 'ogimage' | 'rss' | 'hreflang' | 'mdmirror';
 
+function renderArtifact(artifact: GeneratedArtifact, config: SiteConfig, jsonLdKind: JsonLdKind): string {
+  const map: Record<GeneratedArtifact, (c: SiteConfig, k: JsonLdKind) => string> = {
+    llms: c => generateLlms(c),
+    'llms-full': c => generateLlmsFull(c),
+    jsonld: (c, k) => `${JSON.stringify(generateJsonLd(c, k), null, 2)}\n`,
+    webmcp: c => `${JSON.stringify(generateWebmcp(c), null, 2)}\n`,
+    sitemap: c => generateSitemap(c),
+    robots: c => generateRobots(c),
+    ogimage: c => generateOgimage(c),
+    rss: c => generateRss(c),
+    hreflang: c => generateHreflang(c),
+    mdmirror: c => generateMdmirror(c),
+  };
+  const renderer = map[artifact];
+  return renderer ? renderer(config, jsonLdKind) : generateMdmirror(config);
+}
+
 export async function generateArtifact(artifact: GeneratedArtifact, directory = process.cwd(), jsonLdKind: JsonLdKind = 'software'): Promise<string> {
   const config = await loadSiteConfig(directory);
-  if (artifact === 'llms') return generateLlms(config);
-  if (artifact === 'llms-full') return generateLlmsFull(config);
-  if (artifact === 'jsonld') return `${JSON.stringify(generateJsonLd(config, jsonLdKind), null, 2)}\n`;
-  if (artifact === 'webmcp') return `${JSON.stringify(generateWebmcp(config), null, 2)}\n`;
-  if (artifact === 'sitemap') return generateSitemap(config);
-  if (artifact === 'robots') return generateRobots(config);
-  if (artifact === 'ogimage') return generateOgimage(config);
-  if (artifact === 'rss') return generateRss(config);
-  if (artifact === 'hreflang') return generateHreflang(config);
-  return generateMdmirror(config);
+  return renderArtifact(artifact, config, jsonLdKind);
 }
 
 export async function writeGeneratedArtifact(
@@ -26,4 +35,3 @@ export async function writeGeneratedArtifact(
   if (options.output) await writeFile(options.output, content, 'utf8');
   return content;
 }
-
