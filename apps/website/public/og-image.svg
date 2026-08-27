@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#080c0f"/>
+  <g font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" text-anchor="middle">
+    <rect x="560" y="340" width="80" height="80" rx="16" fill="#5c9cff"/>
+    <text x="600" y="393" font-size="44" font-weight="700" fill="#080c0f">g</text>
+    <text x="600" y="490" font-size="56" font-weight="700" fill="#eceff2" letter-spacing="-0.03em">geoaeo</text>
+    <text x="600" y="575" font-size="32" font-weight="600" fill="#eceff2" letter-spacing="-0.02em">Make any site quotable by AI answer engines</text>
+    <rect x="540" y="620" width="120" height="3" rx="1" fill="#5c9cff"/>
+    <text x="600" y="870" font-size="16" font-weight="600" fill="#707478" letter-spacing="0.22em">USEGEOAEO.COM</text>
+  </g>
+</svg>
