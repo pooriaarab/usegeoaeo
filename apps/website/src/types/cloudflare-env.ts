@@ -20,7 +20,7 @@ export interface CloudflareEnv {
   // Static assets
   ASSETS: Fetcher;
   // Outbox queue (transactional-outbox pattern from the spike)
-  OUTBOX_QUEUE: Queue<any>;
+  OUTBOX_QUEUE: Queue<unknown>;
   /** Cloudflare Email Service (wrangler send_email binding named EMAIL) */
   EMAIL?: {
     send(message: {
