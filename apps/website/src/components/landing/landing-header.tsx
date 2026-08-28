@@ -33,39 +33,9 @@ export function LandingHeader() {
       }`}
     >
       <div className="mx-auto max-w-6xl flex items-center justify-between px-5 h-14 sm:h-16">
-        {/* Logo */}
-        <Link href="/" aria-label="geoaeo home" className="flex items-center gap-2.5 shrink-0">
-          <LogoMark className="size-7" />
-          <span className="text-base font-semibold tracking-tight font-mono">geoaeo</span>
-        </Link>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm">
-            <a href="https://github.com/pooriaarab/usegeoaeo" target="_blank" rel="noreferrer">GitHub</a>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/docs">
-              Get started
-              <ArrowRight />
-            </Link>
-          </Button>
-        </div>
-
-        {/* Mobile Menu Button */}
+        <HeaderLogo />
+        <DesktopNav />
+        <DesktopCta />
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground"
@@ -75,29 +45,77 @@ export function LandingHeader() {
         </button>
       </div>
 
-      {/* Mobile Nav */}
-      {mobileOpen && (
-        <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border px-5 pb-4">
-          <nav className="flex flex-col gap-1 mb-3">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <Button asChild size="sm" className="w-full">
-            <Link href="/docs">
-              Get started
-              <ArrowRight />
-            </Link>
-          </Button>
-        </div>
-      )}
+      {mobileOpen && <MobileNav onNavigate={() => setMobileOpen(false)} />}
     </header>
+  );
+}
+
+function HeaderLogo() {
+  return (
+    <Link href="/" aria-label="geoaeo home" className="flex items-center gap-2.5 shrink-0">
+      <LogoMark className="size-7" />
+      <span className="text-base font-semibold tracking-tight font-mono">geoaeo</span>
+    </Link>
+  );
+}
+
+function DesktopNav() {
+  return (
+    <nav className="hidden md:flex items-center gap-1">
+      {navLinks.map((link) => (
+        <Link
+          key={link.href}
+          href={link.href}
+          className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md"
+        >
+          {link.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function DesktopCta() {
+  return (
+    <div className="hidden md:flex items-center gap-2">
+      <Button asChild variant="ghost" size="sm">
+        <a href="https://github.com/pooriaarab/usegeoaeo" target="_blank" rel="noreferrer">GitHub</a>
+      </Button>
+      <Button asChild size="sm">
+        <Link href="/docs">
+          Get started
+          <ArrowRight />
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * The open mobile menu. The parent owns the open/closed state, so this stays a
+ * plain component and takes the close callback as a prop.
+ */
+function MobileNav({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border px-5 pb-4">
+      <nav className="flex flex-col gap-1 mb-3">
+        {navLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={onNavigate}
+            className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+      <Button asChild size="sm" className="w-full">
+        <Link href="/docs">
+          Get started
+          <ArrowRight />
+        </Link>
+      </Button>
+    </div>
   );
 }
