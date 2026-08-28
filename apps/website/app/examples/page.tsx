@@ -104,147 +104,197 @@ export default function ExamplesPage() {
       <LandingHeader />
       <main className="pt-28 sm:pt-32 pb-16 sm:pb-24 px-5">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumb className="mb-8">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink asChild>
-                  <Link href="/">Home</Link>
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Examples</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
+          <ExamplesBreadcrumb />
 
-          <div className="max-w-2xl mb-10 sm:mb-14">
-            <p className="text-sm font-medium text-muted-foreground mb-2 tracking-wide uppercase">
-              Examples
-            </p>
-            <h1 className="text-fluid-xl sm:text-4xl font-bold tracking-tight mb-4">
-              Three GeoWeather targets, three audit scores
-            </h1>
-            <p className="text-muted-foreground text-fluid-sm sm:text-base leading-relaxed">
-              The geoaeo package ships a static HTML site, a Next.js App Router
-              app, and an Astro site. Each is the same product (GeoWeather)
-              after <code className="font-mono text-sm">geoaeo init</code>.
-              Scores below are from{" "}
-              <code className="font-mono text-sm">geoaeo audit .</code> on the
-              source directory.
-            </p>
-          </div>
+          <PageIntro />
 
-          <Alert className="mb-10 sm:mb-14 max-w-3xl">
-            <AlertTitle>Source-directory audits understate framework apps</AlertTitle>
-            <AlertDescription>
-              <p>
-                Framework apps understate when audited as a source directory
-                because artifacts are generated at runtime. Next.js serves{" "}
-                <code className="font-mono text-xs">llms.txt</code>, sitemap,
-                robots, WebMCP, and Markdown mirrors from route handlers. Astro
-                writes titles, meta, and JSON-LD into HTML at build time. Audit
-                the deployed URL (or Astro{" "}
-                <code className="font-mono text-xs">dist/</code>) for the true
-                score. The static HTML example has no such gap: the files on
-                disk are what engines fetch.
-              </p>
-            </AlertDescription>
-          </Alert>
+          <SourceAuditCaveat />
 
-          <div className="grid gap-4 sm:grid-cols-3 mb-12 sm:mb-16">
-            {examples.map((example) => (
-              <a
-                key={example.slug}
-                href={`#${example.slug}`}
-                className="rounded-xl border border-border bg-card p-5 hover:border-foreground/10 transition-colors"
-              >
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-                  {example.name}
-                </p>
-                <p className="text-3xl font-bold tracking-tight tabular-nums">
-                  {example.score}
-                  <span className="text-base font-medium text-muted-foreground">
-                    /100
-                  </span>
-                </p>
-              </a>
-            ))}
-          </div>
+          <ScoreCards />
 
-          <div className="grid gap-8">
-            {examples.map((example) => (
-              <Card key={example.slug} id={example.slug} className="scroll-mt-24">
-                <CardHeader className="border-b">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <Badge variant={example.badgeVariant} className="font-normal">
-                      {example.badge}
-                    </Badge>
-                    <Badge variant="outline" className="font-mono font-normal">
-                      {example.score}/100
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-xl">{example.name}</CardTitle>
-                  <CardDescription className="font-mono text-xs">
-                    {example.path}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <p className="text-sm leading-relaxed">{example.summary}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {example.why}
-                  </p>
-                  <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono">
-                    {example.command}
-                  </pre>
-                  <div>
-                    <h3 className="text-sm font-semibold mb-3">What ships</h3>
-                    <ul className="space-y-2">
-                      {example.files.map((item) => (
-                        <li
-                          key={item.file}
-                          className="grid gap-1 sm:grid-cols-[minmax(0,14rem)_1fr] sm:gap-4 text-sm"
-                        >
-                          <code className="font-mono text-xs break-all">
-                            {item.file}
-                          </code>
-                          <span className="text-muted-foreground">
-                            {item.purpose}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <ExampleCards />
 
-          <div className="mt-14 max-w-2xl">
-            <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight mb-3">
-              Reproduce a score
-            </h2>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              From a clone of the repo, audit the example directory. Then
-              compare the gap list to the{" "}
-              <Link href="/checklist" className="text-foreground underline underline-offset-4">
-                GEO/AEO checklist
-              </Link>
-              .
-            </p>
-            <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono mb-6">{`npx geoaeo audit ./packages/geoaeo/examples/static-html
-npx geoaeo audit ./packages/geoaeo/examples/nextjs-app
-npx geoaeo audit ./packages/geoaeo/examples/astro-site`}</pre>
-            <Button asChild>
-              <Link href="/checklist">
-                Open the checklist
-                <ArrowRight />
-              </Link>
-            </Button>
-          </div>
+          <ReproduceSection />
         </div>
       </main>
       <Footer />
     </div>
+  );
+}
+
+/** Home / Examples. */
+function ExamplesBreadcrumb() {
+  return (
+    <Breadcrumb className="mb-8">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link href="/">Home</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Examples</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+/** Title and the one-paragraph framing. */
+function PageIntro() {
+  return (
+    <div className="max-w-2xl mb-10 sm:mb-14">
+      <p className="text-sm font-medium text-muted-foreground mb-2 tracking-wide uppercase">
+        Examples
+      </p>
+      <h1 className="text-fluid-xl sm:text-4xl font-bold tracking-tight mb-4">
+        Three GeoWeather targets, three audit scores
+      </h1>
+      <p className="text-muted-foreground text-fluid-sm sm:text-base leading-relaxed">
+        The geoaeo package ships a static HTML site, a Next.js App Router
+        app, and an Astro site. Each is the same product (GeoWeather)
+        after <code className="font-mono text-sm">geoaeo init</code>.
+        Scores below are from{" "}
+        <code className="font-mono text-sm">geoaeo audit .</code> on the
+        source directory.
+      </p>
+    </div>
+  );
+}
+
+/** Why a source-directory audit understates a framework app. */
+function SourceAuditCaveat() {
+  return (
+    <Alert className="mb-10 sm:mb-14 max-w-3xl">
+      <AlertTitle>Source-directory audits understate framework apps</AlertTitle>
+      <AlertDescription>
+        <p>
+          Framework apps understate when audited as a source directory
+          because artifacts are generated at runtime. Next.js serves{" "}
+          <code className="font-mono text-xs">llms.txt</code>, sitemap,
+          robots, WebMCP, and Markdown mirrors from route handlers. Astro
+          writes titles, meta, and JSON-LD into HTML at build time. Audit
+          the deployed URL (or Astro{" "}
+          <code className="font-mono text-xs">dist/</code>) for the true
+          score. The static HTML example has no such gap: the files on
+          disk are what engines fetch.
+        </p>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+/** Jump links, one per example, showing its score. */
+function ScoreCards() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-3 mb-12 sm:mb-16">
+      {examples.map((example) => (
+        <a
+          key={example.slug}
+          href={`#${example.slug}`}
+          className="rounded-xl border border-border bg-card p-5 hover:border-foreground/10 transition-colors"
+        >
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            {example.name}
+          </p>
+          <p className="text-3xl font-bold tracking-tight tabular-nums">
+            {example.score}
+            <span className="text-base font-medium text-muted-foreground">
+              /100
+            </span>
+          </p>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+/** The full write-up for each example. */
+function ExampleCards() {
+  return (
+    <div className="grid gap-8">
+      {examples.map((example) => (
+        <ExampleCard key={example.slug} example={example} />
+      ))}
+    </div>
+  );
+}
+
+/** How to re-run the audits yourself. */
+function ReproduceSection() {
+  return (
+    <div className="mt-14 max-w-2xl">
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight mb-3">
+        Reproduce a score
+      </h2>
+      <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+        From a clone of the repo, audit the example directory. Then
+        compare the gap list to the{" "}
+        <Link href="/checklist" className="text-foreground underline underline-offset-4">
+          GEO/AEO checklist
+        </Link>
+        .
+      </p>
+      <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono mb-6">{`npx geoaeo audit ./packages/geoaeo/examples/static-html
+npx geoaeo audit ./packages/geoaeo/examples/nextjs-app
+npx geoaeo audit ./packages/geoaeo/examples/astro-site`}</pre>
+      <Button asChild>
+        <Link href="/checklist">
+          Open the checklist
+          <ArrowRight />
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+
+/** One example: its badges, summary, audit command and shipped files. */
+function ExampleCard({ example }: { example: (typeof examples)[number] }) {
+  return (
+    <Card id={example.slug} className="scroll-mt-24">
+      <CardHeader className="border-b">
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          <Badge variant={example.badgeVariant} className="font-normal">
+            {example.badge}
+          </Badge>
+          <Badge variant="outline" className="font-mono font-normal">
+            {example.score}/100
+          </Badge>
+        </div>
+        <CardTitle className="text-xl">{example.name}</CardTitle>
+        <CardDescription className="font-mono text-xs">
+          {example.path}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <p className="text-sm leading-relaxed">{example.summary}</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {example.why}
+        </p>
+        <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono">
+          {example.command}
+        </pre>
+        <div>
+          <h3 className="text-sm font-semibold mb-3">What ships</h3>
+          <ul className="space-y-2">
+            {example.files.map((item) => (
+              <li
+                key={item.file}
+                className="grid gap-1 sm:grid-cols-[minmax(0,14rem)_1fr] sm:gap-4 text-sm"
+              >
+                <code className="font-mono text-xs break-all">
+                  {item.file}
+                </code>
+                <span className="text-muted-foreground">
+                  {item.purpose}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
