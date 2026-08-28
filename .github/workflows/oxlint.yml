@@ -3,6 +3,17 @@ on:
   pull_request:
   push:
     branches: [main]
+
+# A second push to a PR makes the in-flight run's result worthless, but the
+# runner keeps working on it anyway. Cancel the superseded run instead.
+#
+# The cancellation is gated on pull_request: a push to the default branch must
+# run to completion, or you lose the signal for what is actually on main.
+# github.ref is in the group so two branches never cancel each other.
+concurrency:
+  group: oxlint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   oxlint:
     runs-on: ubuntu-latest
