@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { z } from 'zod/v3';
+import { z } from 'zod';
 import { auditTarget } from './audit.js';
 import { VERSION, PKG_NAME } from './constants.js';
 import { generateArtifact } from './commands/gen.js';
@@ -9,17 +9,22 @@ import { humanizeGlob } from './commands/humanize.js';
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({ name: PKG_NAME, version: VERSION });
-  server.registerTool(
+  const registerTool = server.registerTool as unknown as (
+    name: string,
+    config: { description: string; inputSchema: Record<string, unknown> },
+    handler: (...args: never[]) => unknown,
+  ) => void;
+  registerTool(
     'audit',
     {
       description: 'Audit a live URL or local site directory for GEO and AEO gaps.',
       inputSchema: { target: z.string() },
     },
-    async ({ target }) => ({
+    async ({ target }: { target: string }) => ({
       content: [{ type: 'text', text: JSON.stringify(await auditTarget(target), null, 2) }],
     })
   );
-  server.registerTool(
+  registerTool(
     'gen',
     {
       description: 'Generate one GEO or AEO artifact from the local site config.',
@@ -28,17 +33,20 @@ export function createMcpServer(): McpServer {
         type: z.enum(['software', 'product', 'faq', 'breadcrumb']).optional(),
       },
     },
-    async ({ artifact, type }) => ({
+    async ({ artifact, type }: {
+      artifact: 'llms' | 'llms-full' | 'jsonld' | 'webmcp' | 'sitemap' | 'robots';
+      type?: 'software' | 'product' | 'faq' | 'breadcrumb';
+    }) => ({
       content: [{ type: 'text', text: await generateArtifact(artifact, process.cwd(), type ?? 'software') }],
     })
   );
-  server.registerTool(
+  registerTool(
     'humanize',
     {
       description: 'Find AI-writing tells in prose files. Set write to update them.',
       inputSchema: { glob: z.string(), write: z.boolean().optional() },
     },
-    async ({ glob, write }) => {
+    async ({ glob, write }: { glob: string; write?: boolean }) => {
       const results = await humanizeGlob(glob, { write });
       const summary = [...results.entries()].map(([file, result]) => ({ file, findings: result.findings }));
       return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] };
