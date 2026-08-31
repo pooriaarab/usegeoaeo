@@ -9,7 +9,7 @@ import { humanizeGlob } from './commands/humanize.js';
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({ name: PKG_NAME, version: VERSION });
-  const registerTool = server.registerTool as unknown as (
+  const registerTool = server.registerTool.bind(server) as unknown as (
     name: string,
     config: { description: string; inputSchema: Record<string, unknown> },
     handler: (...args: never[]) => unknown,
