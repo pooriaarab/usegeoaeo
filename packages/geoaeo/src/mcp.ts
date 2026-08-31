@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { auditTarget } from './audit.js';
 import { VERSION, PKG_NAME } from './constants.js';
 import { generateArtifact } from './commands/gen.js';
@@ -56,4 +56,3 @@ if (import.meta.url === `file://${process.argv[1]}`) startMcpServer().catch(erro
   process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
   process.exitCode = 1;
 });
-
