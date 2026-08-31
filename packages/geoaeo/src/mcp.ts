@@ -9,6 +9,10 @@ import { humanizeGlob } from './commands/humanize.js';
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({ name: PKG_NAME, version: VERSION });
+  // The SDK's registerTool types its inputSchema against a bundled zod version that this
+  // package's zod (v4) does not structurally match, so we erase the type here to call it.
+  // That erasure also removes the compiler's link between each inputSchema and its handler
+  // params below: keep the handler's destructured keys and types in sync with inputSchema by hand.
   const registerTool = server.registerTool.bind(server) as unknown as (
     name: string,
     config: { description: string; inputSchema: Record<string, unknown> },
