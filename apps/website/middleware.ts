@@ -15,5 +15,8 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!_next/static|_next/image|favicon.ico).*)",
+  // _next/static is excluded for perf (hashed, high-volume build assets that
+  // are never indexable pages). /_next/image and /favicon.ico still need to
+  // run through protectWorkerPreview since they can serve real image content.
+  matcher: "/((?!_next/static).*)",
 };
