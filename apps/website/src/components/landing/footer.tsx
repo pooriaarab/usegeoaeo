@@ -6,6 +6,7 @@ const footerLinks = [
   { label: "Checklist", href: "/checklist" },
   { label: "Examples", href: "/examples" },
   { label: "Tools", href: "/tools" },
+  { label: "Brand", href: "/brand" },
   { label: "GitHub", href: "https://github.com/pooriaarab/usegeoaeo" },
   { label: "npm", href: "https://www.npmjs.com/package/geoaeo" },
 ];

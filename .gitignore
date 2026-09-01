@@ -11,3 +11,4 @@ node_modules
 .next
 dist
 bun.lock.tmp
+apps/website/src/generated/design-context.generated.ts
