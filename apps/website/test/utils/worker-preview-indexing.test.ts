@@ -19,6 +19,7 @@ describe("Worker Preview indexing", () => {
     for (const path of [
       "/llms.txt",
       "/agents.md",
+      "/design.md",
       "/sitemap.xml",
       "/.well-known/agent-card.json",
     ]) {

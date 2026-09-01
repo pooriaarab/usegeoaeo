@@ -3,6 +3,13 @@
 Guide for any agent that discovers, evaluates, or uses geoaeo.
 This project follows the `agentification` skill (pooriaarab/skills).
 
+## Brand and design context
+
+- Read `.agents/brand.md` before writing public-facing copy.
+- Read `.agents/design.md` before changing visual presentation.
+- Treat both files as the canonical brand and design context.
+- Keep `/design.md` byte-identical to `.agents/design.md` through its generator.
+
 ## What geoaeo does
 
 geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates answer-engine artifacts: llms.txt, sitemaps, robots, JSON-LD, WebMCP, and Markdown mirrors.
