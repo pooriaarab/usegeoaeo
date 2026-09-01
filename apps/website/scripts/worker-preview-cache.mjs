@@ -239,15 +239,17 @@ export async function prepareCache(name, sourcePath, outputPath, statePath) {
     written.push(statePath);
     return state;
   } catch (error) {
-    if (!created) throw error;
     const failures = [error];
-    try {
-      const live = exactLive(await namespaces(account, token), resource);
-      if (live) await request(`/accounts/${account}/storage/kv/namespaces/${live.id}`, token, { method: "DELETE" });
-    } catch (cleanupError) {
-      failures.push(cleanupError);
+    if (created) {
+      try {
+        const live = exactLive(await namespaces(account, token), resource);
+        if (live) await request(`/accounts/${account}/storage/kv/namespaces/${live.id}`, token, { method: "DELETE" });
+      } catch (cleanupError) {
+        failures.push(cleanupError);
+      }
     }
-    await Promise.allSettled(written.map((path) => unlink(path)));
+    const unlinkResults = await Promise.allSettled(written.map((path) => unlink(path)));
+    for (const result of unlinkResults) if (result.status === "rejected") failures.push(result.reason);
     throw new AggregateError(failures, "Preview cache preparation failed", { cause: error });
   }
 }
