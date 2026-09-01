@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFile, unlink, writeFile } from "node:fs/promises";
+import { open, readFile, unlink } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 const API = "https://api.cloudflare.com/client/v4";
@@ -206,6 +206,16 @@ function exactLive(items, record) {
   return byId[0];
 }
 
+async function writeExclusive(path, content, written) {
+  const handle = await open(path, "wx");
+  written.push(path);
+  try {
+    await handle.writeFile(content);
+  } finally {
+    await handle.close();
+  }
+}
+
 export async function prepareCache(name, sourcePath, outputPath, statePath) {
   validatePreviewName(name);
   await verifyAccess();
@@ -233,16 +243,15 @@ export async function prepareCache(name, sourcePath, outputPath, statePath) {
     const confirmed = (await namespaces(account, token)).filter((item) => item.title === title);
     if (confirmed.length !== 1 || confirmed[0].id !== resource.id) throw new Error("Concurrent Preview KV preparation detected");
     const state = { previewName: name, cache: { id: resource.id, title } };
-    await writeFile(outputPath, renderRuntimeConfig(source, resource.id), { flag: "wx" });
-    written.push(outputPath);
-    await writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`, { flag: "wx" });
-    written.push(statePath);
+    await writeExclusive(outputPath, renderRuntimeConfig(source, resource.id), written);
+    await writeExclusive(statePath, `${JSON.stringify(state, null, 2)}\n`, written);
     return state;
   } catch (error) {
     const failures = [error];
     if (created) {
       try {
-        const live = exactLive(await namespaces(account, token), resource);
+        const live = (await namespaces(account, token)).find((item) => item.id === resource.id);
+        if (live && live.title !== title) throw new Error("Preview KV namespace title changed unexpectedly", { cause: error });
         if (live) await request(`/accounts/${account}/storage/kv/namespaces/${live.id}`, token, { method: "DELETE" });
       } catch (cleanupError) {
         failures.push(cleanupError);
