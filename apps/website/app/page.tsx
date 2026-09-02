@@ -1,8 +1,10 @@
 import { LandingHeader } from "@/components/landing/landing-header";
 import { HeroSection } from "@/components/landing/hero-section";
 import { IntegrationMarquee } from "@/components/landing/integration-marquee";
+import { ProblemSection } from "@/components/landing/problem-section";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
+import { ProofSection } from "@/components/landing/proof-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FAQSection } from "@/components/landing/faq-section";
 import { Footer } from "@/components/landing/footer";
@@ -45,8 +47,10 @@ export default function Page() {
       <main>
         <HeroSection />
         <IntegrationMarquee />
+        <ProblemSection />
         <FeaturesSection />
         <HowItWorksSection />
+        <ProofSection />
         <PricingSection />
         <FAQSection />
         <CTAFooter />

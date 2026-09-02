@@ -5,34 +5,34 @@ import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
-    question: "What are GEO and AEO?",
+    question: "What is GEO and AEO?",
     answer:
-      "GEO is Generative Engine Optimization and AEO is Answer Engine Optimization. They are the practice of making your site easy for AI systems like ChatGPT, Claude, Perplexity, and Google AI to find, quote, and cite, the way SEO does for classic search. geoaeo covers all three: SEO, GEO, and AEO.",
+      "GEO is Generative Engine Optimization. AEO is Answer Engine Optimization. They ensure AI engines like ChatGPT, Claude, Perplexity, and Google AI can find, quote, and cite your site. geoaeo unifies SEO, GEO, and AEO into one audit and artifact workflow.",
   },
   {
-    question: "What does geoaeo actually do?",
+    question: "What does geoaeo do?",
     answer:
-      "It audits any site 0-100 across 20 weighted checks, then generates the files answer engines need: llms.txt, llms-full.txt, sitemaps, robots, JSON-LD structured data, a WebMCP manifest, and Markdown mirrors of your pages. It also humanizes copy and runs as an MCP server.",
+      "geoaeo audits any site from 0 to 100 across 20 weighted checks, then generates missing discovery artifacts. It outputs llms.txt, llms-full.txt, sitemaps, robots.txt, JSON-LD schemas, WebMCP manifests, and Markdown mirrors. It also includes an AI copy humanizer and an MCP server.",
   },
   {
-    question: "Does it work with my framework?",
+    question: "Does geoaeo work with my framework?",
     answer:
-      "Yes. geoaeo init scaffolds the right routes for Next.js, Astro, SvelteKit, Nuxt, and Remix, and writes static files for plain HTML sites. The audit works on a live URL or a local build directory, whatever you use.",
+      "Yes. Run geoaeo init to scaffold artifacts into Next.js, Astro, SvelteKit, Nuxt, Remix, or static HTML. The audit inspects any live URL or local site directory.",
   },
   {
-    question: "How do I use it with Claude, Cursor, or another agent?",
+    question: "How do I use geoaeo with coding agents?",
     answer:
-      "geoaeo ships an MCP server (geoaeo-mcp) that exposes audit, gen, and humanize as tools. Point your agent at it and it can score and fix a site on demand. The docs have a setup page for each harness.",
+      "Run the MCP server with npx geoaeo-mcp over stdio. It exposes audit, gen, and humanize tools directly to Claude Code, Cursor, Windsurf, Codex, Gemini CLI, Copilot, and Continue.",
   },
   {
-    question: "Is it free?",
+    question: "Is geoaeo free?",
     answer:
-      "Yes. geoaeo is free and open source under the MIT license. Install it with npm install geoaeo. There is no account, no paywall, and no telemetry.",
+      "Yes. geoaeo is free and open source under the MIT license. There are no paid tiers, no user accounts, and no telemetry. Install it with npm install geoaeo.",
   },
   {
-    question: "Can I gate my CI on the score?",
+    question: "Can I gate CI builds on the audit score?",
     answer:
-      "Yes. Run geoaeo audit --ci --min-score 85 in your pipeline and the command exits non-zero when the score drops below your threshold, so a regression fails the build.",
+      "Yes. Run geoaeo audit <url|dir> --ci --min-score 90 in your pipeline. The command exits with a non-zero code when the score falls below your threshold, failing the build on regressions.",
   },
 ];
 
