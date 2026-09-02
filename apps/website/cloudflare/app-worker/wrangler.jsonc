@@ -23,6 +23,12 @@
   },
 
   "env": {
+    "staging": {
+      "name": "usegeoaeo-website-staging",
+      "vars": { "ENVIRONMENT": "staging" },
+      "kv_namespaces": [{ "binding": "NEXT_INC_CACHE_KV", "id": "27b37834150746be93842c246f081b0f" }],
+      "routes": [{ "pattern": "staging.usegeoaeo.com", "custom_domain": true }]
+    },
     "production": {
       "name": "usegeoaeo-website",
       "vars": { "ENVIRONMENT": "production" },
