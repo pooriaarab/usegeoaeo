@@ -1,0 +1,77 @@
+name: Deploy
+
+# Website deploys. Merges to main go to staging; pushes to the release
+# branch go to production. Manual runs pick an environment explicitly.
+#
+# Needs repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID before
+# the first run. Website worker only; cron and queue-consumer are still
+# template-grade and are not deployed here.
+
+on:
+  push:
+    branches: [main, release]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Cloudflare environment for a manual deploy
+        required: true
+        type: choice
+        options: [staging, production]
+        default: staging
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  TURBO_API: ${{ vars.TURBO_API }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  deploy:
+    name: Deploy website worker
+    runs-on: ubicloud-standard-4
+    environment:
+      name: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_name == 'main' && 'staging' || 'production') }}
+    env:
+      CF_ENV: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_name == 'main' && 'staging' || 'production') }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run test
+      # The website imports the geoaeo workspace package, so its dist must
+      # exist before the OpenNext build. Build the website and its
+      # dependencies (the ... suffix) through turbo, not the package script
+      # directly, or the deploy fails on the missing module.
+      - name: Build website and dependencies
+        run: bunx turbo run build --filter @usegeoaeo/website...
+      - name: OpenNext build
+        working-directory: apps/website
+        run: bun run build:worker
+      - name: Deploy website worker
+        working-directory: apps/website
+        run: bunx wrangler deploy -c cloudflare/app-worker/wrangler.jsonc --env "$CF_ENV"
+
+      # A deploy that serves 500s looks identical to a good one in CI.
+      - name: Smoke check the deployed site
+        run: |
+          if [ "$CF_ENV" = "production" ]; then
+            base="https://usegeoaeo.com"
+          else
+            base="https://staging.usegeoaeo.com"
+          fi
+          echo "Smoke checking $CF_ENV at $base"
+          fail=0
+          for path in / /brand /docs /tools /examples /checklist /agents.md /design.md; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$base$path" || echo 000)
+            printf '%-36s %s\n' "$path" "$code"
+            [ "$code" = "200" ] || fail=1
+          done
+          exit $fail
