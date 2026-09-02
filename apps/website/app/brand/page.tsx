@@ -9,7 +9,7 @@ import { LandingHeader } from "@/components/landing/landing-header";
 
 export const metadata: Metadata = {
   title: "Brand",
-  description: "The name, mark, colors, typography, and voice of geoaeo.",
+  description: "Name, mark, colors, typography, and voice rules for geoaeo.",
 };
 
 const swatches = [
@@ -19,11 +19,20 @@ const swatches = [
   { name: "Primary", classes: "bg-primary text-primary-foreground" },
 ];
 
+const markMisuseRules = [
+  "Do not uppercase geoaeo or capitalize the mark.",
+  "Do not recolor the mark; preserve monochrome foreground and background tokens.",
+  "Do not add gradients, outlines, shadows, or decorative effects.",
+  "Do not stretch, rotate, or alter the rounded-square geometry.",
+];
+
 const voiceRules = [
-  "Lead with the answer.",
-  "Name the exact command, artifact, or score.",
-  "Use short sentences and active verbs.",
-  "Never invent a capability or pricing claim.",
+  "Lead with the answer or completed action.",
+  "Use concrete nouns, active verbs, and short sentences.",
+  "Name the exact artifact, command, score, or missing check.",
+  "Explain limitations directly without hedging.",
+  "Avoid hype, filler, and invented capabilities.",
+  "Prefer npm install geoaeo when showing installation.",
 ];
 
 export default function BrandPage() {
@@ -50,9 +59,37 @@ function BrandHero() {
         <h1 className="text-fluid-2xl mb-5 font-bold tracking-tight">
           Clear enough to quote
         </h1>
-        <p className="text-fluid-base mb-8 max-w-2xl leading-relaxed text-muted-foreground">
-          geoaeo uses direct language, quiet surfaces, and precise technical
-          details. The product should feel useful before it feels branded.
+        <p className="text-fluid-base mb-4 max-w-2xl leading-relaxed text-muted-foreground">
+          geoaeo audits sites for search engine optimization (SEO), generative
+          engine optimization (GEO), and answer engine optimization (AEO). It
+          scores gaps from 0 to 100 and generates discovery artifacts. The
+          package is free, open source (MIT), and has no paid tier.
+        </p>
+        <p className="mb-8 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          This human guide at{" "}
+          <Link
+            href="/brand"
+            className="text-foreground underline underline-offset-4 hover:text-muted-foreground"
+          >
+            /brand
+          </Link>{" "}
+          defines name, mark, and voice rules. The machine guide at{" "}
+          <Link
+            href="/design.md"
+            className="text-foreground underline underline-offset-4 hover:text-muted-foreground"
+          >
+            /design.md
+          </Link>{" "}
+          defines semantic tokens for agents. The{" "}
+          <a
+            href="https://www.npmjs.com/package/geoaeo"
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground underline underline-offset-4 hover:text-muted-foreground"
+          >
+            geoaeo package
+          </a>{" "}
+          ships on npm via <code className="font-mono text-xs">npm install geoaeo</code>.
         </p>
         <Button asChild variant="outline">
           <Link href="/design.md">Read the machine guide</Link>
@@ -74,10 +111,24 @@ function BrandFoundations() {
             <LogoMark className="size-12 text-xl" />
             <span className="font-mono text-2xl font-semibold">geoaeo</span>
           </div>
-          <p className="max-w-xl text-muted-foreground">
-            Keep the name lowercase. Keep the mark monochrome. Use “usegeoaeo”
-            only for the repository or domain.
+          <p className="mb-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
+            Write the product name as lowercase <code className="font-mono">geoaeo</code>.
+            Render the mark as a monochrome, high-contrast rounded square with a lowercase{" "}
+            <code className="font-mono">g</code>. Use “usegeoaeo” only for the
+            repository or domain.
           </p>
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Mark misuse
+            </p>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {markMisuseRules.map((rule) => (
+                <li key={rule} className="border-l border-border pl-3">
+                  {rule}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <div>
           <p className="mb-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">
@@ -128,7 +179,7 @@ function TypeSamples() {
       <div className="rounded-xl border border-border bg-card p-6">
         <p className="text-2xl font-semibold">Geist Sans</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Interface, guidance, and long-form explanation.
+          Interface, prose, and explanatory copy.
         </p>
       </div>
       <div className="rounded-xl border border-border bg-card p-6">

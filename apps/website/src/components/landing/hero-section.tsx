@@ -10,22 +10,17 @@ export function HeroSection() {
 
       <div className="mx-auto max-w-3xl text-center">
         <Badge variant="secondary" className="mb-6 font-normal">
-          SEO + GEO + AEO, one tool
+          SEO + GEO + AEO
         </Badge>
 
         <h1 className="text-fluid-2xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] text-foreground mb-5">
-          Get your app{" "}
-          <span className="text-muted-foreground">cited by AI</span>
+          Get your site cited by{" "}
+          <span className="text-muted-foreground">AI answers</span>
         </h1>
 
-        <p className="text-fluid-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed mb-2">
-          geoaeo audits any site 0&ndash;100 for search, generative, and answer
-          engines, then generates the files they need to find, quote, and use it:
-          llms.txt, structured data, sitemaps, and more.
-        </p>
-
-        <p className="text-fluid-sm sm:text-base font-medium text-foreground/70 mb-8">
-          Free and open source. One command to start.
+        <p className="text-fluid-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed mb-8">
+          geoaeo audits your site 0&ndash;100 and generates the llms.txt, structured
+          data, and Markdown mirrors engines cite.
         </p>
 
         <div className="mx-auto mb-8 max-w-md">

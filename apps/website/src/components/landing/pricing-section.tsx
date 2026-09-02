@@ -3,12 +3,12 @@ import { Button } from "@template/ui/primitives/button";
 import { Check } from "lucide-react";
 
 const features = [
-  "The full audit: 20 weighted checks, 0-100 score",
-  "Every generator: llms.txt, sitemap, robots, JSON-LD, WebMCP, RSS, Markdown mirrors",
-  "init scaffolds for Next.js, Astro, SvelteKit, Nuxt, Remix, and static HTML",
-  "MCP server for Claude, Cursor, and other agents",
-  "CI gate: audit --ci --min-score",
-  "No account, no telemetry, no paywall",
+  "Full site audit: 20 weighted checks with 0-100 score",
+  "All generators: llms.txt, JSON-LD, sitemaps, robots.txt, WebMCP, RSS, Markdown mirrors",
+  "Scaffolding for Next.js, Astro, SvelteKit, Nuxt, Remix, and static HTML",
+  "Built-in MCP server: audit, gen, and humanize tools over stdio",
+  "CI regression gating with geoaeo audit --ci --min-score",
+  "Free and open source under MIT, with no paid tier or telemetry",
 ];
 
 export function PricingSection() {
@@ -36,7 +36,7 @@ function PricingHeading() {
         Free and open source
       </h2>
       <p className="text-muted-foreground text-fluid-sm sm:text-base">
-        geoaeo is MIT licensed. Everything, for everyone, at no cost.
+        geoaeo is MIT licensed. Every feature is free with no paid tier.
       </p>
     </div>
   );
@@ -49,7 +49,7 @@ function PricingCard() {
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-1">geoaeo</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          The whole toolkit, open source.
+          Complete CLI, library, and MCP server.
         </p>
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold">$0</span>

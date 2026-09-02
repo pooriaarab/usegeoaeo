@@ -6,21 +6,21 @@ const steps = [
     icon: Search,
     title: "Audit",
     description:
-      "Run geoaeo audit on your URL or build. Get a 0-100 score and a ranked list of exactly what is missing for search, generative, and answer engines.",
+      "Run geoaeo audit on a live URL or local directory. Get a 0-100 score and a ranked list of missing SEO, GEO, and AEO signals.",
   },
   {
     num: "02",
     icon: Wand2,
     title: "Generate",
     description:
-      "geoaeo gen writes the files each gap needs: llms.txt, structured data, sitemaps, Markdown mirrors, and a WebMCP manifest, from one config.",
+      "Run geoaeo gen to fill gaps. Output llms.txt, JSON-LD, sitemaps, robots.txt, WebMCP manifests, and Markdown mirrors from one config.",
   },
   {
     num: "03",
     icon: Rocket,
     title: "Gate and ship",
     description:
-      "Add geoaeo audit --ci --min-score to your pipeline so a regression fails the build. Ship knowing your site stays quotable.",
+      "Add geoaeo audit --ci --min-score 90 to your pipeline. Block regressions and keep your site discoverable before PRs merge.",
   },
 ];
 

@@ -30,7 +30,7 @@ const integrations = [
   { name: "Windsurf", Logo: PromptLogo },
   { name: "Codex", Logo: PromptLogo },
   { name: "Gemini CLI", Logo: PromptLogo },
-  { name: "GitHub Copilot", Logo: PromptLogo },
+  { name: "Copilot", Logo: PromptLogo },
   { name: "Continue", Logo: PromptLogo },
 ];
 
@@ -39,7 +39,7 @@ export function IntegrationMarquee() {
     <section className="py-10 sm:py-14 overflow-hidden">
       <div className="mx-auto max-w-6xl px-5 mb-6">
         <p className="text-sm text-muted-foreground text-center">
-          Works inside the AI coding agents your team already uses
+          Works inside your coding agent via geoaeo-mcp over stdio
         </p>
       </div>
 

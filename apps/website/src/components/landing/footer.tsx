@@ -18,7 +18,7 @@ export function Footer() {
         <div className="flex items-center gap-2.5">
           <LogoMark className="size-6" />
           <span className="text-sm text-muted-foreground">
-            geoaeo &mdash; SEO, GEO &amp; AEO for any app
+            geoaeo &middot; SEO, GEO, and AEO for any app
           </span>
         </div>
         <nav className="flex flex-wrap items-center justify-center gap-4">

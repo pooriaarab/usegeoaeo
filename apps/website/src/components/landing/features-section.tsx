@@ -10,39 +10,39 @@ import {
 const features = [
   {
     icon: Gauge,
-    title: "Score any site 0-100",
+    title: "Score any site from 0 to 100",
     description:
-      "Audit a live URL or a local build across 20 weighted checks: answerability, structured data, crawlability, freshness, and E-E-A-T.",
+      "Run geoaeo audit on a live URL or local directory. Inspect 20 weighted checks across answerability, structured data, crawlability, and freshness.",
   },
   {
     icon: FileText,
-    title: "Generate the AI files",
+    title: "Generate discovery artifacts",
     description:
-      "One command writes llms.txt, llms-full.txt, sitemaps, robots, RSS, and Markdown mirrors of your pages for agents to read.",
+      "Run geoaeo gen to output llms.txt, llms-full.txt, sitemaps, robots.txt, WebMCP manifests, and Markdown mirrors.",
   },
   {
     icon: Braces,
-    title: "Structured data, done",
+    title: "Schema.org structured data",
     description:
-      "Ten JSON-LD kinds, including Organization, WebSite with SearchAction, Article, HowTo, and FAQ, ready to drop in.",
+      "Generate JSON-LD for software, product, FAQ, and breadcrumb schemas, ready to drop into any page.",
   },
   {
     icon: Bot,
-    title: "MCP server built in",
+    title: "Built-in MCP server",
     description:
-      "Run geoaeo as a Model Context Protocol server so Claude, Cursor, and other agents can audit and generate on demand.",
+      "Run geoaeo-mcp over stdio. Agents in Claude Code, Cursor, and other harnesses call the audit, gen, and humanize tools directly.",
   },
   {
     icon: Sparkles,
-    title: "Answer-first content",
+    title: "Detect AI-writing tells",
     description:
-      "The humanizer strips AI-writing tells, and the audit rewards direct answers and question framing that engines quote.",
+      "Run geoaeo humanize to find AI filler, inflated phrasing, and unnatural patterns that lower search and citation quality.",
   },
   {
     icon: Boxes,
-    title: "Works with your stack",
+    title: "Framework scaffolding",
     description:
-      "Scaffold artifacts into Next.js, Astro, SvelteKit, Nuxt, Remix, or plain static HTML. No lock-in, MIT licensed.",
+      "Run geoaeo init to scaffold routes and static files into Next.js, Astro, SvelteKit, Nuxt, Remix, or static HTML.",
   },
 ];
 
@@ -58,8 +58,8 @@ export function FeaturesSection() {
             Everything an answer engine looks for
           </h2>
           <p className="text-muted-foreground text-fluid-sm sm:text-base">
-            From the audit that finds the gaps to the generators that fill them,
-            geoaeo is the full toolkit for AI discoverability.
+            From the audit that finds gaps to the generators that fill them,
+            geoaeo provides tools for search and answer engine discoverability.
           </p>
         </div>
 
