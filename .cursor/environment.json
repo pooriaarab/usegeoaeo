@@ -1,0 +1,12 @@
+{
+  "name": "usegeoaeo Cloud Environment",
+  "install": "bun install",
+  "start": "echo 'Environment ready for cloud agents'",
+  "terminals": [
+    {
+      "name": "Verify",
+      "command": "bun run test",
+      "description": "Run tests/lint before opening PRs"
+    }
+  ]
+}
