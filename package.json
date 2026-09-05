@@ -9,6 +9,7 @@
     "workers/*"
   ],
   "scripts": {
+    "ci:local": "bun run lint && bun run typecheck && bun run test",
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
