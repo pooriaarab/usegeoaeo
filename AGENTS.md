@@ -130,3 +130,15 @@ Cloud agents need push access via Git integration and a successful environment B
 Setup guide: https://github.com/pooriaarab/scripts/blob/main/cursor-cloud-rollout.md
 
 <!-- cursor-cloud:end -->
+
+## Merge gates
+
+Run `bun run ci:local` (or `npm run ci:local`) before every `git push`.
+Do not push a red local gate. Do not use CI as the test runner.
+
+For a change a user can see, or that talks to a third party, walk the
+Cloudflare Worker Preview before merge. Quote the Preview URL and status
+codes. A 2xx on the site home is not that walk.
+
+Wait for one LLM review APPROVED. Red CI blocks merge even when GitHub
+does not require checks.
