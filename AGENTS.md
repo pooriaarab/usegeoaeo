@@ -93,6 +93,18 @@ no one to ask for one. Split the change.
 Settings for this repo are in `.github/pr-standards.json`. The standard is at
 https://github.com/pooriaarab/scripts/blob/main/pr-standards.md
 
+## Agent presence
+
+Before you cut a branch:
+
+```
+bin/fleet-presence claim pooriaarab/<repo> <N> --goal "..." --branch <branch>
+```
+
+One sticky GitHub comment per agent. Create once, then PATCH. Same-machine
+lock is local. Name harness, model, host, start time, and goal. Do not dump
+transcripts. Full rule: pooriaarab/agents-private `rules/agent-presence.md`.
+
 <!-- pr-standards:end -->
 
 <!-- cursor-cloud:start -->
