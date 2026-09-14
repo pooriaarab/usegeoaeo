@@ -376,11 +376,8 @@
     display: block;
     width: 16px;
     height: 16px;
-    background-color: #c8102e;
+    background-color: var(--destructive);
     animation: swiss-red-travel 240ms cubic-bezier(0.2, 0, 0, 1) 1 both;
-  }
-  .dark .swiss-red-square {
-    background-color: #ff4438;
   }
   @keyframes swiss-red-travel {
     from {
