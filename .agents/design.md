@@ -51,10 +51,15 @@ provide them.
 
 ## Layout
 
-Use a centered `max-w-6xl` shell with 20 px side padding for primary pages. Keep
-hero content near `max-w-3xl` and explanatory copy near `max-w-2xl`. Use 16 px
-to 24 px gaps inside compact components. Use 64 px to 96 px vertical padding on
-marketing sections.
+Use a centered `max-w-6xl` shell with 20 px side padding for primary pages such
+as docs and tools. Keep hero content near `max-w-3xl` and explanatory copy near
+`max-w-2xl` on those pages. Use 16 px to 24 px gaps inside compact components.
+Use 64 px to 96 px vertical padding on marketing sections.
+
+The landing page is flush left inside its `max-w-6xl` shell, drawn over the
+visible twelve-column grid (four columns below 768px). Each landing section
+opens with a top hairline and a numbered mono label (`01 / ...`) instead of a
+centered eyebrow.
 
 Use responsive grids for equal feature or reference cards. Stack primary and
 secondary actions on narrow screens. Keep navigation and calls to action clear
