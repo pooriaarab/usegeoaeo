@@ -303,6 +303,97 @@
 }
 
 @layer base {
+  /* Swiss brand: the visible twelve-column grid. A fixed, non-interactive
+     layer at the page max width, running the full page height behind the
+     content. The 1px hairlines use the border token (#d8d4d4 / #282424). */
+  .swiss-grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+  }
+  .swiss-grid-overlay__inner {
+    width: 100%;
+    max-width: 72rem;
+    height: 100%;
+    display: grid;
+    /* Four columns on a phone, twelve from 768px. Twelve hairlines across
+       390px is ~32px per column, which stops reading as structure and turns
+       into a grey wash -- the direction dies at small size unless the count
+       drops. The grid stays visible either way; only its density changes. */
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  @media (min-width: 768px) {
+    .swiss-grid-overlay__inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+  }
+  /* The extra eight cells only exist from 768px up. */
+  .swiss-grid-cell:nth-child(n + 5) {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .swiss-grid-cell:nth-child(n + 5) {
+      display: block;
+    }
+  }
+  .swiss-grid-cell {
+    border-left: 1px solid var(--border);
+  }
+  /* Below 768px only the first four cells render, so the DOM's last-child
+     (the twelfth cell) is display:none and never paints its border-right.
+     Close the grid on the fourth cell instead, then hand the right edge
+     back to the twelfth cell once all twelve are visible. */
+  .swiss-grid-cell:nth-child(4) {
+    border-right: 1px solid var(--border);
+  }
+  @media (min-width: 768px) {
+    .swiss-grid-cell:nth-child(4) {
+      border-right: none;
+    }
+    .swiss-grid-cell:last-child {
+      border-right: 1px solid var(--border);
+    }
+  }
+
+  /* Every page section paints above the grid layer. The sections are
+     transparent, so the hairlines still read through their empty space --
+     they just never draw across a glyph. Without this the fixed overlay
+     wins the paint order against static text and crosses the headlines. */
+  .swiss-grid-overlay ~ * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Swiss brand: the one authored motion. The single red square travels a
+     short distance once on load — a change of position and nothing else:
+     no fade, no scale. It is already visible at its resting state. */
+  .swiss-red-square {
+    display: block;
+    width: 16px;
+    height: 16px;
+    background-color: var(--destructive);
+    animation: swiss-red-travel 240ms cubic-bezier(0.2, 0, 0, 1) 1 both;
+  }
+  @keyframes swiss-red-travel {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(16px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .swiss-red-square {
+      animation: none;
+      transform: translateX(16px);
+    }
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

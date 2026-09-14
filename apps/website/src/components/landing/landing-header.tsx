@@ -26,9 +26,9 @@ export function LandingHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color] duration-300 ${
         scrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-subtle"
+          ? "bg-background border-b border-border"
           : "bg-transparent"
       }`}
     >
@@ -66,7 +66,7 @@ function DesktopNav() {
         <Link
           key={link.href}
           href={link.href}
-          className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-md"
+          className="px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           {link.label}
         </Link>
@@ -97,14 +97,14 @@ function DesktopCta() {
  */
 function MobileNav({ onNavigate }: { onNavigate: () => void }) {
   return (
-    <div className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border px-5 pb-4">
+    <div className="md:hidden bg-background border-b border-border px-5 pb-4">
       <nav className="flex flex-col gap-1 mb-3">
         {navLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             onClick={onNavigate}
-            className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground rounded-md"
+            className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
           >
             {link.label}
           </Link>
