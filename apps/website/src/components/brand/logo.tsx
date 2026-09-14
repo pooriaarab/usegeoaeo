@@ -7,7 +7,7 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className={`inline-flex items-center justify-center rounded-lg bg-foreground text-sm font-bold leading-none text-background ${className}`}
+      className={`inline-flex items-center justify-center rounded-none bg-foreground text-sm font-bold leading-none text-background ${className}`}
     >
       g
     </span>

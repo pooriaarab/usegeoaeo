@@ -23,7 +23,7 @@ const markMisuseRules = [
   "Do not uppercase geoaeo or capitalize the mark.",
   "Do not recolor the mark; preserve monochrome foreground and background tokens.",
   "Do not add gradients, outlines, shadows, or decorative effects.",
-  "Do not stretch, rotate, or alter the rounded-square geometry.",
+  "Do not stretch, rotate, or alter the square geometry.",
 ];
 
 const voiceRules = [
@@ -113,7 +113,7 @@ function BrandFoundations() {
           </div>
           <p className="mb-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Write the product name as lowercase <code className="font-mono">geoaeo</code>.
-            Render the mark as a monochrome, high-contrast rounded square with a lowercase{" "}
+            Render the mark as a monochrome, high-contrast square with a lowercase{" "}
             <code className="font-mono">g</code>. Use “usegeoaeo” only for the
             repository or domain.
           </p>
@@ -177,7 +177,7 @@ function TypeSamples() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-xl border border-border bg-card p-6">
-        <p className="text-2xl font-semibold">Geist Sans</p>
+        <p className="text-2xl font-semibold">Archivo</p>
         <p className="mt-2 text-sm text-muted-foreground">
           Interface, prose, and explanatory copy.
         </p>
