@@ -6,6 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* Swiss brand: Archivo for sans, Roboto Mono for mono (loaded in layout.tsx). */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -60,19 +61,18 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  /* Swiss brand: radius 0 everywhere, no shadows. */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
 
-  --shadow-subtle: rgba(0, 0, 0, 0.04) 0px 1px 2px;
-  --shadow-keystone:
-    rgba(0, 0, 0, 0.04) 0px 3px 3px, rgba(0, 0, 0, 0.05) 0px 1px 2px;
-  --shadow-floating:
-    0 0 0 1px rgba(0, 0, 0, 0.05), 0 8px 24px -4px rgba(0, 0, 0, 0.1);
+  --shadow-subtle: none;
+  --shadow-keystone: none;
+  --shadow-floating: none;
 
   --animate-shimmer: shimmer 2s infinite;
   --animate-status-pulse: status-pulse 2.5s ease-in-out infinite;
@@ -187,114 +187,119 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Tinted neutrals with subtle cool blue (hue 250) for professional tech feel */
-  --background: oklch(0.99 0.002 250);
-  --foreground: oklch(0.145 0.01 250);
-  --card: oklch(1 0.002 250);
-  --card-foreground: oklch(0.145 0.01 250);
-  --popover: oklch(1 0.002 250);
-  --popover-foreground: oklch(0.145 0.01 250);
-  --primary: oklch(0.205 0.01 250);
-  --primary-foreground: oklch(0.985 0.005 250);
-  --secondary: oklch(0.97 0.005 250);
-  --secondary-foreground: oklch(0.205 0.01 250);
-  --muted: oklch(0.97 0.005 250);
-  --muted-foreground: oklch(0.556 0.008 250);
-  --accent: oklch(0.97 0.005 250);
-  --accent-foreground: oklch(0.205 0.01 250);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0.005 250);
-  --input: oklch(0.922 0.005 250);
-  --ring: oklch(0.708 0.008 250);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  /* Semantic status colors */
-  --success: oklch(0.6 0.17 145);
-  --success-foreground: oklch(0.44 0.14 145);
-  --success-subtle: oklch(0.96 0.03 150);
-  --success-border: oklch(0.9 0.07 150);
-  --warning: oklch(0.7 0.17 70);
-  --warning-foreground: oklch(0.55 0.14 60);
-  --warning-subtle: oklch(0.98 0.03 85);
-  --warning-border: oklch(0.92 0.08 85);
-  --error: oklch(0.58 0.22 27);
-  --error-foreground: oklch(0.45 0.18 25);
-  --error-subtle: oklch(0.97 0.01 25);
-  --error-border: oklch(0.9 0.06 25);
-  --info: oklch(0.55 0.2 260);
-  --info-foreground: oklch(0.44 0.17 260);
-  --info-subtle: oklch(0.97 0.01 260);
-  --info-border: oklch(0.9 0.06 260);
+  --radius: 0;
+  /* Swiss brand palette (light): bg #ffffff, surface #f2f2f2, fg #111111,
+     muted #5c5555, border #d8d4d4, accent red #c8102e, accentFg #ffffff.
+     Buttons stay black on white: --primary is fg, --primary-foreground is bg.
+     The red lives only in --destructive/--error; it is not a button colour. */
+  --background: #ffffff;
+  --foreground: #111111;
+  --card: #f2f2f2;
+  --card-foreground: #111111;
+  --popover: #f2f2f2;
+  --popover-foreground: #111111;
+  --primary: #111111;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #111111;
+  --muted: #f2f2f2;
+  --muted-foreground: #5c5555;
+  --accent: #f2f2f2;
+  --accent-foreground: #111111;
+  --destructive: #c8102e;
+  --border: #d8d4d4;
+  --input: #d8d4d4;
+  --ring: #111111;
+  --chart-1: #111111;
+  --chart-2: #5c5555;
+  --chart-3: #d8d4d4;
+  --chart-4: #111111;
+  --chart-5: #5c5555;
+  /* Semantic status colors, folded into the swiss neutrals (errors stay red) */
+  --success: #111111;
+  --success-foreground: #111111;
+  --success-subtle: #f2f2f2;
+  --success-border: #d8d4d4;
+  --warning: #111111;
+  --warning-foreground: #5c5555;
+  --warning-subtle: #f2f2f2;
+  --warning-border: #d8d4d4;
+  --error: #c8102e;
+  --error-foreground: #ffffff;
+  --error-subtle: #f2f2f2;
+  --error-border: #d8d4d4;
+  --info: #111111;
+  --info-foreground: #5c5555;
+  --info-subtle: #f2f2f2;
+  --info-border: #d8d4d4;
   /* Interactive link colors */
-  --link: oklch(0.55 0.2 260);
-  --link-hover: oklch(0.44 0.17 260);
-  --sidebar: oklch(0.985 0.005 250);
-  --sidebar-foreground: oklch(0.145 0.01 250);
-  --sidebar-primary: oklch(0.205 0.01 250);
-  --sidebar-primary-foreground: oklch(0.985 0.005 250);
-  --sidebar-accent: oklch(0.97 0.005 250);
-  --sidebar-accent-foreground: oklch(0.205 0.01 250);
-  --sidebar-border: oklch(0.922 0.005 250);
-  --sidebar-ring: oklch(0.708 0.008 250);
+  --link: #111111;
+  --link-hover: #111111;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111111;
+  --sidebar-primary: #111111;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2f2f2;
+  --sidebar-accent-foreground: #111111;
+  --sidebar-border: #d8d4d4;
+  --sidebar-ring: #111111;
 }
 
 .dark {
-  /* Dark mode with tinted neutrals - lighter surfaces for depth, reduced font weight recommended */
-  --background: oklch(0.15 0.01 250);
-  --foreground: oklch(0.95 0.005 250);
-  --card: oklch(0.2 0.01 250);
-  --card-foreground: oklch(0.95 0.005 250);
-  --popover: oklch(0.2 0.01 250);
-  --popover-foreground: oklch(0.95 0.005 250);
-  --primary: oklch(0.88 0.008 250);
-  --primary-foreground: oklch(0.2 0.01 250);
-  --secondary: oklch(0.27 0.01 250);
-  --secondary-foreground: oklch(0.95 0.005 250);
-  --muted: oklch(0.27 0.01 250);
-  --muted-foreground: oklch(0.708 0.008 250);
-  --accent: oklch(0.27 0.01 250);
-  --accent-foreground: oklch(0.95 0.005 250);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0.005 250 / 12%);
-  --input: oklch(1 0.005 250 / 18%);
-  --ring: oklch(0.556 0.008 250);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  /* Semantic status colors — dark mode */
-  --success: oklch(0.72 0.17 155);
-  --success-foreground: oklch(0.8 0.14 155);
-  --success-subtle: oklch(0.22 0.04 145);
-  --success-border: oklch(0.3 0.06 145);
-  --warning: oklch(0.82 0.16 75);
-  --warning-foreground: oklch(0.88 0.12 75);
-  --warning-subtle: oklch(0.22 0.04 65);
-  --warning-border: oklch(0.3 0.06 65);
-  --error: oklch(0.7 0.19 25);
-  --error-foreground: oklch(0.78 0.15 25);
-  --error-subtle: oklch(0.22 0.04 25);
-  --error-border: oklch(0.3 0.06 25);
-  --info: oklch(0.62 0.17 255);
-  --info-foreground: oklch(0.79 0.14 255);
-  --info-subtle: oklch(0.22 0.04 260);
-  --info-border: oklch(0.3 0.06 260);
+  /* Swiss brand palette (dark): same poster under gallery lighting.
+     bg #0a0a0a, surface #161616, fg #f2f2f2, muted #a09a9a,
+     border #282424, accent red #ff4438, accentFg #0a0a0a. */
+  --background: #0a0a0a;
+  --foreground: #f2f2f2;
+  --card: #161616;
+  --card-foreground: #f2f2f2;
+  --popover: #161616;
+  --popover-foreground: #f2f2f2;
+  --primary: #f2f2f2;
+  --primary-foreground: #0a0a0a;
+  --secondary: #161616;
+  --secondary-foreground: #f2f2f2;
+  --muted: #161616;
+  --muted-foreground: #a09a9a;
+  --accent: #161616;
+  --accent-foreground: #f2f2f2;
+  --destructive: #ff4438;
+  --border: #282424;
+  --input: #282424;
+  --ring: #f2f2f2;
+  --chart-1: #f2f2f2;
+  --chart-2: #a09a9a;
+  --chart-3: #282424;
+  --chart-4: #f2f2f2;
+  --chart-5: #a09a9a;
+  /* Semantic status colors — dark mode, folded into the swiss neutrals */
+  --success: #f2f2f2;
+  --success-foreground: #f2f2f2;
+  --success-subtle: #161616;
+  --success-border: #282424;
+  --warning: #f2f2f2;
+  --warning-foreground: #a09a9a;
+  --warning-subtle: #161616;
+  --warning-border: #282424;
+  --error: #ff4438;
+  --error-foreground: #0a0a0a;
+  --error-subtle: #161616;
+  --error-border: #282424;
+  --info: #f2f2f2;
+  --info-foreground: #a09a9a;
+  --info-subtle: #161616;
+  --info-border: #282424;
   /* Interactive link colors — dark mode */
-  --link: oklch(0.7 0.17 260);
-  --link-hover: oklch(0.82 0.14 260);
-  --sidebar: oklch(0.2 0.01 250);
-  --sidebar-foreground: oklch(0.95 0.005 250);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.95 0.005 250);
-  --sidebar-accent: oklch(0.27 0.01 250);
-  --sidebar-accent-foreground: oklch(0.95 0.005 250);
-  --sidebar-border: oklch(1 0.005 250 / 10%);
-  --sidebar-ring: oklch(0.556 0.008 250);
+  --link: #f2f2f2;
+  --link-hover: #f2f2f2;
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #f2f2f2;
+  --sidebar-primary: #f2f2f2;
+  --sidebar-primary-foreground: #0a0a0a;
+  --sidebar-accent: #161616;
+  --sidebar-accent-foreground: #f2f2f2;
+  --sidebar-border: #282424;
+  --sidebar-ring: #f2f2f2;
 }
 
 @layer base {

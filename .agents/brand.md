@@ -29,7 +29,7 @@ Assume technical curiosity, but explain GEO and AEO on first use.
 
 ## Mark
 
-The mark is a high-contrast rounded square containing a lowercase `g`. Render
+The mark is a high-contrast square containing a lowercase `g`. Render
 it with the foreground and background tokens. Keep its geometry and case. Do
 not add gradients, outlines, shadows, or decorative effects.
 
