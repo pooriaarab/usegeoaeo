@@ -17,3 +17,6 @@ apps/website/src/generated/agents-md.generated.ts
 # Cursor cloud — local secrets stay local
 .env.local
 .env.*.local
+
+# wrangler local state
+.wrangler/
