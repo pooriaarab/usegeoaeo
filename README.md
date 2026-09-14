@@ -39,7 +39,7 @@ artifact. Any other directory gets static files.
 
 ## What the audit measures
 
-Twenty weighted checks across answerability, structured data, `llms.txt`, crawlability,
+24 weighted checks across answerability, structured data, `llms.txt`, crawlability,
 freshness, and E-E-A-T. The score is a number you can put in CI:
 
 ```bash

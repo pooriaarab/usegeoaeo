@@ -12,7 +12,7 @@ const faqs = [
   {
     question: "What does geoaeo do?",
     answer:
-      "geoaeo audits any site from 0 to 100 across 20 weighted checks, then generates missing discovery artifacts. It outputs llms.txt, llms-full.txt, sitemaps, robots.txt, JSON-LD schemas, WebMCP manifests, and Markdown mirrors. It also includes an AI copy humanizer and an MCP server.",
+      "geoaeo audits any site from 0 to 100 across 24 weighted checks, then generates missing discovery artifacts. It outputs llms.txt, llms-full.txt, sitemaps, robots.txt, JSON-LD schemas, WebMCP manifests, and Markdown mirrors. It also includes an AI copy humanizer and an MCP server.",
   },
   {
     question: "Does geoaeo work with my framework?",

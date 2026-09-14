@@ -3,7 +3,7 @@ import { Button } from "@template/ui/primitives/button";
 import { Check } from "lucide-react";
 
 const features = [
-  "Full site audit: 20 weighted checks with 0-100 score",
+  "Full site audit: 24 weighted checks with 0-100 score",
   "All generators: llms.txt, JSON-LD, sitemaps, robots.txt, WebMCP, RSS, Markdown mirrors",
   "Scaffolding for Next.js, Astro, SvelteKit, Nuxt, Remix, and static HTML",
   "Built-in MCP server: audit, gen, and humanize tools over stdio",
