@@ -6,6 +6,26 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-14
+
+### Fixed
+
+- MCP server: `registerTool` is now bound to the server before it is called.
+  It was invoked detached, so `this` was undefined inside the SDK method.
+- MCP tool schemas use the Zod shapes the SDK accepts natively, replacing a
+  brief detour through a `zod/v3` import.
+
+### Added
+
+- `mcpName` (`io.github.pooriaarab/geoaeo`) in the package manifest, so the
+  MCP registry can resolve the server. `server.json` moved with it.
+
+### Changed
+
+- Zod range tightened from `^4.0.0` to `^4.5.4`.
+- `audit` and `init` split into smaller modules to fit the repo's lint
+  budgets. No behaviour change.
+
 ## [0.3.0] - 2026-08-13
 
 ### Added
