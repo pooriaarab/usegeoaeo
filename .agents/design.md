@@ -9,35 +9,41 @@ UI primitives before adding styles or components.
 
 ## Colors
 
-Use the semantic tokens in `apps/website/app/globals.css`. The neutral scale has
-a subtle cool tint at OKLCH hue 250. Do not use raw gray utilities.
+Use the semantic tokens in `apps/website/app/globals.css`. The neutral scale is
+a flat Swiss palette of black, white, and grays. Do not use raw gray utilities.
+Red is reserved for the `destructive`/`error` families; it is not a button
+color. Primary buttons stay foreground-on-background (black on white in light
+mode, white on black in dark mode).
 
 Core light tokens:
 
-- Background: `oklch(0.99 0.002 250)`.
-- Foreground: `oklch(0.145 0.01 250)`.
-- Card: `oklch(1 0.002 250)`.
-- Primary: `oklch(0.205 0.01 250)`.
-- Muted: `oklch(0.97 0.005 250)`.
-- Border: `oklch(0.922 0.005 250)`.
+- Background: `#ffffff`.
+- Foreground: `#111111`.
+- Card: `#f2f2f2`.
+- Primary: `#111111`.
+- Muted: `#f2f2f2` (muted foreground `#5c5555`).
+- Border: `#d8d4d4`.
+- Destructive/error: `#c8102e`.
 
 Core dark tokens:
 
-- Background: `oklch(0.15 0.01 250)`.
-- Foreground: `oklch(0.95 0.005 250)`.
-- Card: `oklch(0.2 0.01 250)`.
-- Primary: `oklch(0.88 0.008 250)`.
-- Muted: `oklch(0.27 0.01 250)`.
-- Border: `oklch(1 0.005 250 / 12%)`.
+- Background: `#0a0a0a`.
+- Foreground: `#f2f2f2`.
+- Card: `#161616`.
+- Primary: `#f2f2f2`.
+- Muted: `#161616` (muted foreground `#a09a9a`).
+- Border: `#282424`.
+- Destructive/error: `#ff4438`.
 
 Use the `success`, `warning`, `error`, and `info` families only for their named
 states. Check contrast in light and dark themes.
 
 ## Typography
 
-Use Geist Sans for interface and prose. Use Geist Mono for commands, code,
-scores, and the `geoaeo` wordmark. In code, disable ligatures and use a slashed
-zero. Use tabular numbers for scores and structured data.
+Use Archivo for interface and prose. Use Roboto Mono for commands, code,
+scores, and the `geoaeo` wordmark. Both load at weights 400, 500, 600, and 700.
+In code, disable ligatures and use a slashed zero. Use tabular numbers for
+scores and structured data.
 
 Use balanced wrapping for headings and natural wrapping for paragraphs. Keep
 body copy short. Use fluid display sizes only where the existing utilities
@@ -56,21 +62,19 @@ without competing with the page answer.
 
 ## Elevation & Depth
 
-Prefer borders and surface tokens. Use the three defined shadows sparingly:
-
-- `shadow-subtle` for a small surface lift.
-- `shadow-keystone` for prominent panels.
-- `shadow-floating` for overlays and popovers.
+Use borders and surface tokens for depth, not shadows. `shadow-subtle`,
+`shadow-keystone`, and `shadow-floating` all resolve to `none`; do not add new
+box-shadow utilities to fake elevation.
 
 Use 150–300 ms transitions for state changes. Honor `prefers-reduced-motion`.
 Never require animation to understand status or progress.
 
 ## Shapes
 
-The base radius is `0.625rem`. Use derived radius tokens. Cards typically use
-`rounded-xl`; controls and the logo use smaller radii.
+The base radius is `0`. Every derived radius token (`rounded-sm` through
+`rounded-4xl`) resolves to `0`; do not add a hardcoded radius to work around it.
 
-The logo is a rounded square with a lowercase `g`. Keep it monochrome and
+The logo is a square with a lowercase `g`. Keep it monochrome and
 high-contrast. Use Lucide icons at the existing component size. Do not invent a
 second logo or decorative icon family.
 
