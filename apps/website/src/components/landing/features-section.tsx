@@ -49,31 +49,32 @@ const features = [
 export function FeaturesSection() {
   return (
     <section id="features" className="py-16 sm:py-24 px-5 scroll-mt-20">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-6xl border-t border-border pt-6">
+        <p className="font-mono text-[11px] uppercase tracking-[0.06em] text-muted-foreground mb-10 sm:mb-12">
+          01 / WHAT IT DOES
+        </p>
+
         <div className="max-w-2xl mb-12 sm:mb-16">
-          <p className="text-sm font-medium text-muted-foreground mb-2 tracking-wide uppercase">
-            Capabilities
-          </p>
-          <h2 className="text-fluid-xl sm:text-3xl font-bold tracking-tight mb-3">
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-[-0.035em] leading-[0.98] mb-4">
             Everything an answer engine looks for
           </h2>
-          <p className="text-muted-foreground text-fluid-sm sm:text-base">
+          <p className="text-muted-foreground text-base leading-[1.5]">
             From the audit that finds gaps to the generators that fill them,
             geoaeo provides tools for search and answer engine discoverability.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger-fade-in">
+        <div className="grid gap-px bg-border border border-border sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <div
               key={f.title}
-              className="group relative p-5 sm:p-6 rounded-xl border border-border bg-card hover:border-foreground/10 transition-colors"
+              className="bg-background p-5 sm:p-6"
             >
-              <div className="size-9 rounded-lg bg-muted flex items-center justify-center mb-4 group-hover:bg-foreground/[0.06] transition-colors">
+              <div className="size-9 bg-muted flex items-center justify-center mb-4">
                 <f.icon className="size-[18px] text-foreground" />
               </div>
               <h3 className="text-sm font-semibold mb-1.5">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-[1.5]">
                 {f.description}
               </p>
             </div>

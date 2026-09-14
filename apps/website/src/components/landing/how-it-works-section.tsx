@@ -27,31 +27,30 @@ const steps = [
 export function HowItWorksSection() {
   return (
     <section id="how-it-works" className="py-16 sm:py-24 px-5 scroll-mt-20">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-6xl border-t border-border pt-6">
+        <p className="font-mono text-[11px] uppercase tracking-[0.06em] text-muted-foreground mb-10 sm:mb-12">
+          02 / HOW IT WORKS
+        </p>
+
         <div className="max-w-2xl mb-12 sm:mb-16">
-          <p className="text-sm font-medium text-muted-foreground mb-2 tracking-wide uppercase">
-            How it works
-          </p>
-          <h2 className="text-fluid-xl sm:text-3xl font-bold tracking-tight mb-3">
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-[-0.035em] leading-[0.98]">
             Audit, generate, ship
           </h2>
         </div>
 
-        <div className="grid gap-8 sm:gap-6 lg:grid-cols-3">
+        <div className="grid gap-px bg-border border border-border lg:grid-cols-3">
           {steps.map((step) => (
-            <div key={step.num} className="relative">
-              <span className="text-[64px] sm:text-[80px] font-bold leading-none text-foreground/[0.04] absolute -top-2 -left-1 select-none pointer-events-none">
+            <div key={step.num} className="bg-background p-5 sm:p-6">
+              <p className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground mb-6">
                 {step.num}
-              </span>
-              <div className="relative pt-12 sm:pt-14">
-                <div className="size-9 rounded-lg bg-muted flex items-center justify-center mb-4">
-                  <step.icon className="size-[18px] text-foreground" />
-                </div>
-                <h3 className="text-base font-semibold mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.description}
-                </p>
+              </p>
+              <div className="size-9 bg-muted flex items-center justify-center mb-4">
+                <step.icon className="size-[18px] text-foreground" />
               </div>
+              <h3 className="text-base font-semibold mb-2">{step.title}</h3>
+              <p className="text-sm text-muted-foreground leading-[1.5]">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
