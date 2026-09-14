@@ -344,8 +344,20 @@
   .swiss-grid-cell {
     border-left: 1px solid var(--border);
   }
-  .swiss-grid-cell:last-child {
+  /* Below 768px only the first four cells render, so the DOM's last-child
+     (the twelfth cell) is display:none and never paints its border-right.
+     Close the grid on the fourth cell instead, then hand the right edge
+     back to the twelfth cell once all twelve are visible. */
+  .swiss-grid-cell:nth-child(4) {
     border-right: 1px solid var(--border);
+  }
+  @media (min-width: 768px) {
+    .swiss-grid-cell:nth-child(4) {
+      border-right: none;
+    }
+    .swiss-grid-cell:last-child {
+      border-right: 1px solid var(--border);
+    }
   }
 
   /* Every page section paints above the grid layer. The sections are
