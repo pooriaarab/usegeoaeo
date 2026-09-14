@@ -13,7 +13,7 @@ const geistSans = Archivo({
 const geistMono = Roboto_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700"],
 });
 
 // 150 characters. The previous one ran to 186 and Google cut it mid-list.
