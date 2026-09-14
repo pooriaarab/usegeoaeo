@@ -32,19 +32,42 @@ jobs:
         working-directory: .
         run: bun run --filter geoaeo verify
 
+      # Both publish steps run from a copy of the package OUTSIDE the repo.
+      #
+      # npm has no workspace: protocol. Run it anywhere under this repo root
+      # and it loads the root `workspaces` config, reads every member manifest
+      # -- including apps/website, which bun links with workspace:* -- and dies
+      # with EUNSUPPORTEDPROTOCOL before it uploads anything. packages/geoaeo
+      # itself has no workspace: dependency; being a member of the workspace is
+      # enough. A copy with no workspace root above it never enters that mode.
+      #
+      # --ignore-scripts skips prepublishOnly, which would re-run verify against
+      # a tree with no node_modules. The Verify step above already ran it, and
+      # it built the dist/ that gets copied here.
+      - name: Stage the package outside the workspace
+        working-directory: .
+        run: |
+          rm -rf "$RUNNER_TEMP/geoaeo-publish"
+          mkdir -p "$RUNNER_TEMP/geoaeo-publish"
+          cp -R packages/geoaeo/. "$RUNNER_TEMP/geoaeo-publish"/
+          rm -rf "$RUNNER_TEMP/geoaeo-publish/node_modules"
+          test -f "$RUNNER_TEMP/geoaeo-publish/dist/cli.js"
+
       # Production: a pushed vX.Y.Z tag. package.json version must match the tag.
       - name: Publish latest (production)
         if: startsWith(github.ref, 'refs/tags/v')
-        run: npm publish --tag latest
+        working-directory: ${{ runner.temp }}/geoaeo-publish
+        run: npm publish --tag latest --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Staging: a merge to main. Publish a unique prerelease under `next`.
       - name: Publish next (staging)
         if: github.ref == 'refs/heads/main'
+        working-directory: ${{ runner.temp }}/geoaeo-publish
         run: |
           BASE=$(node -p "require('./package.json').version")
           npm version "${BASE}-next.${GITHUB_RUN_NUMBER}" --no-git-tag-version
-          npm publish --tag next
+          npm publish --tag next --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
