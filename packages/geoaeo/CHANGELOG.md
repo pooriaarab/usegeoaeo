@@ -12,6 +12,10 @@ All notable changes to geoaeo are recorded here. The format follows
   check fails when that header or the robots meta tag contains `noindex`,
   and the detail names which signal set it. A directory audit still
   checks only the meta tag.
+- `audit` no longer passes a `robots.txt` that disallows AI crawlers. A new
+  `ai-crawlers` check parses the policy's user-agent groups and fails, naming
+  the blocked agents, when one is disallowed from `/`. `robots` keeps the
+  presence-and-sitemap test at weight 1; the 25 checks still sum to 100.
 
 ## [0.3.1] - 2026-09-14
 

@@ -47,11 +47,15 @@ content. Client-only shells with empty first HTML give them nothing to index or 
 the systems you want to cite you.
 
 **How geoaeo covers it.**
-- `geoaeo gen robots` emits a robots policy that includes a `Sitemap:` line from config.
+- `geoaeo gen robots` emits a robots policy that includes a `Sitemap:` line from config
+  and an `Allow: /` group for each named AI crawler.
 - Audit check `robots` requires a robots artifact that mentions a user-agent policy and a
   sitemap URL.
+- Audit check `ai-crawlers` parses the policy's user-agent groups and fails when a named
+  AI crawler (GPTBot, ClaudeBot, PerplexityBot, and peers) is disallowed from `/`. A
+  crawler with no block of its own inherits the `*` group.
 
-**Not covered yet.** No parser for `Disallow` overreach, no AI-bot allowlist presets, no
+**Not covered yet.** No AI-bot allowlist presets beyond the generator's fixed list, no
 live robots negotiation beyond fetching `/robots.txt`.
 
 ### 1.3 Stable, linkable URLs
@@ -314,8 +318,8 @@ speeds discovery.
 
 **How geoaeo covers it.**
 - `geoaeo gen robots`
-- Audit `robots` (weight 8) requires both a user-agent policy signal and a sitemap
-  reference.
+- Audit `robots` (weight 1) requires both a user-agent policy signal and a sitemap
+  reference. Whether the policy actually admits AI crawlers is `ai-crawlers` (§1.2).
 
 **Not covered yet.** No sitemap index for very large sites, no hreflang entries inside
 the sitemap, no automated submission to search consoles.
