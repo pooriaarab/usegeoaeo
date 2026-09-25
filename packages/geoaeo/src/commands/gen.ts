@@ -3,7 +3,21 @@ import { loadSiteConfig } from './load-config.js';
 import { generateHreflang, generateJsonLd, generateLlms, generateLlmsFull, generateMdmirror, generateOgimage, generateRobots, generateRss, generateSitemap, generateWebmcp, type JsonLdKind } from '../generators/index.js';
 import type { SiteConfig } from '../config.js';
 
-export type GeneratedArtifact = 'llms' | 'llms-full' | 'jsonld' | 'webmcp' | 'sitemap' | 'robots' | 'ogimage' | 'rss' | 'hreflang' | 'mdmirror';
+// Single source for the library type, the CLI allow-list, and the MCP Zod enum.
+export const GENERATED_ARTIFACTS = [
+  'llms',
+  'llms-full',
+  'jsonld',
+  'webmcp',
+  'sitemap',
+  'robots',
+  'ogimage',
+  'rss',
+  'hreflang',
+  'mdmirror',
+] as const;
+
+export type GeneratedArtifact = (typeof GENERATED_ARTIFACTS)[number];
 
 function renderArtifact(artifact: GeneratedArtifact, config: SiteConfig, jsonLdKind: JsonLdKind): string {
   const map: Record<GeneratedArtifact, (c: SiteConfig, k: JsonLdKind) => string> = {

@@ -145,8 +145,10 @@ function Tools() {
 { "artifact": "jsonld", "type": "software" }`}</code>
       </pre>
       <p>
-        <code>artifact</code> enum: llms, llms-full, jsonld, webmcp, sitemap, robots. For jsonld, <code>type</code>{" "}
-        may be software, product, faq, or breadcrumb. Reads <code>geoaeo.config.ts</code> in the current directory.
+        <code>artifact</code> enum: llms, llms-full, jsonld, webmcp, sitemap, robots, ogimage, rss, hreflang,
+        mdmirror. For jsonld, <code>type</code>{" "}
+        may be software, product, faq, breadcrumb, organization, website, article, howto, person, or review. Reads{" "}
+        <code>geoaeo.config.ts</code> in the current directory.
       </p>
 
       <h3>
