@@ -39,6 +39,7 @@ export interface PageSignals {
   h1: boolean;
   earlyFaq: boolean;
   directAnswer: boolean;
+  wordCount: number;
   questionHeadings: boolean;
   freshness: boolean;
   author: boolean;
