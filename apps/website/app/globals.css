@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
@@ -576,4 +577,12 @@
       animation: none;
     }
   }
+}
+
+/* The typography plugin paints pre text for a dark code slab, and it
+   sets a 6px radius. Docs pages ask for a muted pre background, and
+   this site's radius is 0. */
+.prose :is(pre) {
+  color: var(--foreground);
+  border-radius: 0;
 }
