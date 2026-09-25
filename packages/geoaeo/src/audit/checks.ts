@@ -1,6 +1,7 @@
-import type { AuditCheck, PageSnapshot, TargetSnapshot } from './types.js';
+import type { AuditCheck, PageSignals, PageSnapshot, TargetSnapshot } from './types.js';
 import { AI_AGENTS } from '../generators/robots.js';
 import { analyzePage } from './analyze-page.js';
+import { ANSWERABILITY_WORD_FLOOR } from './constants.js';
 import { blockedAgents } from './robots-policy.js';
 
 interface CheckContext {
@@ -68,6 +69,31 @@ function noindexReasons(header: boolean, meta: boolean): string {
   return reasons.filter(reason => reason.length > 0).join('; ');
 }
 
+function hasOpeningAnswer(page: PageSignals): boolean {
+  return page.directAnswer && page.h1;
+}
+
+function hasQuoteBody(page: PageSignals): boolean {
+  return page.wordCount >= ANSWERABILITY_WORD_FLOOR;
+}
+
+function isAnswerable(page: PageSignals): boolean {
+  return hasOpeningAnswer(page) && hasQuoteBody(page);
+}
+
+/** Name which half of answerability failed. A generic miss hides the cause. */
+function answerabilityDetails(ctx: CheckContext): string {
+  const opening = ctx.anyPage(hasOpeningAnswer);
+  const quote = ctx.anyPage(hasQuoteBody);
+  if (ctx.anyPage(isAnswerable)) {
+    return 'A page opens with a concise, direct answer under a clear H1 and has enough body text to quote.';
+  }
+  if (opening && !quote) return `Not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`;
+  if (!opening && quote) return 'No concise direct answer under a clear H1.';
+  if (opening && quote) return 'No single page has both a direct opening answer and enough words to quote.';
+  return `No concise direct answer under a clear H1, and not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`;
+}
+
 function getCheckDefinitions(): CheckDef[] {
   return [
     { id: 'llms', label: '/llms.txt', weight: 6, details: 'Short site map is present.', passed: ctx => /generateLlms|#\s+\S+/i.test(ctx.artifacts.get('__llms') ?? '') },
@@ -87,7 +113,7 @@ function getCheckDefinitions(): CheckDef[] {
     { id: 'meta-robots', label: 'Indexable', weight: 2, details: 'No page is set to noindex.', passed: ctx => ctx.allPage(page => page.metaRobotsOk) && !headerNoindex(ctx.pages) },
     { id: 'image-alt', label: 'Image alt text', weight: 1, details: 'Every image has alt text.', passed: ctx => ctx.allPage(page => page.imageAlt) },
     { id: 'heading-order', label: 'Heading structure', weight: 3, details: 'A page has one H1 and section H2s.', passed: ctx => ctx.anyPage(page => page.headingOrder) },
-    { id: 'answerability', label: 'Answer-first content', weight: 9, details: 'A page opens with a concise, direct answer under a clear H1.', passed: ctx => ctx.anyPage(page => page.directAnswer && page.h1) },
+    { id: 'answerability', label: 'Answer-first content', weight: 9, details: 'A page opens with a concise, direct answer under a clear H1 and has enough body text to quote.', passed: ctx => ctx.anyPage(isAnswerable) },
     { id: 'qa-framing', label: 'Question framing', weight: 5, details: 'Content is framed as questions an engine can quote.', passed: ctx => ctx.anyPage(page => page.questionHeadings || page.earlyFaq) },
     { id: 'freshness', label: 'Freshness signals', weight: 6, details: 'Pages show a published or updated date.', passed: ctx => ctx.anyPage(page => page.freshness) },
     { id: 'author', label: 'Author and E-E-A-T', weight: 6, details: 'Pages name an author or organization.', passed: ctx => ctx.anyPage(page => page.author) },
@@ -106,11 +132,12 @@ function detailFor(check: CheckDef, ctx: CheckContext): string {
     return reasons || check.details;
   }
   if (check.id === 'ai-crawlers' && ctx.blockedAiAgents.length) return `Blocked: ${ctx.blockedAiAgents.join(', ')}.`;
+  if (check.id === 'answerability') return answerabilityDetails(ctx);
   return check.details;
 }
 
 function applyFailurePrefix(check: AuditCheck): AuditCheck {
-  if (check.passed || check.id === 'ai-crawlers' || check.details.startsWith('noindex set by ')) return check;
+  if (check.passed || check.id === 'ai-crawlers' || check.id === 'answerability' || check.details.startsWith('noindex set by ')) return check;
   return { ...check, details: `Missing: ${check.details.toLowerCase()}` };
 }
 

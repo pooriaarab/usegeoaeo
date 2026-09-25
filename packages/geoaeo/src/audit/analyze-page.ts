@@ -48,6 +48,12 @@ function buildHtmlContext(source: string): HtmlContext {
   return { source, visible, top, jsonLdTypes, firstParagraph, questionHeadings, images, $ };
 }
 
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+}
+
 function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[keyof PageSignals] {
   const table: Record<string, () => unknown> = {
     title: () => ctx.$('title').text().trim().length > 0,
@@ -60,6 +66,7 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     h1: () => ctx.$('h1').length > 0,
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(ctx.visible.slice(0, 5000)),
     directAnswer: () => ctx.firstParagraph.length >= 40 && ctx.firstParagraph.length <= 600,
+    wordCount: () => countWords(ctx.visible),
     questionHeadings: () => ctx.questionHeadings,
     freshness: () => checkHtmlFreshness(ctx),
     author: () => checkHtmlAuthor(ctx),
@@ -93,7 +100,7 @@ function analyzeHtml(source: string): PageSignals {
   const ctx = buildHtmlContext(source);
   const keys: Array<keyof PageSignals> = [
     'title', 'description', 'canonical', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
-    'h1', 'earlyFaq', 'directAnswer', 'questionHeadings', 'freshness', 'author',
+    'h1', 'earlyFaq', 'directAnswer', 'wordCount', 'questionHeadings', 'freshness', 'author',
     'headingOrder', 'imageAlt', 'metaRobotsOk', 'hreflang',
   ];
   const result = {} as PageSignals;
@@ -113,6 +120,7 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
     h1: () => sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
     directAnswer: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
+    wordCount: () => countWords(source),
     questionHeadings: () => /<h[23][^>]*>[^<]*\?/i.test(source),
     freshness: () => sourceHas(source, [/date(Published|Modified)/i, /<time[\s>]/i, /(updated|published|last modified)[^.]{0,40}\b20\d{2}\b/i]),
     author: () => sourceHas(source, [/name=["']author["']/i, /rel=["']author["']/i, /itemprop=["']author["']/i, /"@type"\s*:\s*"Person"/i]),
@@ -127,7 +135,7 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
 function analyzeSource(source: string): PageSignals {
   const keys: Array<keyof PageSignals> = [
     'title', 'description', 'canonical', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
-    'h1', 'earlyFaq', 'directAnswer', 'questionHeadings', 'freshness', 'author',
+    'h1', 'earlyFaq', 'directAnswer', 'wordCount', 'questionHeadings', 'freshness', 'author',
     'headingOrder', 'imageAlt', 'metaRobotsOk', 'hreflang',
   ];
   const result = {} as PageSignals;
