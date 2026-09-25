@@ -104,13 +104,31 @@ function parseSitemapUrls(sitemap: string): string[] {
     .slice(0, 4);
 }
 
+/** Rewrite a sitemap <loc> onto the target's origin: keep the path, replace scheme, host and port. */
+function resolveOnTarget(rawUrl: string, target: URL): string | undefined {
+  try {
+    const loc = new URL(rawUrl, target.href);
+    return `${target.origin}${loc.pathname}${loc.search}${loc.hash}`;
+  } catch {
+    return undefined;
+  }
+}
+
 async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
   const home = await fetchText(base);
   if (home.text) pages.push(pageFromFetch(base, home));
-  const sitemapUrls = parseSitemapUrls(sitemap);
-  for (const url of sitemapUrls) {
-    if (url === base) continue;
+  let target: URL;
+  try {
+    target = new URL(base);
+  } catch {
+    return pages;
+  }
+  const seen = new Set<string>([target.href]);
+  for (const rawUrl of parseSitemapUrls(sitemap)) {
+    const url = resolveOnTarget(rawUrl, target);
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
     const page = await fetchText(url);
     if (page.text) pages.push(pageFromFetch(url, page));
   }
