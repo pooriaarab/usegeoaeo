@@ -15,6 +15,27 @@ const genTypeSchema = z.enum(JSON_LD_KINDS);
 export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
 export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
+async function auditHandler({ target }: { target: string }) {
+  const report = await auditTarget(target);
+  // Text is the same report the CLI prints. structuredContent is the object
+  // an agent can read without parsing a JSON blob.
+  return {
+    content: [{ type: 'text', text: formatAuditReport(report) }],
+    structuredContent: report,
+  };
+}
+
+async function humanizeHandler({ glob, write }: { glob: string; write?: boolean }) {
+  const results = await humanizeGlob(glob, { write });
+  const summary = [...results.entries()].map(([file, result]) => ({ file, findings: result.findings }));
+  const findingCount = summary.reduce((count, item) => count + item.findings.length, 0);
+  // MCP structuredContent must be an object, so the findings array lives under results.
+  return {
+    content: [{ type: 'text', text: `${summary.length} files, ${findingCount} findings` }],
+    structuredContent: { results: summary },
+  };
+}
+
 export function createMcpServer(): McpServer {
   const server = new McpServer({ name: PKG_NAME, version: VERSION });
   // The SDK's registerTool types its inputSchema against a bundled zod version that this
@@ -32,15 +53,7 @@ export function createMcpServer(): McpServer {
       description: 'Audit a live URL or local site directory for GEO and AEO gaps.',
       inputSchema: { target: z.string() },
     },
-    async ({ target }: { target: string }) => {
-      const report = await auditTarget(target);
-      // Text is the same report the CLI prints. structuredContent is the object
-      // an agent can read without parsing a JSON blob.
-      return {
-        content: [{ type: 'text', text: formatAuditReport(report) }],
-        structuredContent: report,
-      };
-    }
+    auditHandler
   );
   registerTool(
     'gen',
@@ -64,16 +77,7 @@ export function createMcpServer(): McpServer {
       description: 'Find AI-writing tells in prose files. Set write to update them.',
       inputSchema: { glob: z.string(), write: z.boolean().optional() },
     },
-    async ({ glob, write }: { glob: string; write?: boolean }) => {
-      const results = await humanizeGlob(glob, { write });
-      const summary = [...results.entries()].map(([file, result]) => ({ file, findings: result.findings }));
-      const findingCount = summary.reduce((count, item) => count + item.findings.length, 0);
-      // MCP structuredContent must be an object, so the findings array lives under results.
-      return {
-        content: [{ type: 'text', text: `${summary.length} files, ${findingCount} findings` }],
-        structuredContent: { results: summary },
-      };
-    }
+    humanizeHandler
   );
   return server;
 }
