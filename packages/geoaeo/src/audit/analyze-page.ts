@@ -120,6 +120,10 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
     h1: () => sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
     directAnswer: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
+    // Source files have no rendered text, so this counts the raw source --
+    // imports and className strings included. A code-heavy page with little
+    // prose can clear the floor here. The HTML path above counts visible text
+    // and is the one that decides a URL audit. Tracked separately.
     wordCount: () => countWords(source),
     questionHeadings: () => /<h[23][^>]*>[^<]*\?/i.test(source),
     freshness: () => sourceHas(source, [/date(Published|Modified)/i, /<time[\s>]/i, /(updated|published|last modified)[^.]{0,40}\b20\d{2}\b/i]),
