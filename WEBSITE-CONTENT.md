@@ -13,7 +13,7 @@ components at `apps/website/src/components/landing/*.tsx`, shadcn primitives fro
   (scaffold artifacts into Next/Astro/SvelteKit/Nuxt/Remix/static), `geoaeo gen <artifact>`
   (llms.txt, llms-full, sitemap, robots, jsonld, webmcp, ogimage, rss, hreflang, mdmirror),
   `geoaeo humanize` (strip AI-writing tells), `geoaeo mcp` (MCP server, bin `geoaeo-mcp`,
-  tools audit/gen/humanize). Audit = 24 weighted checks (answerability, structured data,
+  tools audit/gen/humanize). Audit = 25 weighted checks (answerability, structured data,
   llms.txt, crawlability, freshness, E-E-A-T…).
 - Audience: indie hackers → enterprise teams who want their site cited by ChatGPT, Claude,
   Perplexity, Google AI. Source of truth: `packages/geoaeo/README.md`,

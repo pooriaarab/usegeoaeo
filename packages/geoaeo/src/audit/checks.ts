@@ -1,10 +1,13 @@
 import type { AuditCheck, PageSnapshot, TargetSnapshot } from './types.js';
+import { AI_AGENTS } from '../generators/robots.js';
 import { analyzePage } from './analyze-page.js';
+import { blockedAgents } from './robots-policy.js';
 
 interface CheckContext {
   artifacts: Map<string, string>;
   mirrors: string[];
   pages: PageSnapshot[];
+  blockedAiAgents: string[];
   pageSignals: ReturnType<typeof analyzePage>[];
   jsonTypes: string[];
   has: (value: string) => boolean;
@@ -45,7 +48,8 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
   const allPage = (predicate: (page: ReturnType<typeof analyzePage>) => boolean) => pageSignals.length > 0 && pageSignals.every(predicate);
   const jsonTypes = [...new Set(pageSignals.flatMap(page => page.jsonLdTypes))];
   const has = (value: string) => value.trim().length > 0;
-  return { artifacts, mirrors: snapshot.mirrors, pages: snapshot.pages, pageSignals, jsonTypes, has, anyPage, allPage };
+  const blockedAiAgents = blockedAgents(robots, AI_AGENTS);
+  return { artifacts, mirrors: snapshot.mirrors, pages: snapshot.pages, blockedAiAgents, pageSignals, jsonTypes, has, anyPage, allPage };
 }
 
 function headerNoindex(pages: PageSnapshot[]): boolean {
@@ -69,7 +73,8 @@ function getCheckDefinitions(): CheckDef[] {
     { id: 'llms', label: '/llms.txt', weight: 6, details: 'Short site map is present.', passed: ctx => /generateLlms|#\s+\S+/i.test(ctx.artifacts.get('__llms') ?? '') },
     { id: 'llms-full', label: '/llms-full.txt', weight: 6, details: 'Full site map is present.', passed: ctx => /generateLlmsFull|##\s+(What it is|Common questions)/i.test(ctx.artifacts.get('__llmsFull') ?? '') },
     { id: 'sitemap', label: '/sitemap.xml', weight: 6, details: 'A sitemap artifact is present.', passed: ctx => /<urlset|generateSitemap|sitemap\s*\(/i.test(ctx.artifacts.get('__sitemap') ?? '') },
-    { id: 'robots', label: '/robots.txt', weight: 4, details: 'Robots policy includes a sitemap URL.', passed: ctx => /User-agent:|generateRobots/i.test(ctx.artifacts.get('__robots') ?? '') && /Sitemap:|sitemap\s*:/i.test(ctx.artifacts.get('__robots') ?? '') },
+    { id: 'robots', label: '/robots.txt', weight: 1, details: 'Robots policy includes a sitemap URL.', passed: ctx => /User-agent:|generateRobots/i.test(ctx.artifacts.get('__robots') ?? '') && /Sitemap:|sitemap\s*:/i.test(ctx.artifacts.get('__robots') ?? '') },
+    { id: 'ai-crawlers', label: 'AI crawler access', weight: 3, details: 'No named AI crawler is disallowed from /.', passed: ctx => ctx.blockedAiAgents.length === 0 },
     { id: 'webmcp', label: 'WebMCP manifest', weight: 4, details: 'A WebMCP-style tool manifest is present.', passed: ctx => /generateWebmcp|"tools"|tools\s*[:=]/i.test(ctx.artifacts.get('__webmcp') ?? '') },
     { id: 'markdown', label: 'Markdown mirrors', weight: 4, details: '', passed: ctx => ctx.mirrors.length > 0 },
     { id: 'title', label: 'Page titles', weight: 4, details: 'Every inspected page has a title.', passed: ctx => ctx.allPage(page => page.title) },
@@ -100,11 +105,12 @@ function detailFor(check: CheckDef, ctx: CheckContext): string {
     const reasons = noindexReasons(headerNoindex(ctx.pages), metaTagNoindex(ctx.pageSignals));
     return reasons || check.details;
   }
+  if (check.id === 'ai-crawlers' && ctx.blockedAiAgents.length) return `Blocked: ${ctx.blockedAiAgents.join(', ')}.`;
   return check.details;
 }
 
 function applyFailurePrefix(check: AuditCheck): AuditCheck {
-  if (check.passed || check.details.startsWith('noindex set by ')) return check;
+  if (check.passed || check.id === 'ai-crawlers' || check.details.startsWith('noindex set by ')) return check;
   return { ...check, details: `Missing: ${check.details.toLowerCase()}` };
 }
 

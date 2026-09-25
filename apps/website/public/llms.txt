@@ -8,7 +8,7 @@
 - [CLI reference](https://usegeoaeo.com/docs/cli): `audit <url|dir>`, `init`, `gen <artifact>`, `humanize`, `mcp` with flags and examples.
 - [MCP server](https://usegeoaeo.com/docs/mcp): run `npx geoaeo-mcp` over stdio, tools `audit`, `gen`, `humanize`.
 - [Harnesses](https://usegeoaeo.com/docs): Claude Code, Cursor, Windsurf, Codex, Gemini CLI, GitHub Copilot, Continue.
-- [GEO/AEO checklist](https://usegeoaeo.com/checklist): 24 weighted checks for answerability, structured data, crawlability, freshness, E-E-A-T.
+- [GEO/AEO checklist](https://usegeoaeo.com/checklist): 25 weighted checks for answerability, structured data, crawlability, freshness, E-E-A-T.
 - [Examples](https://usegeoaeo.com/examples): static-html, nextjs-app, astro-site with audit scores.
 - [Docs index](https://usegeoaeo.com/docs)
 

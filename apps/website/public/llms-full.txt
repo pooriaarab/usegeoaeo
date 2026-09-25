@@ -4,7 +4,7 @@
 
 ## What it is
 
-geoaeo makes any app discoverable, quotable, and usable by AI answer engines and search — SEO, GEO, and AEO in one tool. It audits a live URL or local site directory, scores it 0-100 across 24 weighted checks (answerability, structured data, llms.txt, crawlability, freshness, E-E-A-T), and generates the files answer engines read. It ships a library, a CLI, and an MCP server at one version.
+geoaeo makes any app discoverable, quotable, and usable by AI answer engines and search — SEO, GEO, and AEO in one tool. It audits a live URL or local site directory, scores it 0-100 across 25 weighted checks (answerability, structured data, llms.txt, crawlability, freshness, E-E-A-T), and generates the files answer engines read. It ships a library, a CLI, and an MCP server at one version.
 
 ## Docs
 
@@ -12,7 +12,7 @@ geoaeo makes any app discoverable, quotable, and usable by AI answer engines and
 - [CLI reference](https://usegeoaeo.com/docs/cli): `audit <url|dir>`, `init`, `gen <artifact>`, `humanize`, `mcp`
 - [MCP server](https://usegeoaeo.com/docs/mcp): `npx geoaeo-mcp` over stdio, tools `audit`, `gen`, `humanize`
 - [Harnesses](https://usegeoaeo.com/docs): Claude Code, Cursor, Windsurf, Codex, Gemini CLI, GitHub Copilot, Continue setup
-- [GEO/AEO checklist](https://usegeoaeo.com/checklist): 24 checks with fixes
+- [GEO/AEO checklist](https://usegeoaeo.com/checklist): 25 checks with fixes
 - [Examples](https://usegeoaeo.com/examples): static-html 80, nextjs-app 48, astro-site 46
 - [Docs index](https://usegeoaeo.com/docs)
 
@@ -59,4 +59,4 @@ Q: Does it work with my framework?
 A: Yes. `npx geoaeo init` detects Next.js, Astro, SvelteKit, Nuxt, and Remix and writes App Router routes or static files. Any other site gets static artifacts.
 
 Q: What does audit check?
-A: 24 weighted checks for answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T. Run `npx geoaeo audit <url|dir>` for the score and gap list.
+A: 25 weighted checks for answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T. Run `npx geoaeo audit <url|dir>` for the score and gap list.
