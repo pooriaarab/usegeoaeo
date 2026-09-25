@@ -48,11 +48,7 @@ Each path runs the same audit. Start at the top.
 npx geoaeo audit https://example.com
 ```
 
-3. Add it to a project:
-
-```bash
-npm install geoaeo
-```
+3. Add it to a project, and call it from a build script or CI. See [Install](#install).
 
 4. Drive it from your agent over MCP:
 
