@@ -11,8 +11,10 @@ export async function GET(
   context: { params: Promise<{ skill: string }> },
 ) {
   const { skill } = await context.params;
+  if (!Object.hasOwn(skillMarkdown, skill)) {
+    return new Response("Not Found", { status: 404 });
+  }
   const markdown = skillMarkdown[skill];
-  if (!markdown) return new Response("Not Found", { status: 404 });
   return new Response(markdown, {
     headers: { "content-type": "text/markdown; charset=utf-8" },
   });

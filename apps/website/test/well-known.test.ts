@@ -60,6 +60,15 @@ describe("GET /.well-known/agent-skills/[skill]/SKILL.md", () => {
     });
     expect(response.status).toBe(404);
   });
+
+  it("404s for prototype-property segments instead of resolving Object.prototype", async () => {
+    for (const skill of ["__proto__", "constructor", "toString", "hasOwnProperty"]) {
+      const response = await getSkillFile(new Request("https://usegeoaeo.com"), {
+        params: Promise.resolve({ skill }),
+      });
+      expect(response.status).toBe(404);
+    }
+  });
 });
 
 describe("GET /docs.md", () => {
