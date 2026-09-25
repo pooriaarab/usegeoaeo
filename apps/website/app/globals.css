@@ -586,3 +586,12 @@
   color: var(--foreground);
   border-radius: 0;
 }
+
+/* The plugin wraps inline code in literal backticks through ::before and
+   ::after. These pages already style inline code, and the docs never showed
+   backticks before the plugin was registered, so dropping them keeps the fix
+   to typography rather than changing what the copy reads as. */
+.prose :is(code)::before,
+.prose :is(code)::after {
+  content: none;
+}
