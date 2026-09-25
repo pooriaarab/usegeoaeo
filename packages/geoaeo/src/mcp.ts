@@ -3,6 +3,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { auditTarget } from './audit.js';
+import { formatAuditReport } from './audit/format.js';
 import { VERSION, PKG_NAME } from './constants.js';
 import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from './commands/gen.js';
 import { JSON_LD_KINDS, type JsonLdKind } from './generators/index.js';
@@ -31,9 +32,15 @@ export function createMcpServer(): McpServer {
       description: 'Audit a live URL or local site directory for GEO and AEO gaps.',
       inputSchema: { target: z.string() },
     },
-    async ({ target }: { target: string }) => ({
-      content: [{ type: 'text', text: JSON.stringify(await auditTarget(target), null, 2) }],
-    })
+    async ({ target }: { target: string }) => {
+      const report = await auditTarget(target);
+      // Text is the same report the CLI prints. structuredContent is the object
+      // an agent can read without parsing a JSON blob.
+      return {
+        content: [{ type: 'text', text: formatAuditReport(report) }],
+        structuredContent: report,
+      };
+    }
   );
   registerTool(
     'gen',
@@ -60,7 +67,12 @@ export function createMcpServer(): McpServer {
     async ({ glob, write }: { glob: string; write?: boolean }) => {
       const results = await humanizeGlob(glob, { write });
       const summary = [...results.entries()].map(([file, result]) => ({ file, findings: result.findings }));
-      return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] };
+      const findingCount = summary.reduce((count, item) => count + item.findings.length, 0);
+      // MCP structuredContent must be an object, so the findings array lives under results.
+      return {
+        content: [{ type: 'text', text: `${summary.length} files, ${findingCount} findings` }],
+        structuredContent: { results: summary },
+      };
     }
   );
   return server;
