@@ -115,6 +115,38 @@ describe('MCP tools over an in-memory transport', () => {
     });
   });
 
+  it('publishes titles, annotations, and described fields for every tool', async () => {
+    await withClient(async client => {
+      const { tools } = await client.listTools();
+      const byName = new Map(tools.map(tool => [tool.name, tool]));
+      expect(tools.map(tool => tool.name).sort()).toEqual(['audit', 'gen', 'humanize']);
+      for (const tool of tools) {
+        expect(typeof tool.description).toBe('string');
+        const schema = tool.inputSchema as { properties?: Record<string, { description?: unknown }> };
+        for (const [field, property] of Object.entries(schema.properties ?? {})) {
+          expect(typeof property.description, `${tool.name}.${field} needs a description`).toBe('string');
+        }
+      }
+      expect(byName.get('audit')).toMatchObject({
+        title: 'Audit a site',
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
+      });
+      expect(byName.get('gen')).toMatchObject({
+        title: 'Generate an artifact',
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+      });
+      expect(byName.get('gen')?.description).toContain('does not write a file');
+      expect(byName.get('humanize')).toMatchObject({
+        title: 'Humanize prose',
+        annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+      });
+      const humanizeSchema = byName.get('humanize')?.inputSchema as {
+        properties?: Record<string, { description?: string }>;
+      };
+      expect(humanizeSchema.properties?.write?.description).toContain('in place');
+    });
+  });
+
   it('humanize scans files under the directory argument', async () => {
     await withFixture(async directory => {
       const file = path.join(directory, 'post.md');
