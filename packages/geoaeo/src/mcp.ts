@@ -12,6 +12,7 @@ import { humanizeGlob } from './commands/humanize.js';
 // Built from the shared arrays so a new artifact or kind cannot land in one face only.
 const genArtifactSchema = z.enum(GENERATED_ARTIFACTS);
 const genTypeSchema = z.enum(JSON_LD_KINDS);
+const directorySchema = z.string().optional().describe('Absolute path to the site root. Defaults to the MCP server\'s working directory, which is usually not the project you mean — pass it explicitly.');
 export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
 export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
@@ -25,8 +26,8 @@ async function auditHandler({ target }: { target: string }) {
   };
 }
 
-async function humanizeHandler({ glob, write }: { glob: string; write?: boolean }) {
-  const results = await humanizeGlob(glob, { write });
+async function humanizeHandler({ glob, write, directory }: { glob: string; write?: boolean; directory?: string }) {
+  const results = await humanizeGlob(glob, { write, directory });
   const summary = [...results.entries()].map(([file, result]) => ({ file, findings: result.findings }));
   const findingCount = summary.reduce((count, item) => count + item.findings.length, 0);
   // MCP structuredContent must be an object, so the findings array lives under results.
@@ -34,6 +35,14 @@ async function humanizeHandler({ glob, write }: { glob: string; write?: boolean 
     content: [{ type: 'text', text: `${summary.length} files, ${findingCount} findings` }],
     structuredContent: { results: summary },
   };
+}
+
+async function genHandler({ artifact, type, directory }: {
+  artifact: GeneratedArtifact;
+  type?: JsonLdKind;
+  directory?: string;
+}) {
+  return { content: [{ type: 'text', text: await generateArtifact(artifact, directory, type ?? 'software') }] };
 }
 
 export function createMcpServer(): McpServer {
@@ -62,20 +71,16 @@ export function createMcpServer(): McpServer {
       inputSchema: {
         artifact: genArtifactSchema,
         type: genTypeSchema.optional(),
+        directory: directorySchema,
       },
     },
-    async ({ artifact, type }: {
-      artifact: GeneratedArtifact;
-      type?: JsonLdKind;
-    }) => ({
-      content: [{ type: 'text', text: await generateArtifact(artifact, process.cwd(), type ?? 'software') }],
-    })
+    genHandler
   );
   registerTool(
     'humanize',
     {
       description: 'Find AI-writing tells in prose files. Set write to update them.',
-      inputSchema: { glob: z.string(), write: z.boolean().optional() },
+      inputSchema: { glob: z.string(), write: z.boolean().optional(), directory: directorySchema },
     },
     humanizeHandler
   );
