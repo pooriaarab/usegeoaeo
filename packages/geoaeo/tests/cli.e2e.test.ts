@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,8 +16,9 @@ describe('geoaeo CLI end-to-end', () => {
     expect(existsSync(cli)).toBe(true);
   });
 
-  it('prints a semver version', () => {
-    expect(run(['--version']).trim()).toMatch(/^\d+\.\d+\.\d+$/);
+  it('prints the version from package.json', () => {
+    const pkg = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+    expect(run(['--version']).trim()).toBe(pkg.version);
   });
 
   it('audits a fixture and returns a scored report whose weights sum to 100', () => {
