@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
@@ -576,4 +577,21 @@
       animation: none;
     }
   }
+}
+
+/* The typography plugin paints pre text for a dark code slab, and it
+   sets a 6px radius. Docs pages ask for a muted pre background, and
+   this site's radius is 0. */
+.prose :is(pre) {
+  color: var(--foreground);
+  border-radius: 0;
+}
+
+/* The plugin wraps inline code in literal backticks through ::before and
+   ::after. These pages already style inline code, and the docs never showed
+   backticks before the plugin was registered, so dropping them keeps the fix
+   to typography rather than changing what the copy reads as. */
+.prose :is(code)::before,
+.prose :is(code)::after {
+  content: none;
 }
