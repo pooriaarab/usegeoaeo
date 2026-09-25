@@ -59,6 +59,15 @@ interface FetchedText {
 async function fetchText(url: string): Promise<FetchedText> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    // response.url reflects the post-redirect URL: a target-served redirect can
+    // otherwise carry the fetch off the pinned host while the result is still
+    // recorded under the pinned URL. Compare host, not origin, so a same-host
+    // http->https upgrade (routine on most sites) still passes. Empty
+    // response.url (e.g. a stubbed Response in tests) skips this check rather
+    // than throwing on new URL('').
+    if (response.url && new URL(response.url).host !== new URL(url).host) {
+      return { status: 0, text: '', xRobotsTag: '' };
+    }
     const xRobotsTag = response.headers.get('x-robots-tag') ?? '';
     return { status: response.status, text: await response.text(), xRobotsTag };
   } catch {
