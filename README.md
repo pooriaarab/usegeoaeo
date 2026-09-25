@@ -32,7 +32,7 @@ FAIL  hreflang alternates: Missing: language alternates are declared.
 PASS  Indexable: No page is set to noindex.
 PASS  Image alt text: Every image has alt text.
 FAIL  Heading structure: Missing: a page has one h1 and section h2s.
-PASS  Answer-first content: A page opens with a concise, direct answer under a clear H1.
+PASS  Answer-first content: A page opens with a concise, direct answer under a clear H1 and has enough body text to quote.
 FAIL  Question framing: Missing: content is framed as questions an engine can quote.
 FAIL  Freshness signals: Missing: pages show a published or updated date.
 FAIL  Author and E-E-A-T: Missing: pages name an author or organization.
