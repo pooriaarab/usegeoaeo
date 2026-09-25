@@ -50,13 +50,24 @@ export async function snapshotDirectory(directory: string): Promise<TargetSnapsh
   return { artifacts, pages, mirrors };
 }
 
-async function fetchText(url: string): Promise<{ status: number; text: string }> {
+interface FetchedText {
+  status: number;
+  text: string;
+  xRobotsTag: string;
+}
+
+async function fetchText(url: string): Promise<FetchedText> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    return { status: response.status, text: await response.text() };
+    const xRobotsTag = response.headers.get('x-robots-tag') ?? '';
+    return { status: response.status, text: await response.text(), xRobotsTag };
   } catch {
-    return { status: 0, text: '' };
+    return { status: 0, text: '', xRobotsTag: '' };
   }
+}
+
+function pageFromFetch(url: string, fetched: FetchedText): PageSnapshot {
+  return { url, source: fetched.text, isHtml: true, xRobotsTag: fetched.xRobotsTag };
 }
 
 async function fetchSingleArtifact(base: string, paths: string[]): Promise<string> {
@@ -96,12 +107,12 @@ function parseSitemapUrls(sitemap: string): string[] {
 async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
   const home = await fetchText(base);
-  if (home.text) pages.push({ url: base, source: home.text, isHtml: true });
+  if (home.text) pages.push(pageFromFetch(base, home));
   const sitemapUrls = parseSitemapUrls(sitemap);
   for (const url of sitemapUrls) {
     if (url === base) continue;
     const page = await fetchText(url);
-    if (page.text) pages.push({ url, source: page.text, isHtml: true });
+    if (page.text) pages.push(pageFromFetch(url, page));
   }
   return pages;
 }

@@ -1,9 +1,10 @@
-import type { AuditCheck, TargetSnapshot } from './types.js';
+import type { AuditCheck, PageSnapshot, TargetSnapshot } from './types.js';
 import { analyzePage } from './analyze-page.js';
 
 interface CheckContext {
   artifacts: Map<string, string>;
   mirrors: string[];
+  pages: PageSnapshot[];
   pageSignals: ReturnType<typeof analyzePage>[];
   jsonTypes: string[];
   has: (value: string) => boolean;
@@ -44,7 +45,23 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
   const allPage = (predicate: (page: ReturnType<typeof analyzePage>) => boolean) => pageSignals.length > 0 && pageSignals.every(predicate);
   const jsonTypes = [...new Set(pageSignals.flatMap(page => page.jsonLdTypes))];
   const has = (value: string) => value.trim().length > 0;
-  return { artifacts, mirrors: snapshot.mirrors, pageSignals, jsonTypes, has, anyPage, allPage };
+  return { artifacts, mirrors: snapshot.mirrors, pages: snapshot.pages, pageSignals, jsonTypes, has, anyPage, allPage };
+}
+
+function headerNoindex(pages: PageSnapshot[]): boolean {
+  return pages.some(page => /noindex/i.test(page.xRobotsTag ?? ''));
+}
+
+function metaTagNoindex(signals: CheckContext['pageSignals']): boolean {
+  return signals.some(page => !page.metaRobotsOk);
+}
+
+function noindexReasons(header: boolean, meta: boolean): string {
+  const reasons = [
+    header ? 'noindex set by X-Robots-Tag header' : '',
+    meta ? 'noindex set by meta tag' : '',
+  ];
+  return reasons.filter(reason => reason.length > 0).join('; ');
 }
 
 function getCheckDefinitions(): CheckDef[] {
@@ -62,7 +79,7 @@ function getCheckDefinitions(): CheckDef[] {
     { id: 'twitter', label: 'Twitter tags', weight: 2, details: 'Twitter card tags are present.', passed: ctx => ctx.anyPage(page => page.twitter) },
     { id: 'json-ld', label: 'JSON-LD', weight: 7, details: '', passed: ctx => ctx.anyPage(page => page.jsonLd) },
     { id: 'hreflang', label: 'hreflang alternates', weight: 3, details: 'Language alternates are declared.', passed: ctx => ctx.anyPage(page => page.hreflang) },
-    { id: 'meta-robots', label: 'Indexable', weight: 2, details: 'No page is set to noindex.', passed: ctx => ctx.allPage(page => page.metaRobotsOk) },
+    { id: 'meta-robots', label: 'Indexable', weight: 2, details: 'No page is set to noindex.', passed: ctx => ctx.allPage(page => page.metaRobotsOk) && !headerNoindex(ctx.pages) },
     { id: 'image-alt', label: 'Image alt text', weight: 1, details: 'Every image has alt text.', passed: ctx => ctx.allPage(page => page.imageAlt) },
     { id: 'heading-order', label: 'Heading structure', weight: 3, details: 'A page has one H1 and section H2s.', passed: ctx => ctx.anyPage(page => page.headingOrder) },
     { id: 'answerability', label: 'Answer-first content', weight: 9, details: 'A page opens with a concise, direct answer under a clear H1.', passed: ctx => ctx.anyPage(page => page.directAnswer && page.h1) },
@@ -79,7 +96,16 @@ function getCheckDefinitions(): CheckDef[] {
 function detailFor(check: CheckDef, ctx: CheckContext): string {
   if (check.id === 'markdown') return ctx.mirrors.length ? `${ctx.mirrors.length} mirror file(s) found.` : 'No page markdown mirrors were found.';
   if (check.id === 'json-ld') return ctx.jsonTypes.length ? `Types: ${ctx.jsonTypes.join(', ')}.` : 'No schema.org JSON-LD was found.';
+  if (check.id === 'meta-robots') {
+    const reasons = noindexReasons(headerNoindex(ctx.pages), metaTagNoindex(ctx.pageSignals));
+    return reasons || check.details;
+  }
   return check.details;
+}
+
+function applyFailurePrefix(check: AuditCheck): AuditCheck {
+  if (check.passed || check.details.startsWith('noindex set by ')) return check;
+  return { ...check, details: `Missing: ${check.details.toLowerCase()}` };
 }
 
 export function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
@@ -92,5 +118,5 @@ export function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
     weight: def.weight,
     details: detailFor(def, ctx),
   }));
-  return checks.map(check => ({ ...check, details: check.passed ? check.details : `Missing: ${check.details.toLowerCase()}` }));
+  return checks.map(applyFailurePrefix);
 }

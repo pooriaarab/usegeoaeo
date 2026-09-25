@@ -6,6 +6,13 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- A URL audit reads the `X-Robots-Tag` response header. The indexable
+  check fails when that header or the robots meta tag contains `noindex`,
+  and the detail names which signal set it. A directory audit still
+  checks only the meta tag.
+
 ## [0.3.1] - 2026-09-14
 
 ### Fixed
