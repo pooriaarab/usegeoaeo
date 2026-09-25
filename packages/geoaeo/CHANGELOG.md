@@ -6,6 +6,8 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-25
+
 ### Fixed
 
 - A URL audit reads the `X-Robots-Tag` response header. The indexable
@@ -16,6 +18,12 @@ All notable changes to geoaeo are recorded here. The format follows
   `ai-crawlers` check parses the policy's user-agent groups and fails, naming
   the blocked agents, when one is disallowed from `/`. `robots` keeps the
   presence-and-sitemap test at weight 1; the 25 checks still sum to 100.
+
+### Changed
+
+- The MCP `gen` tool accepts all ten artifacts and all ten JSON-LD kinds.
+  Its two schemas now derive from the lists the CLI already used, so the
+  two faces cannot drift again. MCP previously accepted six and four.
 
 ## [0.3.1] - 2026-09-14
 
@@ -98,7 +106,7 @@ All notable changes to geoaeo are recorded here. The format follows
 - `humanize` — find and rewrite AI-writing tells in copy.
 - `geoaeo-mcp` — an MCP server exposing `audit`, `gen`, and `humanize`.
 
-[Unreleased]: https://github.com/pooriaarab/geoaeo/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/pooriaarab/geoaeo/compare/v0.4.0...HEAD
 [0.2.1]: https://github.com/pooriaarab/geoaeo/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/pooriaarab/geoaeo/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/pooriaarab/geoaeo/releases/tag/v0.1.0
