@@ -2,6 +2,12 @@
 
 Repo-internal guide for anyone working IN this repo (layout, build, conventions, parity). The public operating guide is in [AGENTS.md](./AGENTS.md), also served at https://usegeoaeo.com/agents.md.
 
+Because this file exists, GitHub does not show the account-wide default from
+[pooriaarab/.github](https://github.com/pooriaarab/.github/blob/main/CONTRIBUTING.md).
+Read that one too: it carries the issue-first rule, the branch and title
+patterns, the 500-line cap, and the proof a pull request has to show. This file
+covers only what is specific to this repo.
+
 ## What this repo is
 
 geoaeo makes any app discoverable, quotable, and usable by AI answer engines and agents. One npm package ships three faces of the same capabilities:
@@ -52,7 +58,8 @@ Docs, help text, comments, and commit messages must describe only what the code 
 - CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`.
 - npm bins: `geoaeo` and `geoaeo-mcp`.
 - MCP tools: `audit`, `gen`, `humanize`.
-- JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`.
+- JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`, `organization`,
+  `website`, `article`, `howto`, `person`, `review`.
 
 If a doc needs a capability that is not built yet, mark it `<!-- TODO(v0.3): not built -->`. Do not pretend it works.
 
