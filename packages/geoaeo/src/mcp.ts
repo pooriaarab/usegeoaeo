@@ -4,8 +4,15 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { auditTarget } from './audit.js';
 import { VERSION, PKG_NAME } from './constants.js';
-import { generateArtifact } from './commands/gen.js';
+import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from './commands/gen.js';
+import { JSON_LD_KINDS, type JsonLdKind } from './generators/index.js';
 import { humanizeGlob } from './commands/humanize.js';
+
+// Built from the shared arrays so a new artifact or kind cannot land in one face only.
+const genArtifactSchema = z.enum(GENERATED_ARTIFACTS);
+const genTypeSchema = z.enum(JSON_LD_KINDS);
+export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
+export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
 export function createMcpServer(): McpServer {
   const server = new McpServer({ name: PKG_NAME, version: VERSION });
@@ -33,13 +40,13 @@ export function createMcpServer(): McpServer {
     {
       description: 'Generate one GEO or AEO artifact from the local site config.',
       inputSchema: {
-        artifact: z.enum(['llms', 'llms-full', 'jsonld', 'webmcp', 'sitemap', 'robots']),
-        type: z.enum(['software', 'product', 'faq', 'breadcrumb']).optional(),
+        artifact: genArtifactSchema,
+        type: genTypeSchema.optional(),
       },
     },
     async ({ artifact, type }: {
-      artifact: 'llms' | 'llms-full' | 'jsonld' | 'webmcp' | 'sitemap' | 'robots';
-      type?: 'software' | 'product' | 'faq' | 'breadcrumb';
+      artifact: GeneratedArtifact;
+      type?: JsonLdKind;
     }) => ({
       content: [{ type: 'text', text: await generateArtifact(artifact, process.cwd(), type ?? 'software') }],
     })
