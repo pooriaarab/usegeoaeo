@@ -51,6 +51,18 @@ jobs:
         working-directory: .
         run: bun run --filter geoaeo verify
 
+      # The repo test compares --version against package.json, but it can only
+      # ever see a dist/ built from the manifest beside it, so it cannot fail on
+      # the ordering this step guards. Assert the real artifact here, after the
+      # real build, in the one place the two can diverge.
+      - name: The built binary reports the version being published
+        working-directory: packages/geoaeo
+        run: |
+          MANIFEST=$(node -p "require('./package.json').version")
+          BUILT=$(node dist/cli.js --version)
+          echo "manifest=$MANIFEST built=$BUILT"
+          test "$MANIFEST" = "$BUILT"
+
       # Both publish steps run from a copy of the package OUTSIDE the repo.
       #
       # npm has no workspace: protocol. Run it anywhere under this repo root
