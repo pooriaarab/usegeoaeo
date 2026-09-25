@@ -10,48 +10,67 @@
 </p>
 
 ```bash
-npx geoaeo audit https://example.com
+npx geoaeo audit https://usegeoaeo.com
 ```
 
 ```
-https://example.com: 16/100
-
-FAIL  /llms.txt: Missing: short site map is present.
-FAIL  /llms-full.txt: Missing: full site map is present.
-FAIL  /sitemap.xml: Missing: a sitemap artifact is present.
-FAIL  /robots.txt: Missing: robots policy includes a sitemap url.
-FAIL  WebMCP manifest: Missing: a webmcp-style tool manifest is present.
-FAIL  Markdown mirrors: Missing: no page markdown mirrors were found.
-PASS  Page titles: Every inspected page has a title.
-FAIL  Meta descriptions: Missing: every inspected page has a meta description.
-FAIL  Canonical links: Missing: every inspected page has a canonical url.
-FAIL  Open Graph tags: Missing: open graph tags are present.
-FAIL  Twitter tags: Missing: twitter card tags are present.
-FAIL  JSON-LD: Missing: no schema.org json-ld was found.
-FAIL  hreflang alternates: Missing: language alternates are declared.
-PASS  Indexable: No page is set to noindex.
-PASS  Image alt text: Every image has alt text.
-FAIL  Heading structure: Missing: a page has one h1 and section h2s.
-PASS  Answer-first content: A page opens with a concise, direct answer under a clear H1 and has enough body text to quote.
-FAIL  Question framing: Missing: content is framed as questions an engine can quote.
-FAIL  Freshness signals: Missing: pages show a published or updated date.
-FAIL  Author and E-E-A-T: Missing: pages name an author or organization.
-FAIL  MCP server card: Missing: an mcp server card is published at /.well-known/mcp/server-card.json.
-FAIL  Agent card: Missing: an agent card is published at /.well-known/agent-card.json.
-FAIL  Agent skills: Missing: an agent-skills index is published under /.well-known/agent-skills/.
-FAIL  API catalog: Missing: an api catalog is published at /.well-known/api-catalog.
-
+https://usegeoaeo.com: 85/100
+...
 Top fixes:
-1. JSON-LD
-2. /llms.txt
-3. /llms-full.txt
-4. /sitemap.xml
-5. Freshness signals
+1. Markdown mirrors
+2. MCP server card
+3. hreflang alternates
 ```
 
 ## Contents
 
-[Install](#install) · [Quick start](#quick-start) · [Why](#why) · [Usage](#usage) · [How it works](#how-it-works) · [Run it locally](#run-it-locally) · [Contributing](#contributing) · [License](#license)
+[Try it](#try-it) · [Set up in your agent](#set-up-in-your-agent) · [Install](#install) · [Quick start](#quick-start) · [Why](#why) · [Usage](#usage) · [How it works](#how-it-works) · [Run it locally](#run-it-locally) · [Contributing](#contributing) · [License](#license)
+
+## Try it
+
+Each path runs the same audit. Start at the top.
+
+1. Run it in the browser. No install: [usegeoaeo.com/tools](https://usegeoaeo.com/tools).
+2. Run one command. No install:
+
+```bash
+npx geoaeo audit https://example.com
+```
+
+3. Add it to a project:
+
+```bash
+npm i -D geoaeo
+```
+
+4. Drive it from your agent over MCP:
+
+```json
+{
+  "mcpServers": {
+    "geoaeo": {
+      "command": "npx",
+      "args": ["-y", "geoaeo-mcp"]
+    }
+  }
+}
+```
+
+## Set up in your agent
+
+Paste this prompt into your agent:
+
+```
+Set up geoaeo in this agent. Detect the harness, then configure the
+geoaeo MCP server with command `npx` and args `-y geoaeo-mcp`.
+Run an audit on the current directory. Report the score and the
+top three fixes.
+```
+
+Then try one of these:
+
+- `Audit https://example.com and list the top 3 fixes.`
+- `Generate llms.txt for this repo.`
 
 ## Install
 
