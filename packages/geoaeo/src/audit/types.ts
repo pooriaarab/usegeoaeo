@@ -18,6 +18,8 @@ export interface PageSnapshot {
   url: string;
   source: string;
   isHtml: boolean;
+  /** X-Robots-Tag from a live response. Directory snapshots omit it. */
+  xRobotsTag?: string;
 }
 
 export interface TargetSnapshot {
