@@ -15,7 +15,18 @@ npx geoaeo audit https://usegeoaeo.com
 
 ```
 https://usegeoaeo.com: 85/100
-...
+
+PASS  /llms.txt: Short site map is present.
+PASS  /llms-full.txt: Full site map is present.
+PASS  /sitemap.xml: A sitemap artifact is present.
+PASS  /robots.txt: Robots policy includes a sitemap URL.
+PASS  AI crawler access: No named AI crawler is disallowed from /.
+PASS  WebMCP manifest: A WebMCP-style tool manifest is present.
+FAIL  Markdown mirrors: Missing: no page markdown mirrors were found.
+PASS  Page titles: Every inspected page has a title.
+
+... 17 more checks ...
+
 Top fixes:
 1. Markdown mirrors
 2. MCP server card
