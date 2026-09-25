@@ -28,9 +28,40 @@ jobs:
       - name: Install (workspace root)
         working-directory: .
         run: bun install --frozen-lockfile
+
+      # Staging only. tsup inlines VERSION from package.json into dist/
+      # (src/constants.ts imports that file). The prerelease suffix has to be
+      # in the repo manifest before Verify, or --version keeps the base version.
+      #
+      # npm version, run under this repo, also tries to refresh every workspace
+      # and dies on the workspace: protocol (EUNSUPPORTEDPROTOCOL).
+      # --no-workspaces-update writes this package's version and skips that
+      # refresh. Publish still runs from a copy outside the repo, below, for
+      # the same protocol reason.
+      #
+      # Production tags already carry the release version in the pushed commit.
+      - name: Set the prerelease version (staging)
+        if: github.ref == 'refs/heads/main'
+        working-directory: packages/geoaeo
+        run: |
+          BASE=$(node -p "require('./package.json').version")
+          npm version "${BASE}-next.${GITHUB_RUN_NUMBER}" --no-git-tag-version --no-workspaces-update
+
       - name: Verify
         working-directory: .
         run: bun run --filter geoaeo verify
+
+      # The repo test compares --version against package.json, but it can only
+      # ever see a dist/ built from the manifest beside it, so it cannot fail on
+      # the ordering this step guards. Assert the real artifact here, after the
+      # real build, in the one place the two can diverge.
+      - name: The built binary reports the version being published
+        working-directory: packages/geoaeo
+        run: |
+          MANIFEST=$(node -p "require('./package.json').version")
+          BUILT=$(node dist/cli.js --version)
+          echo "manifest=$MANIFEST built=$BUILT"
+          test "$MANIFEST" = "$BUILT"
 
       # Both publish steps run from a copy of the package OUTSIDE the repo.
       #
@@ -61,13 +92,11 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Staging: a merge to main. Publish a unique prerelease under `next`.
+      # Staging: a merge to main. The prerelease version is already in
+      # package.json, and Verify compiled that same version into dist/.
       - name: Publish next (staging)
         if: github.ref == 'refs/heads/main'
         working-directory: ${{ runner.temp }}/geoaeo-publish
-        run: |
-          BASE=$(node -p "require('./package.json').version")
-          npm version "${BASE}-next.${GITHUB_RUN_NUMBER}" --no-git-tag-version
-          npm publish --tag next --ignore-scripts
+        run: npm publish --tag next --ignore-scripts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
