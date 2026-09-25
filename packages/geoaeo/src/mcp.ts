@@ -13,6 +13,11 @@ import { humanizeGlob } from './commands/humanize.js';
 const genArtifactSchema = z.enum(GENERATED_ARTIFACTS);
 const genTypeSchema = z.enum(JSON_LD_KINDS);
 const directorySchema = z.string().optional().describe('Absolute path to the site root. Defaults to the MCP server\'s working directory, which is usually not the project you mean — pass it explicitly.');
+const targetSchema = z.string().describe('A local directory or an absolute http(s) URL.');
+const globSchema = z.string().describe('Glob pattern matching the prose files to scan. Reads the matches; changes nothing unless write is true.');
+const writeSchema = z.boolean().optional().describe('Default false. true rewrites matching files in place. Set true only after the user asked to change files.');
+const artifactSchema = genArtifactSchema.describe('Which GEO or AEO artifact to generate. It is returned as text; no file is written.');
+const artifactTypeSchema = genTypeSchema.optional().describe('Applies only when artifact is jsonld.');
 export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
 export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
@@ -53,34 +58,36 @@ export function createMcpServer(): McpServer {
   // params below: keep the handler's destructured keys and types in sync with inputSchema by hand.
   const registerTool = server.registerTool.bind(server) as unknown as (
     name: string,
-    config: { description: string; inputSchema: Record<string, unknown> },
+    config: { title: string; description: string; inputSchema: Record<string, unknown>; annotations: Record<string, boolean> },
     handler: (...args: never[]) => unknown,
   ) => void;
   registerTool(
     'audit',
     {
-      description: 'Audit a live URL or local site directory for GEO and AEO gaps.',
-      inputSchema: { target: z.string() },
+      title: 'Audit a site',
+      description: 'Audit a live URL or local site directory for GEO and AEO gaps. Reads the target and returns a report; it changes no files. Fetches over the network when the target is a URL.',
+      inputSchema: { target: targetSchema },
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     },
     auditHandler
   );
   registerTool(
     'gen',
     {
-      description: 'Generate one GEO or AEO artifact from the local site config.',
-      inputSchema: {
-        artifact: genArtifactSchema,
-        type: genTypeSchema.optional(),
-        directory: directorySchema,
-      },
+      title: 'Generate an artifact',
+      description: 'Generate one GEO or AEO artifact from the local site config. Returns the artifact as text; it does not write a file.',
+      inputSchema: { artifact: artifactSchema, type: artifactTypeSchema, directory: directorySchema },
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
     genHandler
   );
   registerTool(
     'humanize',
     {
-      description: 'Find AI-writing tells in prose files. Set write to update them.',
-      inputSchema: { glob: z.string(), write: z.boolean().optional(), directory: directorySchema },
+      title: 'Humanize prose',
+      description: 'Find AI-writing tells in prose files. Reports findings without changing files by default; with write true it rewrites matching files in place, so ask the user first.',
+      inputSchema: { glob: globSchema, write: writeSchema, directory: directorySchema },
+      annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
     },
     humanizeHandler
   );
