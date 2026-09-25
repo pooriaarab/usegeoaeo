@@ -1,0 +1,34 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+export default function Page() {
+  return (
+    <Card className="mx-auto max-w-2xl rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+      <CardContent className="space-y-4">
+        <Badge className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700" />
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight">What is geoaeo?</h1>
+        <p className="leading-7 text-slate-600">
+          geoaeo makes any site quotable by AI answer engines, so a page that opens with a direct answer can be cited.
+        </p>
+        <p className="leading-7 text-slate-600">
+          Answer engines do not rank a whole document the way classic search does. They pull a passage
+          and attribute it. That only works when the page has a clear heading, an opening sentence that
+          states the claim, and enough body text after the lede for the engine to quote. A heading plus
+          one short sentence is not a source. It is a stub.
+        </p>
+        <p className="leading-7 text-slate-600">
+          The audit already extracts visible page text, so the check can count words on a string that
+          exists instead of parsing the document a second time. A citation-oriented floor sits below
+          the classic 150-word SEO cutoff because the goal is a passage to quote, not a long article.
+          One quote-length block plus a short supporting paragraph is enough. A page that only opens
+          well and then stops is not.
+        </p>
+        <p className="leading-7 text-slate-600">
+          This fixture is the substantial case. It keeps the same opening shape as the thin page and
+          then adds the body an engine would actually cite. If answerability passes here and fails on
+          the thin sibling, the word-count half is doing the job the check is named for.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
