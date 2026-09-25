@@ -8,6 +8,9 @@ import { GET as getServerCard } from "../app/.well-known/mcp/server-card.json/ro
 import { GET as getAgentSkillsIndex } from "../app/.well-known/agent-skills/index.json/route";
 import { GET as getSkillFile } from "../app/.well-known/agent-skills/[skill]/SKILL.md/route";
 import { GET as getDocsMirror } from "../app/docs.md/route";
+import { GET as getChecklistMirror } from "../app/checklist.md/route";
+import { GET as getExamplesMirror } from "../app/examples.md/route";
+import { GET as getToolsMirror } from "../app/tools.md/route";
 
 const here = fileURLToPath(new URL(".", import.meta.url));
 
@@ -68,5 +71,43 @@ describe("GET /docs.md", () => {
       "text/markdown; charset=utf-8",
     );
     await expect(response.text()).resolves.toContain("# geoaeo documentation");
+  });
+});
+
+describe("GET /checklist.md", () => {
+  it("serves a markdown mirror of the checklist page", async () => {
+    const response = getChecklistMirror();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe(
+      "text/markdown; charset=utf-8",
+    );
+    await expect(response.text()).resolves.toContain("# GEO/AEO checklist");
+  });
+});
+
+describe("GET /examples.md", () => {
+  it("serves a markdown mirror of the examples page", async () => {
+    const response = getExamplesMirror();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe(
+      "text/markdown; charset=utf-8",
+    );
+    await expect(response.text()).resolves.toContain(
+      "# Examples — three GeoWeather targets, three audit scores",
+    );
+  });
+});
+
+describe("GET /tools.md", () => {
+  it("serves a markdown mirror of the tools page", async () => {
+    const response = getToolsMirror();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe(
+      "text/markdown; charset=utf-8",
+    );
+    await expect(response.text()).resolves.toContain("# Free GEO & AEO tools");
   });
 });
