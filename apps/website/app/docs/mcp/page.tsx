@@ -26,6 +26,7 @@ export default function McpPage() {
           <Tools />
           <RunDirectly />
           <ConfigureAHarness />
+          <SetupPrompt />
           <Troubleshooting />
         </div>
 
@@ -217,6 +218,30 @@ function ConfigureAHarness() {
         <li>
           <Link href="/docs/harnesses/continue">Continue</Link> —{" "}
           <code>~/.continue/config.yaml</code>
+        </li>
+      </ul>
+    </>
+  );
+}
+
+function SetupPrompt() {
+  return (
+    <>
+      <h2>Set up in your agent</h2>
+      <p>Paste this prompt into your agent:</p>
+      <pre>
+        <code>{`Set up geoaeo in this agent. Detect the harness, then configure the
+geoaeo MCP server with command \`npx\` and args \`-y geoaeo-mcp\`.
+Run an audit on the current directory. Report the score and the
+top three fixes.`}</code>
+      </pre>
+      <p>Then try one of these:</p>
+      <ul>
+        <li>
+          <code>Audit https://example.com and list the top 3 fixes.</code>
+        </li>
+        <li>
+          <code>Generate llms.txt for this repo.</code>
         </li>
       </ul>
     </>
