@@ -3,8 +3,8 @@ import { Command } from 'commander';
 import { auditTarget, formatAuditReport } from './audit.js';
 import { PKG_NAME, VERSION } from './constants.js';
 import { initProject } from './commands/init.js';
-import { generateArtifact, type GeneratedArtifact } from './commands/gen.js';
-import type { JsonLdKind } from './generators/index.js';
+import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from './commands/gen.js';
+import { JSON_LD_KINDS, type JsonLdKind } from './generators/index.js';
 import { humanizeGlob } from './commands/humanize.js';
 
 const program = new Command();
@@ -42,10 +42,9 @@ program
   .command('gen <artifact>')
   .description('Generate one artifact from the local site config.')
   .option('-o, --output <file>', 'write to a file instead of stdout')
-  .option('--type <kind>', 'JSON-LD kind: software, product, faq, breadcrumb, organization, website, article, howto, person, or review', 'software')
+  .option('--type <kind>', `JSON-LD kind: ${JSON_LD_KINDS.slice(0, -1).join(', ')}, or ${JSON_LD_KINDS[JSON_LD_KINDS.length - 1]}`, 'software')
   .action(async (artifact: string, options: { output?: string; type: string }) => {
-    const allowed = ['llms', 'llms-full', 'jsonld', 'webmcp', 'sitemap', 'robots', 'ogimage', 'rss', 'hreflang', 'mdmirror'];
-    if (!allowed.includes(artifact)) throw new Error(`Unknown artifact: ${artifact}`);
+    if (!(GENERATED_ARTIFACTS as readonly string[]).includes(artifact)) throw new Error(`Unknown artifact: ${artifact}`);
     const content = await generateArtifact(artifact as GeneratedArtifact, process.cwd(), options.type as JsonLdKind);
     if (options.output) {
       const { writeFile } = await import('node:fs/promises');
