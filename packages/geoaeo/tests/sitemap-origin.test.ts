@@ -102,3 +102,40 @@ describe('sitemap urls resolve onto the target origin', () => {
     expect(check(report.checks, 'markdown').passed).toBe(true);
   });
 });
+
+function withResponseUrl(response: Response, url: string): Response {
+  Object.defineProperty(response, 'url', { value: url });
+  return response;
+}
+
+describe('redirects that change response.url', () => {
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it('discards a response that redirected off the target host', async () => {
+    const { requested } = stubFetch(url => {
+      if (url === `${target}/sitemap.xml`) return notFound();
+      if (url === target) return withResponseUrl(new Response(taggedPage), 'https://production.example/');
+      return notFound();
+    });
+    const report = await auditTarget(target);
+    expectAllOnTarget(requested);
+    // The redirect landed on production.example, so the target has no pages at all.
+    expect(report.pages).toEqual([]);
+    expect(check(report.checks, 'open-graph').passed).toBe(false);
+    expect(check(report.checks, 'json-ld').passed).toBe(false);
+  });
+
+  it('keeps a same-host scheme-upgrade redirect', async () => {
+    const { requested } = stubFetch(url => {
+      if (url === `${target}/sitemap.xml`) return notFound();
+      if (url === target) return withResponseUrl(new Response(htmlPage('Home')), 'https://127.0.0.1:4141/');
+      return notFound();
+    });
+    const report = await auditTarget(target);
+    expectAllOnTarget(requested);
+    expect(report.pages).toEqual([target]);
+    expect(check(report.checks, 'title').passed).toBe(true);
+  });
+});
