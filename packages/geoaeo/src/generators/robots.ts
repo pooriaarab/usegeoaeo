@@ -3,7 +3,8 @@ import { absoluteUrl } from '../config.js';
 
 // AI answer-engine crawlers we explicitly welcome. Allowing them is the point of AEO:
 // it lets ChatGPT, Claude, Perplexity, Google AI, and others read and cite the site.
-const AI_AGENTS = [
+// The audit reads the same list to decide whether a robots policy blocks them.
+export const AI_AGENTS = [
   'GPTBot',
   'OAI-SearchBot',
   'ChatGPT-User',

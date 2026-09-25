@@ -55,7 +55,7 @@ describe('X-Robots-Tag on a live URL', () => {
     expect(check.passed).toBe(false);
     expect(check.weight).toBe(2);
     expect(check.details).toBe('noindex set by X-Robots-Tag header');
-    expect(report.checks).toHaveLength(24);
+    expect(report.checks).toHaveLength(25);
     expect(report.checks.reduce((sum, item) => sum + item.weight, 0)).toBe(100);
   });
 

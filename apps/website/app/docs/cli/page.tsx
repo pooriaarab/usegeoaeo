@@ -75,7 +75,7 @@ function AuditCommand() {
       <h2>
         <code>geoaeo audit &lt;target&gt;</code>
       </h2>
-      <p>Audit a live URL or a local directory. Scores 0–100 across 24 weighted checks including answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.</p>
+      <p>Audit a live URL or a local directory. Scores 0–100 across 25 weighted checks including answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.</p>
       <pre>
         <code>{`npx geoaeo audit https://example.com
 npx geoaeo audit https://example.com --json

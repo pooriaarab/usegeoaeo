@@ -12,7 +12,7 @@ const features = [
     icon: Gauge,
     title: "Score any site from 0 to 100",
     description:
-      "Run geoaeo audit on a live URL or local directory. Inspect 24 weighted checks across answerability, structured data, crawlability, and freshness.",
+      "Run geoaeo audit on a live URL or local directory. Inspect 25 weighted checks across answerability, structured data, crawlability, and freshness.",
   },
   {
     icon: FileText,

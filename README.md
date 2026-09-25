@@ -6,7 +6,7 @@
   <a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.3.1"/></a>
   <a href="https://github.com/pooriaarab/usegeoaeo/actions"><img src="https://github.com/pooriaarab/usegeoaeo/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License MIT"/></a>
-  <a href="docs/GEO-AEO-CHECKLIST.md"><img src="https://img.shields.io/badge/checks-24-informational" alt="24 weighted audit checks"/></a>
+  <a href="docs/GEO-AEO-CHECKLIST.md"><img src="https://img.shields.io/badge/checks-25-informational" alt="25 weighted audit checks"/></a>
 </p>
 
 ```bash
@@ -162,16 +162,16 @@ npx geoaeo gen llms
 `hreflang`, `mdmirror`. JSON-LD `--type` values: `software`, `product`, `faq`,
 `breadcrumb`, `organization`, `website`, `article`, `howto`, `person`, `review`.
 
-The audit is 24 weighted checks across answerability, structured data,
+The audit is 25 weighted checks across answerability, structured data,
 `llms.txt`, crawlability, freshness, and E-E-A-T. `--ci --min-score N` exits
 non-zero when the score is below the threshold.
 
-The bundled examples, audited from source on 0.3.1:
+The bundled examples, audited from source:
 
 | Target | Score |
 |---|---|
 | `packages/geoaeo/examples/static-html` | 69 / 100 |
-| `packages/geoaeo/examples/nextjs-app` | 40 / 100 |
+| `packages/geoaeo/examples/nextjs-app` | 43 / 100 |
 | `packages/geoaeo/examples/astro-site` | 26 / 100 |
 
 Framework apps score lower because the audit reads source directories, not
@@ -202,7 +202,7 @@ Docs: [usegeoaeo.com/docs](https://usegeoaeo.com/docs) ·
 
 ## How it works
 
-`auditTarget` snapshots a live URL or a local directory, runs 24 weighted
+`auditTarget` snapshots a live URL or a local directory, runs 25 weighted
 checks that sum to 100, and returns the score plus the top missing artifacts.
 Generators take a `SiteConfig` object. They do not read the site themselves.
 `init` writes that config and either framework routes or static files.
