@@ -14,6 +14,8 @@ dist
 bun.lock.tmp
 apps/website/src/generated/design-context.generated.ts
 apps/website/src/generated/agents-md.generated.ts
+apps/website/src/generated/server-card.generated.ts
+apps/website/src/generated/agent-skills.generated.ts
 # Cursor cloud — local secrets stay local
 .env.local
 .env.*.local
