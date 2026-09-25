@@ -51,7 +51,7 @@ npx geoaeo audit https://example.com
 3. Add it to a project:
 
 ```bash
-npm i -D geoaeo
+npm install geoaeo
 ```
 
 4. Drive it from your agent over MCP:
