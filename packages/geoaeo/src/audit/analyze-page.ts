@@ -5,6 +5,7 @@ import { sourceHas } from './utils.js';
 interface HtmlContext {
   source: string;
   visible: string;
+  prose: string;
   top: string;
   jsonLdTypes: string[];
   firstParagraph: string;
@@ -35,9 +36,20 @@ function extractJsonLdTypes($: ReturnType<typeof load>): string[] {
     });
 }
 
+// $.root().text() concatenates every descendant text node, including the
+// contents of <script>, <style>, and <noscript> tags. A page's word count
+// must come from a clone with those stripped, or a JSON-LD block or an
+// analytics snippet -- not prose -- clears the answerability word floor.
+function extractProse($: ReturnType<typeof load>): string {
+  const clone = $.root().clone();
+  clone.find('script, style, noscript').remove();
+  return clone.text();
+}
+
 function buildHtmlContext(source: string): HtmlContext {
   const $ = load(source);
   const visible = $.root().text();
+  const prose = extractProse($);
   const top = visible.slice(0, 3000);
   const jsonLdTypes = extractJsonLdTypes($);
   const firstParagraph = $('p').first().text().trim();
@@ -45,7 +57,7 @@ function buildHtmlContext(source: string): HtmlContext {
     .toArray()
     .some((element: unknown) => $(element as string).text().trim().endsWith('?'));
   const images = $('img').toArray();
-  return { source, visible, top, jsonLdTypes, firstParagraph, questionHeadings, images, $ };
+  return { source, visible, prose, top, jsonLdTypes, firstParagraph, questionHeadings, images, $ };
 }
 
 function countWords(text: string): number {
@@ -66,7 +78,7 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     h1: () => ctx.$('h1').length > 0,
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(ctx.visible.slice(0, 5000)),
     directAnswer: () => ctx.firstParagraph.length >= 40 && ctx.firstParagraph.length <= 600,
-    wordCount: () => countWords(ctx.visible),
+    wordCount: () => countWords(ctx.prose),
     questionHeadings: () => ctx.questionHeadings,
     freshness: () => checkHtmlFreshness(ctx),
     author: () => checkHtmlAuthor(ctx),

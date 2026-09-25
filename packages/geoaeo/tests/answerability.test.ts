@@ -30,4 +30,11 @@ describe('answerability word floor', () => {
     expect(check.weight).toBe(9);
     expect(check.details).toMatch(/enough body text to quote/i);
   });
+
+  it('does not let a <script> block satisfy the word floor', async () => {
+    const report = await auditTarget(path.join(here, 'fixtures', 'thin-content-script-padded'));
+    const check = answerability(report.checks);
+    expect(check.passed).toBe(false);
+    expect(check.details).toBe(`Not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`);
+  });
 });
