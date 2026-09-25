@@ -80,7 +80,21 @@ Docs, help text, comments, and commit messages must describe only what the code 
 - MCP tools: `audit`, `gen`, `humanize`.
 - JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`, `organization`, `website`, `article`, `howto`, `person`, `review`.
 
-If a doc needs a capability that is not built yet, mark it `<!-- TODO(v0.3): not built -->`. Do not pretend it works.
+If a doc needs a capability that is not built yet, mark it `<!-- TODO(v0.5): not built -->`. Do not pretend it works.
+
+## Conventions
+
+- TypeScript, ESM. Import local modules with the `.js` suffix.
+- kebab-case file names.
+- Site facts live in `SiteConfig` (`packages/geoaeo/src/config.ts`).
+- Target config files are `geoaeo.config.ts`, `.js`, or `.mjs`, loaded with jiti.
+
+## Definition of done
+
+- `bun run ci:local` passes: lint, typecheck, and tests.
+- New behavior has tests.
+- The parity rule holds for every new capability.
+- Docs touched by the change follow the never-invent-capabilities rule.
 
 <!-- pr-standards:start -->
 
