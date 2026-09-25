@@ -1,8 +1,10 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { GENERATED_ARTIFACTS } from '../src/commands/gen.js';
 import { JSON_LD_KINDS } from '../src/generators/jsonld.js';
 import { createMcpServer, MCP_GEN_ARTIFACTS, MCP_JSON_LD_KINDS } from '../src/mcp.js';
@@ -55,5 +57,77 @@ describe('createMcpServer', () => {
     expect(text.text).toMatch(/^\d+ files, \d+ findings$/);
     const structured = result.structuredContent as { results: unknown[] };
     expect(Array.isArray(structured.results)).toBe(true);
+  });
+});
+
+describe('MCP tools over an in-memory transport', () => {
+  async function withClient<T>(run: (client: Client) => Promise<T>): Promise<T> {
+    const server = createMcpServer();
+    const client = new Client({ name: 'geoaeo-test-client', version: '0.0.0' });
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    await server.connect(serverTransport);
+    await client.connect(clientTransport);
+    try {
+      return await run(client);
+    } finally {
+      await client.close();
+      await server.close();
+    }
+  }
+
+  interface ToolResult {
+    content?: { type: string; text?: string }[];
+    structuredContent?: unknown;
+  }
+
+  async function callTool(client: Client, name: string, args: Record<string, unknown>): Promise<ToolResult> {
+    return (await client.callTool({ name, arguments: args })) as ToolResult;
+  }
+
+  async function callToolText(client: Client, name: string, args: Record<string, unknown>): Promise<string> {
+    const result = await callTool(client, name, args);
+    return (result.content ?? []).map(item => (item.type === 'text' ? (item.text ?? '') : '')).join('');
+  }
+
+  async function withFixture<T>(run: (directory: string) => Promise<T>): Promise<T> {
+    const directory = await mkdtemp(path.join(tmpdir(), 'geoaeo-mcp-'));
+    expect(path.resolve(directory)).not.toBe(process.cwd());
+    try {
+      return await run(directory);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  }
+
+  it('gen reads the site config from the directory argument', async () => {
+    await withFixture(async directory => {
+      await writeFile(
+        path.join(directory, 'geoaeo.config.mjs'),
+        `export const siteConfig = {
+          siteName: 'FixtureSite92',
+          siteUrl: 'https://fixture92.example.com',
+          description: 'A fixture site for MCP directory tests.',
+          tools: [],
+        };\n`
+      );
+      const text = await withClient(client => callToolText(client, 'gen', { artifact: 'llms', directory }));
+      expect(text).toContain('FixtureSite92');
+    });
+  });
+
+  it('humanize scans files under the directory argument', async () => {
+    await withFixture(async directory => {
+      const file = path.join(directory, 'post.md');
+      await writeFile(file, 'A seamless tool.\n');
+      const result = await withClient(client => callTool(client, 'humanize', { glob: '*.md', directory }));
+      const { results } = result.structuredContent as { results: { file: string; findings: { rule: string }[] }[] };
+      expect(results).toHaveLength(1);
+      expect(results[0]?.file).toBe(file);
+      expect(results[0]?.findings.length).toBeGreaterThan(0);
+      // The text channel is a count line since #93, so the file list is proof
+      // the directory argument landed, not the summary sentence.
+      const text = (result.content ?? []).map(item => item.text ?? '').join('');
+      expect(text).toBe('1 files, 1 findings');
+    });
   });
 });
