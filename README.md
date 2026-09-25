@@ -62,6 +62,8 @@ npm install geoaeo
 > [!NOTE]
 > Node.js 20 or later.
 
+Save this as `example.mjs`:
+
 ```js
 import { defineConfig, generateLlms } from 'geoaeo'
 
@@ -222,7 +224,7 @@ server.
 
 ```bash
 npm install geoaeo
-node example.mjs
+node example.mjs   # the file from Install, above
 ```
 
 The docs site at [usegeoaeo.com](https://usegeoaeo.com) lives in `apps/website/`
@@ -230,7 +232,10 @@ and is not required to use the library.
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/pooriaarab/.github/blob/main/CONTRIBUTING.md).
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for this repo's layout, build commands
+and the library/CLI/MCP parity rule. It sits on top of the account-wide
+[contribution guide](https://github.com/pooriaarab/.github/blob/main/CONTRIBUTING.md),
+which carries the issue-first rule, the branch pattern and the 500-line cap.
 
 ## License
 

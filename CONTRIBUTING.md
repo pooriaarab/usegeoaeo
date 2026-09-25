@@ -58,7 +58,8 @@ Docs, help text, comments, and commit messages must describe only what the code 
 - CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`.
 - npm bins: `geoaeo` and `geoaeo-mcp`.
 - MCP tools: `audit`, `gen`, `humanize`.
-- JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`.
+- JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`, `organization`,
+  `website`, `article`, `howto`, `person`, `review`.
 
 If a doc needs a capability that is not built yet, mark it `<!-- TODO(v0.3): not built -->`. Do not pretend it works.
 
