@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react';
-import { cn } from '../utils';
+import { useState, useRef, useEffect, useCallback, type ReactNode } from "react";
+import { cn } from "../utils";
 
 interface CollapsibleBadgeListProps {
   children: ReactNode;
@@ -38,12 +38,17 @@ function ToggleButton({
       onClick={onToggle}
       className="text-xs text-muted-foreground hover:text-foreground transition-colors"
     >
-      {expanded ? 'Show less' : `+${totalCount} total — show all`}
+      {expanded ? "Show less" : `+${totalCount} total — show all`}
     </button>
   );
 }
 
-export function CollapsibleBadgeList({ children, maxRows = 2, className, totalCount }: CollapsibleBadgeListProps) {
+export function CollapsibleBadgeList({
+  children,
+  maxRows = 2,
+  className,
+  totalCount,
+}: CollapsibleBadgeListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -66,19 +71,27 @@ export function CollapsibleBadgeList({ children, maxRows = 2, className, totalCo
     return () => observer.disconnect();
   }, [measure]);
 
-  const collapsedStyle = !expanded && isOverflowing && collapsedHeight ? { maxHeight: collapsedHeight } : undefined;
+  const collapsedStyle =
+    !expanded && isOverflowing && collapsedHeight ? { maxHeight: collapsedHeight } : undefined;
 
   return (
     <div className="space-y-1">
       <div
         ref={containerRef}
-        className={cn('flex flex-wrap gap-1 overflow-hidden transition-[max-height] duration-200', className)}
+        className={cn(
+          "flex flex-wrap gap-1 overflow-hidden transition-[max-height] duration-200",
+          className,
+        )}
         style={collapsedStyle}
       >
         {children}
       </div>
       {isOverflowing && (
-        <ToggleButton expanded={expanded} totalCount={totalCount} onToggle={() => setExpanded((prev) => !prev)} />
+        <ToggleButton
+          expanded={expanded}
+          totalCount={totalCount}
+          onToggle={() => setExpanded((prev) => !prev)}
+        />
       )}
     </div>
   );
