@@ -14,10 +14,7 @@ const DISCOVERY_PATHS = new Set([
 function harden(headers: Headers) {
   headers.delete("Link");
   headers.set("Cache-Control", "private, no-store, max-age=0");
-  headers.set(
-    "X-Robots-Tag",
-    "noindex, nofollow, noarchive, nosnippet, noimageindex",
-  );
+  headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet, noimageindex");
 }
 
 export function protectWorkerPreview(
@@ -34,10 +31,7 @@ export function protectWorkerPreview(
     harden(robots.headers);
     return robots;
   }
-  if (
-    DISCOVERY_PATHS.has(normalized) ||
-    normalized.startsWith("/.well-known/")
-  ) {
+  if (DISCOVERY_PATHS.has(normalized) || normalized.startsWith("/.well-known/")) {
     const missing = new Response("Not Found", { status: 404 });
     harden(missing.headers);
     return missing;

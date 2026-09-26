@@ -92,17 +92,13 @@ export const ONBOARDING_STEPS: readonly OnboardingStepMeta[] = [
 /* Navigation                                                                  */
 /* -------------------------------------------------------------------------- */
 
-export function getNextOnboardingStep(
-  current: OnboardingStepId,
-): OnboardingStepId | null {
+export function getNextOnboardingStep(current: OnboardingStepId): OnboardingStepId | null {
   const idx = ONBOARDING_STEP_IDS.indexOf(current);
   if (idx < 0 || idx >= ONBOARDING_STEP_IDS.length - 1) return null;
   return ONBOARDING_STEP_IDS[idx + 1];
 }
 
-export function getPreviousOnboardingStep(
-  current: OnboardingStepId,
-): OnboardingStepId | null {
+export function getPreviousOnboardingStep(current: OnboardingStepId): OnboardingStepId | null {
   const idx = ONBOARDING_STEP_IDS.indexOf(current);
   if (idx <= 0) return null;
   return ONBOARDING_STEP_IDS[idx - 1];
@@ -141,8 +137,6 @@ export function computeOnboardingCompletion(args: {
 }
 
 /** Convenience: true when every step is complete. */
-export function isOnboardingComplete(
-  completion: Record<OnboardingStepId, boolean>,
-): boolean {
+export function isOnboardingComplete(completion: Record<OnboardingStepId, boolean>): boolean {
   return ONBOARDING_STEP_IDS.every((id) => completion[id]);
 }

@@ -24,7 +24,7 @@
  * ```
  */
 
-'use client';
+"use client";
 
 import {
   AlertDialog,
@@ -35,7 +35,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '../primitives/alert-dialog';
+} from "../primitives/alert-dialog";
 
 interface ConfirmDialogProps {
   /** Whether the dialog is open */
@@ -54,7 +54,7 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
 
   /** Button variant (default: "default") */
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
 
   /** Callback when confirm is clicked */
   onConfirm: () => void;
@@ -71,8 +71,8 @@ export function ConfirmDialog({
   onOpenChange,
   title,
   description,
-  confirmLabel = 'Confirm',
-  variant = 'default',
+  confirmLabel = "Confirm",
+  variant = "default",
   onConfirm,
   loading = false,
   children,
@@ -95,7 +95,7 @@ export function ConfirmDialog({
               onConfirm();
             }}
           >
-            {loading ? 'Processing…' : confirmLabel}
+            {loading ? "Processing…" : confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

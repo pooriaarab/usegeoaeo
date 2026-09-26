@@ -33,14 +33,10 @@ export const BillingInfoSchema = z
     entitlements: EntitlementsSchema,
     updatedAt: z.date(),
   })
-  .refine(
-    (v) =>
-      v.plan === "free" || (v.customerId !== null && v.subscriptionId !== null),
-    {
-      message: "customerId + subscriptionId required on paid plans",
-      path: ["customerId"],
-    },
-  );
+  .refine((v) => v.plan === "free" || (v.customerId !== null && v.subscriptionId !== null), {
+    message: "customerId + subscriptionId required on paid plans",
+    path: ["customerId"],
+  });
 export type BillingInfo = z.infer<typeof BillingInfoSchema>;
 
 export const BillingEventSchema = z.object({
