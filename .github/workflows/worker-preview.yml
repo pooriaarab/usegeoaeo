@@ -108,8 +108,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Its own marker: the ownership step treats any comment carrying
+          # the Preview MARKER as recorded state, so reusing it here would
+          # block every later deploy, and a loose match could overwrite the
+          # ownership record that close-time cleanup needs.
           body=$(cat <<'EOF'
-          <!-- worker-preview -->
+          <!-- worker-preview-missing-secrets -->
           ## Worker Preview
 
           **No Preview was deployed for this pull request.**
@@ -126,7 +130,7 @@ jobs:
           )
           body=${body/MISSING_KEYS_MARK/${{ steps.secrets.outputs.missing }}}
           existing=$(gh api --paginate "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
-            --jq '[.[] | select(.user.login=="github-actions[bot]" and (.body|contains("worker-preview"))) | .id] | first // empty')
+            --jq '[.[] | select(.user.login=="github-actions[bot]" and (.body|contains("<!-- worker-preview-missing-secrets -->"))) | .id] | first // empty')
           if [ -n "$existing" ]; then
             gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$existing" -f body="$body"
           else
