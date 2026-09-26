@@ -84,10 +84,6 @@ async function outputSchemaOf(client: Client, name: string): Promise<JsonSchema>
 }
 
 describe('createMcpServer', () => {
-  it('registers the audit, gen, and humanize tools without throwing', () => {
-    expect(() => createMcpServer()).not.toThrow();
-  });
-
   it('keeps the gen artifact list and JSON-LD kinds equal to the CLI', () => {
     expect(MCP_GEN_ARTIFACTS).toEqual([...GENERATED_ARTIFACTS]);
     expect(MCP_JSON_LD_KINDS).toEqual([...JSON_LD_KINDS]);
@@ -185,6 +181,7 @@ describe('MCP tools over an in-memory transport', () => {
       const byName = new Map(tools.map(tool => [tool.name, tool]));
       expect(tools.map(tool => tool.name).sort()).toEqual(['audit', 'gen', 'humanize']);
       for (const tool of tools) {
+        expect(typeof tool.title, `${tool.name} needs a title`).toBe('string');
         expect(typeof tool.description).toBe('string');
         const schema = tool.inputSchema as { properties?: Record<string, { description?: unknown }> };
         for (const [field, property] of Object.entries(schema.properties ?? {})) {
