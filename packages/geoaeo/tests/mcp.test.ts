@@ -1,4 +1,4 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -111,8 +111,8 @@ describe('createMcpServer', () => {
 });
 
 describe('MCP tools over an in-memory transport', () => {
-  async function withClient<T>(run: (client: Client) => Promise<T>): Promise<T> {
-    const server = createMcpServer();
+  async function withClient<T>(run: (client: Client) => Promise<T>, allowedRoots?: readonly string[]): Promise<T> {
+    const server = allowedRoots === undefined ? createMcpServer() : createMcpServer(allowedRoots);
     const client = new Client({ name: 'geoaeo-test-client', version: '0.0.0' });
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
     await server.connect(serverTransport);
@@ -170,7 +170,7 @@ describe('MCP tools over an in-memory transport', () => {
     await withClient(async client => {
       expect(client.getServerCapabilities()?.tools?.listChanged).toBe(false);
       expect(client.getInstructions()).toBe(
-        'Call only audit, gen, or humanize. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. Ask the user before you set write.'
+        'Call only audit, gen, or humanize. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. Ask the user before you set write. When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root. An http(s) audit URL stays allowed. A path outside the roots is an error.'
       );
     });
   });
@@ -283,6 +283,140 @@ describe('MCP tools over an in-memory transport', () => {
         error: { code: 'CONFIG_INVALID', message: 'No default export' },
       });
     });
+  });
+
+  it('refuses a local path outside GEOAEO_ALLOWED_ROOTS for audit, gen, and humanize', async () => {
+    const parent = await mkdtemp(path.join(tmpdir(), 'geoaeo-roots-'));
+    const inside = path.join(parent, 'inside');
+    const outside = path.join(parent, 'outside');
+    await mkdir(inside);
+    await mkdir(outside);
+    const prose = path.join(outside, 'post.md');
+    const original = 'A seamless tool.\n';
+    await writeFile(prose, original);
+    await writeFile(path.join(outside, 'geoaeo.config.mjs'), 'export const siteConfig = { siteName: "Outside", siteUrl: "https://outside.example.com", description: "x", tools: [] };\n');
+    const given = path.join(inside, '..', 'outside');
+    try {
+      await withClient(async client => {
+        const audit = await callTool(client, 'audit', { target: given });
+        const gen = await callTool(client, 'gen', { artifact: 'llms', directory: given });
+        const humanize = await callTool(client, 'humanize', { glob: '*.md', directory: given, write: true });
+        const message = `${given} is outside GEOAEO_ALLOWED_ROOTS`;
+        for (const result of [audit, gen, humanize]) {
+          const text = (result.content ?? []).map(item => item.text ?? '').join('');
+          expect(result.isError).toBe(true);
+          expect(text).toBe(message);
+          expect(result.structuredContent).toEqual({
+            status: 'error',
+            error: { code: 'PATH_OUTSIDE_ALLOWED_ROOTS', message },
+          });
+        }
+        expect(await readFile(prose, 'utf8')).toBe(original);
+      }, [inside]);
+    } finally {
+      await rm(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('accepts a local path that resolves inside GEOAEO_ALLOWED_ROOTS', async () => {
+    const parent = await mkdtemp(path.join(tmpdir(), 'geoaeo-roots-'));
+    const inside = path.join(parent, 'inside');
+    const linkParent = path.join(parent, 'links');
+    await mkdir(inside);
+    await mkdir(linkParent);
+    const link = path.join(linkParent, 'site');
+    await symlink(inside, link, 'dir');
+    await writeFile(path.join(inside, 'post.md'), 'A seamless tool.\n');
+    await writeFile(
+      path.join(inside, 'geoaeo.config.mjs'),
+      `export const siteConfig = {
+        siteName: 'Inside117',
+        siteUrl: 'https://inside117.example.com',
+        description: 'A site inside the allowed root.',
+        tools: [],
+      };\n`
+    );
+    try {
+      await withClient(async client => {
+        const audit = await callTool(client, 'audit', { target: link });
+        const gen = await callToolText(client, 'gen', { artifact: 'llms', directory: link });
+        const humanize = await callTool(client, 'humanize', { glob: '*.md', directory: link });
+        expect(audit.isError).not.toBe(true);
+        expect(typeof (audit.structuredContent as { score?: number }).score).toBe('number');
+        expect((audit.structuredContent as { target?: string }).target).toBe(link);
+        expect(gen).toContain('Inside117');
+        const { results } = humanize.structuredContent as { results: { file: string }[] };
+        expect(results[0]?.file).toBe(path.join(link, 'post.md'));
+      }, [inside]);
+    } finally {
+      await rm(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('reads GEOAEO_ALLOWED_ROOTS when the server starts', async () => {
+    const parent = await mkdtemp(path.join(tmpdir(), 'geoaeo-roots-'));
+    const inside = path.join(parent, 'inside');
+    const outside = path.join(parent, 'outside');
+    await mkdir(inside);
+    await mkdir(outside);
+    const previous = process.env.GEOAEO_ALLOWED_ROOTS;
+    process.env.GEOAEO_ALLOWED_ROOTS = inside;
+    try {
+      await withClient(async client => {
+        delete process.env.GEOAEO_ALLOWED_ROOTS;
+        const result = await callTool(client, 'audit', { target: outside });
+        const text = (result.content ?? []).map(item => item.text ?? '').join('');
+        expect(result.isError).toBe(true);
+        expect(text).toBe(`${outside} is outside GEOAEO_ALLOWED_ROOTS`);
+      });
+    } finally {
+      if (previous === undefined) delete process.env.GEOAEO_ALLOWED_ROOTS;
+      else process.env.GEOAEO_ALLOWED_ROOTS = previous;
+      await rm(parent, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps an http URL on audit and rejects a file URL when roots are set', async () => {
+    const inside = await mkdtemp(path.join(tmpdir(), 'geoaeo-roots-'));
+    const fetched: string[] = [];
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (input: string | URL | Request) => {
+      fetched.push(String(input));
+      return new Response('', { status: 404 });
+    }) as typeof fetch;
+    try {
+      await withClient(async client => {
+        const target = 'http://127.0.0.1:1/';
+        const live = await callTool(client, 'audit', { target });
+        expect(live.isError).not.toBe(true);
+        expect((live.structuredContent as { target?: string }).target).toBe(target);
+        expect(fetched.some(url => url.startsWith(target))).toBe(true);
+        const beforeFileUrl = fetched.length;
+        const fileUrl = 'file:///etc/passwd';
+        const blocked = await callTool(client, 'audit', { target: fileUrl });
+        const text = (blocked.content ?? []).map(item => item.text ?? '').join('');
+        expect(blocked.isError).toBe(true);
+        expect(text).toBe(`${fileUrl} is outside GEOAEO_ALLOWED_ROOTS`);
+        expect(fetched).toHaveLength(beforeFileUrl);
+      }, [inside]);
+    } finally {
+      globalThis.fetch = originalFetch;
+      await rm(inside, { recursive: true, force: true });
+    }
+  });
+
+  it('refuses the working directory when it is outside the roots and directory is omitted', async () => {
+    const inside = await mkdtemp(path.join(tmpdir(), 'geoaeo-roots-'));
+    try {
+      await withClient(async client => {
+        const result = await callTool(client, 'gen', { artifact: 'llms' });
+        const text = (result.content ?? []).map(item => item.text ?? '').join('');
+        expect(text).toBe(`${process.cwd()} is outside GEOAEO_ALLOWED_ROOTS`);
+        expect(text).not.toContain(inside);
+      }, [inside]);
+    } finally {
+      await rm(inside, { recursive: true, force: true });
+    }
   });
 
   it('rethrows a gen failure that is not a known config state', async () => {

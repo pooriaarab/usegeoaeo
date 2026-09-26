@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
+import { assertAllowedPath, readAllowedRoots } from './allowed-roots.js';
 import { auditTarget, formatAuditReport } from './audit.js';
 import { PKG_NAME, VERSION } from './constants.js';
 import { initProject } from './commands/init.js';
 import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from './commands/gen.js';
 import { JSON_LD_KINDS, type JsonLdKind } from './generators/index.js';
 import { humanizeGlob } from './commands/humanize.js';
+
+async function assertCliPath(input: string, allowHttpUrl = false): Promise<void> {
+  await assertAllowedPath(input, readAllowedRoots(), allowHttpUrl);
+}
 
 const program = new Command();
 
@@ -18,6 +23,7 @@ program
   .option('--ci', 'exit non-zero when the score is below --min-score')
   .option('--min-score <n>', 'minimum passing score for --ci', '90')
   .action(async (target: string, options: { json?: boolean; ci?: boolean; minScore: string }) => {
+    await assertCliPath(target, true);
     const report = await auditTarget(target);
     process.stdout.write(options.json ? `${JSON.stringify(report, null, 2)}\n` : `${formatAuditReport(report)}\n`);
     if (options.ci) {
@@ -45,6 +51,7 @@ program
   .option('--type <kind>', `JSON-LD kind: ${JSON_LD_KINDS.slice(0, -1).join(', ')}, or ${JSON_LD_KINDS[JSON_LD_KINDS.length - 1]}`, 'software')
   .action(async (artifact: string, options: { output?: string; type: string }) => {
     if (!(GENERATED_ARTIFACTS as readonly string[]).includes(artifact)) throw new Error(`Unknown artifact: ${artifact}`);
+    await assertCliPath(process.cwd());
     const content = await generateArtifact(artifact as GeneratedArtifact, process.cwd(), options.type as JsonLdKind);
     if (options.output) {
       const { writeFile } = await import('node:fs/promises');
@@ -60,6 +67,7 @@ program
   .option('--check', 'report only and exit non-zero when tells are found')
   .option('--write', 'rewrite prose files in place')
   .action(async (pattern: string, options: { check?: boolean; write?: boolean }) => {
+    await assertCliPath(process.cwd());
     const results = await humanizeGlob(pattern, { write: options.write });
     let findings = 0;
     for (const [file, result] of results) {
