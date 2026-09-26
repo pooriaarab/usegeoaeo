@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@template/ui/primitives/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@template/ui/primitives/card";
 import { Badge } from "@template/ui/primitives/badge";
 import { Separator } from "@template/ui/primitives/separator";
+import { DocsBreadcrumb } from "@/components/docs/docs-breadcrumb";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo Docs — CLI, MCP, and harnesses for AI discoverability",
   description:
     "Start with geoaeo in minutes. Install the npm package, run the audit and generators from the CLI, connect the MCP server, and wire it into your AI harness.",
+  alternates: pageAlternates("/docs"),
 };
 
 const sections = [
@@ -43,8 +52,7 @@ const harnesses = [
 
 export default function DocsIndexPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:py-14">
+    <div className="mx-auto max-w-6xl">
         <DocsHeader />
 
         <SectionCards />
@@ -54,7 +62,6 @@ export default function DocsIndexPage() {
         <QuickStart />
 
         <RelatedLinks />
-      </div>
     </div>
   );
 }
@@ -63,13 +70,7 @@ export default function DocsIndexPage() {
 function DocsHeader() {
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
-          Home
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">Docs</span>
-      </nav>
+      <DocsBreadcrumb crumbs={[{ label: "Home", href: "/" }, { label: "Docs" }]} />
 
       <div className="max-w-3xl">
         <Badge variant="secondary" className="mb-3">
@@ -77,8 +78,9 @@ function DocsHeader() {
         </Badge>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">geoaeo documentation</h1>
         <p className="mt-3 text-base sm:text-lg text-muted-foreground leading-relaxed">
-          geoaeo makes any app discoverable and quotable by AI answer engines. SEO plus GEO plus AEO in one package.
-          Install once, audit your site, and generate the files that answer engines read.
+          geoaeo makes any app discoverable and quotable by AI answer engines. SEO plus GEO plus AEO
+          in one package. Install once, audit your site, and generate the files that answer engines
+          read.
         </p>
       </div>
 
@@ -99,8 +101,12 @@ function SectionCards() {
                 <Badge variant="outline" className="w-fit text-xs">
                   {s.label}
                 </Badge>
-                <CardTitle className="text-lg mt-2 group-hover:text-foreground">{s.title}</CardTitle>
-                <CardDescription className="text-sm leading-relaxed">{s.description}</CardDescription>
+                <CardTitle className="text-lg mt-2 group-hover:text-foreground">
+                  {s.title}
+                </CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  {s.description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <span className="text-sm font-medium text-primary group-hover:underline underline-offset-4">
@@ -122,8 +128,8 @@ function HarnessCards() {
       <div className="mt-10">
         <h2 className="text-xl font-semibold tracking-tight">Harnesses</h2>
         <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-          Connect the geoaeo MCP server to your AI harness. Each guide has a copy-paste config block, a verify step,
-          and two walkthroughs for audit and gen.
+          Connect the geoaeo MCP server to your AI harness. Each guide has a copy-paste config
+          block, a verify step, and two walkthroughs for audit and gen.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {harnesses.map((h) => (
@@ -153,7 +159,9 @@ function QuickStart() {
     <>
       <div className="mt-10 rounded-xl border bg-muted/30 p-5 sm:p-6">
         <h2 className="text-base font-semibold">Quick start</h2>
-        <p className="mt-1 text-sm text-muted-foreground">One package, two bins: geoaeo and geoaeo-mcp.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          One package, two bins: geoaeo and geoaeo-mcp.
+        </p>
         <pre className="mt-3 overflow-x-auto rounded-lg bg-muted p-4 text-sm">
           <code>{`npm install geoaeo
 

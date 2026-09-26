@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { cn } from '../utils';
+import * as React from "react";
+import { cn } from "../utils";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '../primitives/dropdown-menu';
+} from "../primitives/dropdown-menu";
 import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
-} from '../primitives/context-menu';
+} from "../primitives/context-menu";
 
 /**
  * Sidebar-consistent menu styles.
@@ -27,10 +27,10 @@ import {
 
 // ── Sidebar Dropdown composites ─────────────────────────────────
 
-const SIDEBAR_MENU_CONTENT_CLASSES = 'w-48 text-[13px]';
+const SIDEBAR_MENU_CONTENT_CLASSES = "w-48 text-[13px]";
 
 const SIDEBAR_MENU_ITEM_CLASSES =
-  'gap-2 text-[13px] text-muted-foreground focus:bg-foreground/[0.04] focus:text-foreground';
+  "gap-2 text-[13px] text-muted-foreground focus:bg-foreground/[0.04] focus:text-foreground";
 
 const SidebarDropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuContent>,
@@ -42,19 +42,15 @@ const SidebarDropdownMenuContent = React.forwardRef<
     {...props}
   />
 ));
-SidebarDropdownMenuContent.displayName = 'SidebarDropdownMenuContent';
+SidebarDropdownMenuContent.displayName = "SidebarDropdownMenuContent";
 
 const SidebarDropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuItem>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuItem>
 >(({ className, ...props }, ref) => (
-  <DropdownMenuItem
-    ref={ref}
-    className={cn(SIDEBAR_MENU_ITEM_CLASSES, className)}
-    {...props}
-  />
+  <DropdownMenuItem ref={ref} className={cn(SIDEBAR_MENU_ITEM_CLASSES, className)} {...props} />
 ));
-SidebarDropdownMenuItem.displayName = 'SidebarDropdownMenuItem';
+SidebarDropdownMenuItem.displayName = "SidebarDropdownMenuItem";
 
 // Re-export separator unchanged (already styled correctly)
 const SidebarDropdownMenuSeparator = DropdownMenuSeparator;
@@ -71,19 +67,15 @@ const SidebarContextMenuContent = React.forwardRef<
     {...props}
   />
 ));
-SidebarContextMenuContent.displayName = 'SidebarContextMenuContent';
+SidebarContextMenuContent.displayName = "SidebarContextMenuContent";
 
 const SidebarContextMenuItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuItem>,
   React.ComponentPropsWithoutRef<typeof ContextMenuItem>
 >(({ className, ...props }, ref) => (
-  <ContextMenuItem
-    ref={ref}
-    className={cn(SIDEBAR_MENU_ITEM_CLASSES, className)}
-    {...props}
-  />
+  <ContextMenuItem ref={ref} className={cn(SIDEBAR_MENU_ITEM_CLASSES, className)} {...props} />
 ));
-SidebarContextMenuItem.displayName = 'SidebarContextMenuItem';
+SidebarContextMenuItem.displayName = "SidebarContextMenuItem";
 
 // Re-export separator unchanged
 const SidebarContextMenuSeparator = ContextMenuSeparator;

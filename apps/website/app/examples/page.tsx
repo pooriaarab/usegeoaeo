@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@template/ui/primitives/card";
-import { Alert, AlertDescription, AlertTitle } from "@template/ui/primitives/alert";
+import { Alert, AlertDescription } from "@template/ui/primitives/alert";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,11 +21,13 @@ import {
 } from "@template/ui/primitives/breadcrumb";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/landing/footer";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "Examples — geoaeo",
   description:
     "Three geoaeo example sites and their source-directory audit scores: static HTML 80/100, Next.js 48/100, Astro 46/100. Framework apps understate when audited as a source directory because artifacts are generated at runtime.",
+  alternates: pageAlternates("/examples"),
 };
 
 const examples = [
@@ -38,8 +40,7 @@ const examples = [
     badgeVariant: "success" as const,
     summary:
       "A plain GeoWeather site: one index.html plus the static artifacts geoaeo init writes at the site root. geoaeo audit . scores the files directly.",
-    why:
-      "This example ships fully optimized. It passes every technical and structured-data check. The open gaps are answerability signals a real content site adds: a dated/updated stamp, a named author, and Markdown mirrors.",
+    why: "This example ships fully optimized. It passes every technical and structured-data check. The open gaps are answerability signals a real content site adds: a dated/updated stamp, a named author, and Markdown mirrors.",
     command: "cd examples/static-html && geoaeo audit .",
     files: [
       { file: "index.html", purpose: "Home page with meta tags, Open Graph, Twitter, and JSON-LD" },
@@ -60,8 +61,7 @@ const examples = [
     badgeVariant: "warning" as const,
     summary:
       "A minimal Next.js App Router site with the route handlers, config, and SEO components that geoaeo init produces.",
-    why:
-      "Next.js generates GEO/AEO artifacts at runtime: route handlers for sitemap, robots, llms.txt, JSON-LD, and .md mirrors. A static source-directory audit cannot see that output, so 48/100 understates the live result. Audit the deployed URL for the true score.",
+    why: "Next.js generates GEO/AEO artifacts at runtime: route handlers for sitemap, robots, llms.txt, JSON-LD, and .md mirrors. A static source-directory audit cannot see that output, so 48/100 understates the live result. Audit the deployed URL for the true score.",
     command: "cd examples/nextjs-app && geoaeo audit .",
     files: [
       { file: "geoaeo.config.ts", purpose: "Site metadata, tools, pricing, FAQ" },
@@ -83,8 +83,7 @@ const examples = [
     badgeVariant: "warning" as const,
     summary:
       "A minimal Astro site with geoaeo.config.ts and the static artifact files geoaeo init produces for non-Next.js projects.",
-    why:
-      "Astro holds titles, meta tags, and JSON-LD in .astro source. Those only appear in HTML after astro build. A source-directory audit cannot see them, so 46/100 understates the result. Audit the built dist/ or the deployed URL.",
+    why: "Astro holds titles, meta tags, and JSON-LD in .astro source. Those only appear in HTML after astro build. A source-directory audit cannot see them, so 46/100 understates the result. Audit the built dist/ or the deployed URL.",
     command: "cd examples/astro-site && geoaeo audit .",
     files: [
       { file: "geoaeo.config.ts", purpose: "Site metadata, tools, pricing, FAQ" },
@@ -152,12 +151,10 @@ function PageIntro() {
         Three GeoWeather targets, three audit scores
       </h1>
       <p className="text-muted-foreground text-fluid-sm sm:text-base leading-relaxed">
-        The geoaeo package ships a static HTML site, a Next.js App Router
-        app, and an Astro site. Each is the same product (GeoWeather)
-        after <code className="font-mono text-sm">geoaeo init</code>.
-        Scores below are from{" "}
-        <code className="font-mono text-sm">geoaeo audit .</code> on the
-        source directory.
+        The geoaeo package ships a static HTML site, a Next.js App Router app, and an Astro site.
+        Each is the same product (GeoWeather) after{" "}
+        <code className="font-mono text-sm">geoaeo init</code>. Scores below are from{" "}
+        <code className="font-mono text-sm">geoaeo audit .</code> on the source directory.
       </p>
     </div>
   );
@@ -167,18 +164,18 @@ function PageIntro() {
 function SourceAuditCaveat() {
   return (
     <Alert className="mb-10 sm:mb-14 max-w-3xl">
-      <AlertTitle>Source-directory audits understate framework apps</AlertTitle>
+      {/* Same look as AlertTitle, but a paragraph so we do not skip h2–h4. */}
+      <p className="mb-1 font-medium leading-none tracking-tight">
+        Source-directory audits understate framework apps
+      </p>
       <AlertDescription>
         <p>
-          Framework apps understate when audited as a source directory
-          because artifacts are generated at runtime. Next.js serves{" "}
-          <code className="font-mono text-xs">llms.txt</code>, sitemap,
-          robots, WebMCP, and Markdown mirrors from route handlers. Astro
-          writes titles, meta, and JSON-LD into HTML at build time. Audit
-          the deployed URL (or Astro{" "}
-          <code className="font-mono text-xs">dist/</code>) for the true
-          score. The static HTML example has no such gap: the files on
-          disk are what engines fetch.
+          Framework apps understate when audited as a source directory because artifacts are
+          generated at runtime. Next.js serves <code className="font-mono text-xs">llms.txt</code>,
+          sitemap, robots, WebMCP, and Markdown mirrors from route handlers. Astro writes titles,
+          meta, and JSON-LD into HTML at build time. Audit the deployed URL (or Astro{" "}
+          <code className="font-mono text-xs">dist/</code>) for the true score. The static HTML
+          example has no such gap: the files on disk are what engines fetch.
         </p>
       </AlertDescription>
     </Alert>
@@ -200,9 +197,7 @@ function ScoreCards() {
           </p>
           <p className="text-3xl font-bold tracking-tight tabular-nums">
             {example.score}
-            <span className="text-base font-medium text-muted-foreground">
-              /100
-            </span>
+            <span className="text-base font-medium text-muted-foreground">/100</span>
           </p>
         </a>
       ))}
@@ -225,12 +220,9 @@ function ExampleCards() {
 function ReproduceSection() {
   return (
     <div className="mt-14 max-w-2xl">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight mb-3">
-        Reproduce a score
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight mb-3">Reproduce a score</h2>
       <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-        From a clone of the repo, audit the example directory. Then
-        compare the gap list to the{" "}
+        From a clone of the repo, audit the example directory. Then compare the gap list to the{" "}
         <Link href="/checklist" className="text-foreground underline underline-offset-4">
           GEO/AEO checklist
         </Link>
@@ -249,7 +241,6 @@ npx geoaeo audit ./packages/geoaeo/examples/astro-site`}</pre>
   );
 }
 
-
 /** One example: its badges, summary, audit command and shipped files. */
 function ExampleCard({ example }: { example: (typeof examples)[number] }) {
   return (
@@ -264,32 +255,24 @@ function ExampleCard({ example }: { example: (typeof examples)[number] }) {
           </Badge>
         </div>
         <CardTitle className="text-xl">{example.name}</CardTitle>
-        <CardDescription className="font-mono text-xs">
-          {example.path}
-        </CardDescription>
+        <CardDescription className="font-mono text-xs">{example.path}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-sm leading-relaxed">{example.summary}</p>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          {example.why}
-        </p>
+        <p className="text-sm text-muted-foreground leading-relaxed">{example.why}</p>
         <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono">
           {example.command}
         </pre>
         <div>
-          <h3 className="text-sm font-semibold mb-3">What ships</h3>
+          <h2 className="text-sm font-semibold mb-3">What ships</h2>
           <ul className="space-y-2">
             {example.files.map((item) => (
               <li
                 key={item.file}
                 className="grid gap-1 sm:grid-cols-[minmax(0,14rem)_1fr] sm:gap-4 text-sm"
               >
-                <code className="font-mono text-xs break-all">
-                  {item.file}
-                </code>
-                <span className="text-muted-foreground">
-                  {item.purpose}
-                </span>
+                <code className="font-mono text-xs break-all">{item.file}</code>
+                <span className="text-muted-foreground">{item.purpose}</span>
               </li>
             ))}
           </ul>

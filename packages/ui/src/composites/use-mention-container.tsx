@@ -1,12 +1,15 @@
-'use client';
+"use client";
 
-import { useImperativeHandle } from 'react';
-import { useMentionState, useMentionRefs } from './use-mention-state';
-import { useSyncEditor, useDropdownScroll, useMentionDerived } from './mention-sync-hooks';
-import { useMentionCallbacks } from './mention-textarea-hooks';
-import type { MentionEntity } from './mention-textarea';
+import { useImperativeHandle } from "react";
+import { useMentionState, useMentionRefs } from "./use-mention-state";
+import { useSyncEditor, useDropdownScroll, useMentionDerived } from "./mention-sync-hooks";
+import { useMentionCallbacks } from "./mention-textarea-hooks";
+import type { MentionEntity } from "./mention-textarea";
 
-export function useFocusHandle(ref: React.Ref<unknown>, editorRef: React.RefObject<HTMLDivElement | null>) {
+export function useFocusHandle(
+  ref: React.Ref<unknown>,
+  editorRef: React.RefObject<HTMLDivElement | null>,
+) {
   useImperativeHandle(ref, () => ({
     focus: () => {
       const editor = editorRef.current;

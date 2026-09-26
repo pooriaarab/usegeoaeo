@@ -48,9 +48,7 @@ export function HowItWorksSection() {
                 <step.icon className="size-[18px] text-foreground" />
               </div>
               <h3 className="text-base font-semibold mb-2">{step.title}</h3>
-              <p className="text-sm text-muted-foreground leading-[1.5]">
-                {step.description}
-              </p>
+              <p className="text-sm text-muted-foreground leading-[1.5]">{step.description}</p>
             </div>
           ))}
         </div>

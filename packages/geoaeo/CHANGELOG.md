@@ -6,6 +6,15 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `GEOAEO_ALLOWED_ROOTS` bounds the local paths `audit`, `gen`, and
+  `humanize` accept. The CLI and the MCP server read it at startup.
+  Separate roots with the platform path delimiter. An unset or empty
+  value keeps every local path allowed. An `http` or `https` URL passed
+  to `audit` stays allowed. A path outside the roots returns an error
+  that names the path the caller passed.
+
 ## [0.5.0] - 2026-09-26
 
 ### Fixed

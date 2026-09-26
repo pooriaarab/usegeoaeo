@@ -5,7 +5,16 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
 
-import { cacheTitle, cleanupCache, listAll, prepareCache, renderRuntimeConfig, validateAccess, validatePreviewName } from "./worker-preview-cache.mjs";
+import {
+  cacheTitle,
+  cleanupCache,
+  listAll,
+  prepareCache,
+  renderRuntimeConfig,
+  validateAccess,
+  validatePreviewName,
+} from "./worker-preview-cache.mjs";
+import { WORKER_FIRST_PATHS, previewSource } from "./worker-preview-source.mjs";
 
 const originalFetch = globalThis.fetch;
 const originalEnv = { ...process.env };
@@ -50,7 +59,8 @@ test("keeps Preview names exact and hashes only long KV titles", () => {
 
 test("accepts only pinned fail-closed Access identities", () => {
   assert.doesNotThrow(() => validateAccess(access()));
-  for (const key of ["workerId", "workerAppId", "hostnameAppId", "clientId", "serviceTokenId"]) assert.throws(() => validateAccess(access({ expected: { ...expected, [key]: "wrong" } })));
+  for (const key of ["workerId", "workerAppId", "hostnameAppId", "clientId", "serviceTokenId"])
+    assert.throws(() => validateAccess(access({ expected: { ...expected, [key]: "wrong" } })));
   const unsafe = access();
   unsafe.apps[0].service_auth_401_redirect = false;
   assert.throws(() => validateAccess(unsafe), /fail-closed/);
@@ -123,36 +133,89 @@ test("rejects disabled, expired, or colliding service tokens", () => {
 
 test("renders one structurally exact isolated KV binding", () => {
   const id = "a".repeat(32);
-  const source = JSON.stringify({
-    name: "preview",
+  const vars = { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" };
+  const kv = [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }];
+  const source = JSON.stringify({ name: "preview", previews: { vars, kv_namespaces: kv } });
+  assert.deepEqual(JSON.parse(renderRuntimeConfig(source, id)).previews.kv_namespaces, [
+    { binding: "NEXT_INC_CACHE_KV", id },
+  ]);
+  for (const unsafe of [
+    "{}",
+    // Top-level vars and kv_namespaces look bound but wrangler preview ignores them.
+    JSON.stringify({ vars, kv_namespaces: kv }),
+    JSON.stringify({
+      previews: { vars: { ENVIRONMENT: "production", WORKER_PREVIEW: "true" }, kv_namespaces: kv },
+    }),
+    JSON.stringify({
+      previews: { vars, kv_namespaces: [{ binding: "OTHER", id: "__PREVIEW_KV_ID__" }] },
+    }),
+    JSON.stringify({ previews: { vars, kv_namespaces: kv }, r2_buckets: [] }),
+    JSON.stringify({ previews: { vars, kv_namespaces: kv, send_email: [] } }),
+    JSON.stringify({ previews: { vars, kv_namespaces: kv, env: { production: {} } } }),
+  ])
+    assert.throws(() => renderRuntimeConfig(unsafe, id));
+});
+
+test("worker-preview-source renders a template renderRuntimeConfig accepts", () => {
+  const config = {
+    name: "usegeoaeo-website",
+    main: "w.js",
+    compatibility_flags: ["nodejs_compat"],
+    assets: { binding: "ASSETS", directory: "dist" },
+    kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "prod-id" }],
+    vars: { ENVIRONMENT: "development" },
+    env: { staging: { name: "w-staging" }, production: { name: "w" } },
+    routes: [{ pattern: "usegeoaeo.com", custom_domain: true }],
+    d1_databases: [{ binding: "DB", database_id: "x" }],
+  };
+  const source = previewSource(config);
+  assert.equal(source.name, "w-staging");
+  assert.equal(source.workers_dev, false);
+  assert.equal(source.preview_urls, false);
+  assert.deepEqual(source.assets, { binding: "ASSETS", directory: "dist", run_worker_first: WORKER_FIRST_PATHS });
+  for (const path of ["/robots.txt", "/llms.txt", "/sitemap.xml", "/.well-known/*"])
+    assert.ok(WORKER_FIRST_PATHS.includes(path), `${path} must run the Worker first`);
+  assert.deepEqual(source.previews, {
     vars: { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" },
     kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
   });
-  assert.deepEqual(JSON.parse(renderRuntimeConfig(source, id)).kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id }]);
-  for (const unsafe of [
-    "{}",
-    JSON.stringify({ vars: { ENVIRONMENT: "production", WORKER_PREVIEW: "true" }, kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }] }),
-    JSON.stringify({
-      kv_namespaces: [{ binding: "OTHER", id: "__PREVIEW_KV_ID__" }],
-    }),
-    JSON.stringify({
-      kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
-      r2_buckets: [],
-    }),
-    JSON.stringify({ kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }], send_email: [] }),
-    JSON.stringify({
-      kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
-      env: { production: { kv_namespaces: [] } },
-    }),
-  ])
-    assert.throws(() => renderRuntimeConfig(unsafe, id));
+  for (const key of ["env", "routes", "d1_databases", "vars", "kv_namespaces"])
+    assert.equal(source[key], undefined);
+  const id = "a".repeat(32);
+  const rendered = renderRuntimeConfig(`${JSON.stringify(source, null, 2)}\n`, id);
+  assert.deepEqual(JSON.parse(rendered).previews.kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id }]);
+  assert.equal(previewSource({ ...config, env: { staging: { name: "other" } } }).name, "other");
+  assert.throws(() => previewSource({ ...config, env: {} }), /env\.staging\.name/);
+});
+
+test("worker-preview-source CLI strips comments and trailing commas", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "preview-source-"));
+  try {
+    const input = join(dir, "wrangler.jsonc");
+    const output = join(dir, "source.json");
+    await writeFile(input, `{ // comment
+      "main": "w.js", "vars": { "URL": "https://a.test//b" },
+      "env": { "staging": { "name": "w-staging", }, },
+      /* block */ "compatibility_flags": ["nodejs_compat",], }`);
+    const script = new URL("./worker-preview-source.mjs", import.meta.url).pathname;
+    const result = spawnSync(process.execPath, [script, input, output]);
+    assert.equal(result.status, 0, result.stderr.toString());
+    const source = JSON.parse(await readTextFile(output, "utf8"));
+    assert.equal(source.name, "w-staging");
+    assert.deepEqual(source.previews.vars, { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 // prettier-ignore
 const response = (result, resultInfo) => new Response(JSON.stringify({ success: true, result, result_info: resultInfo }));
 
 test("validates every Cloudflare list page", async () => {
-  const pages = [response([{ id: "one" }], { page: 1, total_count: 2 }), response([{ id: "two" }], { page: 2, total_count: 2 })];
+  const pages = [
+    response([{ id: "one" }], { page: 1, total_count: 2 }),
+    response([{ id: "two" }], { page: 2, total_count: 2 }),
+  ];
   globalThis.fetch = async () => pages.shift();
   assert.deepEqual(await listAll("/items", "token"), [{ id: "one" }, { id: "two" }]);
   globalThis.fetch = async () => response({}, { page: 1, total_count: 0 });
@@ -171,15 +234,19 @@ test("cleanup uses recorded ID and title, tolerates only true absence", async ()
   const deleted = [];
   globalThis.fetch = async (url, options = {}) => {
     if (options.method === "DELETE") deleted.push(new URL(url).pathname);
-    return options.method === "DELETE" ? response({}) : response([record], { page: 1, total_count: 1 });
+    return options.method === "DELETE"
+      ? response({})
+      : response([record], { page: 1, total_count: 1 });
   };
   await cleanupCache(previewName, state);
   assert.equal(deleted[0].endsWith(record.id), true);
   globalThis.fetch = async () => response([], { page: 1, total_count: 0 });
   await cleanupCache(previewName, state);
-  globalThis.fetch = async () => response([{ ...record, title: "different" }], { page: 1, total_count: 1 });
+  globalThis.fetch = async () =>
+    response([{ ...record, title: "different" }], { page: 1, total_count: 1 });
   await assert.rejects(cleanupCache(previewName, state), AggregateError);
-  globalThis.fetch = async () => response([{ ...record, id: "b".repeat(32) }], { page: 1, total_count: 1 });
+  globalThis.fetch = async () =>
+    response([{ ...record, id: "b".repeat(32) }], { page: 1, total_count: 1 });
   await assert.rejects(cleanupCache(previewName, state), AggregateError);
 });
 
@@ -188,10 +255,10 @@ function setAccessEnv() { Object.assign(process.env, { CF_ACCESS_HUMAN_SELECTORS
 // prettier-ignore
 async function accessFetch(url) { const { pathname } = new URL(url); const state = access(); if (pathname.endsWith("/access/apps")) return response(state.apps, { page: 1, total_count: state.apps.length }); if (pathname.endsWith("/access/service_tokens")) return response(state.serviceTokens, { page: 1, total_count: state.serviceTokens.length }); const match = pathname.match(/\/access\/apps\/([^/]+)\/policies$/); if (match) { const list = state.policiesByApp[match[1]] ?? []; return response(list, { page: 1, total_count: list.length }); } throw new Error(`Unhandled access fetch: ${pathname}`); }
 // prettier-ignore
-async function writeSourceConfig(path) { await writeFile(path, JSON.stringify({ vars: { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" }, kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }] })); }
+async function writeSourceConfig(path) { await writeFile(path, JSON.stringify({ previews: { vars: { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" }, kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }] } })); }
 
 // prettier-ignore
-test("prepareCache creates a namespace and writes config and state once", async () => { setAccessEnv(); const dir = await mkdtemp(join(tmpdir(), "preview-cache-")); const sourcePath = join(dir, "wrangler.jsonc"); const outputPath = join(dir, "wrangler.preview.json"); const statePath = join(dir, "state.json"); await writeSourceConfig(sourcePath); const created = []; globalThis.fetch = async (url, options = {}) => { const { pathname } = new URL(url); if (pathname.includes("/access/")) return accessFetch(url); if (pathname.endsWith("/storage/kv/namespaces") && options.method === "POST") { const item = { id: "a".repeat(32), title: JSON.parse(options.body).title }; created.push(item); return response(item); } if (pathname.endsWith("/storage/kv/namespaces")) return response(created, { page: 1, total_count: created.length }); throw new Error(`Unhandled fetch ${options.method ?? "GET"} ${pathname}`); }; try { const state = await prepareCache(previewName, sourcePath, outputPath, statePath); assert.equal(created.length, 1); assert.deepEqual(state, { previewName, cache: created[0] }); assert.deepEqual(JSON.parse(await readTextFile(outputPath, "utf8")).kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id: created[0].id }]); assert.deepEqual(JSON.parse(await readTextFile(statePath, "utf8")), state); } finally { await rm(dir, { recursive: true, force: true }); } });
+test("prepareCache creates a namespace and writes config and state once", async () => { setAccessEnv(); const dir = await mkdtemp(join(tmpdir(), "preview-cache-")); const sourcePath = join(dir, "wrangler.jsonc"); const outputPath = join(dir, "wrangler.preview.json"); const statePath = join(dir, "state.json"); await writeSourceConfig(sourcePath); const created = []; globalThis.fetch = async (url, options = {}) => { const { pathname } = new URL(url); if (pathname.includes("/access/")) return accessFetch(url); if (pathname.endsWith("/storage/kv/namespaces") && options.method === "POST") { const item = { id: "a".repeat(32), title: JSON.parse(options.body).title }; created.push(item); return response(item); } if (pathname.endsWith("/storage/kv/namespaces")) return response(created, { page: 1, total_count: created.length }); throw new Error(`Unhandled fetch ${options.method ?? "GET"} ${pathname}`); }; try { const state = await prepareCache(previewName, sourcePath, outputPath, statePath); assert.equal(created.length, 1); assert.deepEqual(state, { previewName, cache: created[0] }); assert.deepEqual(JSON.parse(await readTextFile(outputPath, "utf8")).previews.kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id: created[0].id }]); assert.deepEqual(JSON.parse(await readTextFile(statePath, "utf8")), state); } finally { await rm(dir, { recursive: true, force: true }); } });
 // prettier-ignore
 test("prepareCache rolls back its namespace and files but preserves existing files", async () => { setAccessEnv(); const dir = await mkdtemp(join(tmpdir(), "preview-cache-")); const sourcePath = join(dir, "wrangler.jsonc"); const outputPath = join(dir, "wrangler.preview.json"); const statePath = join(dir, "state.json"); await writeSourceConfig(sourcePath); await writeFile(statePath, "pre-existing"); const created = []; const deleted = []; globalThis.fetch = async (url, options = {}) => { const { pathname } = new URL(url); if (pathname.includes("/access/")) return accessFetch(url); if (pathname.endsWith("/storage/kv/namespaces") && options.method === "POST") { const item = { id: "a".repeat(32), title: JSON.parse(options.body).title }; created.push(item); return response(item); } if (pathname.endsWith("/storage/kv/namespaces")) return response(created, { page: 1, total_count: created.length }); if (options.method === "DELETE") { deleted.push(pathname.split("/").pop()); return response({}); } throw new Error(`Unhandled fetch ${options.method ?? "GET"} ${pathname}`); }; await assert.rejects(prepareCache(previewName, sourcePath, outputPath, statePath), AggregateError); assert.deepEqual(deleted, [created[0].id]); await assert.rejects(readTextFile(outputPath, "utf8"), { code: "ENOENT" }); assert.equal(await readTextFile(statePath, "utf8"), "pre-existing"); await rm(dir, { recursive: true, force: true }); });
 // prettier-ignore
@@ -199,6 +266,10 @@ test("prepareCache rollback deletes only its namespace when a duplicate exists",
 
 test("imports safely without an argv script path", () => {
   const moduleUrl = new URL("./worker-preview-cache.mjs", import.meta.url).href;
-  const result = spawnSync(process.execPath, ["--input-type=module", "-e", `process.argv.splice(1); await import(${JSON.stringify(moduleUrl)})`]);
+  const result = spawnSync(process.execPath, [
+    "--input-type=module",
+    "-e",
+    `process.argv.splice(1); await import(${JSON.stringify(moduleUrl)})`,
+  ]);
   assert.equal(result.status, 0, result.stderr.toString());
 });

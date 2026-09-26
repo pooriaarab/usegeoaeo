@@ -13,8 +13,8 @@
  * ```
  */
 
-import { Label } from '../primitives/label';
-import { cn } from '../utils';
+import { Label } from "../primitives/label";
+import { cn } from "../utils";
 
 interface FormFieldProps {
   /** The label text displayed above the input */
@@ -53,18 +53,14 @@ export function FormField({
   children,
 }: FormFieldProps) {
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label htmlFor={htmlFor} className={labelClassName}>
         {label}
         {required && <span className="text-error ml-0.5">*</span>}
       </Label>
       {children}
-      {description && !error && (
-        <p className="text-xs text-muted-foreground">{description}</p>
-      )}
-      {error && (
-        <p className="text-sm text-error">{error}</p>
-      )}
+      {description && !error && <p className="text-xs text-muted-foreground">{description}</p>}
+      {error && <p className="text-sm text-error">{error}</p>}
     </div>
   );
 }

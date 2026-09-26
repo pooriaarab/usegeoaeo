@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Settings2 } from 'lucide-react';
-import { Button } from '../primitives/button';
-import { Switch } from '../primitives/switch';
-import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
-import { ComboboxSelect, type ComboboxOption } from './combobox-select';
-import { ViewTypeTabs } from './view-type-tabs';
-import { GroupingOrderingSection } from './grouping-ordering-section';
+import * as React from "react";
+import { Settings2 } from "lucide-react";
+import { Button } from "../primitives/button";
+import { Switch } from "../primitives/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "../primitives/popover";
+import { ComboboxSelect, type ComboboxOption } from "./combobox-select";
+import { ViewTypeTabs } from "./view-type-tabs";
+import { GroupingOrderingSection } from "./grouping-ordering-section";
 
-export type ViewType = 'list' | 'board' | 'graph' | 'calendar' | 'org';
+export type ViewType = "list" | "board" | "graph" | "calendar" | "org";
 
 export interface DisplayProperty {
   id: string;
@@ -21,7 +21,7 @@ export interface DisplaySettings {
   grouping: string;
   subGrouping: string;
   ordering: string;
-  orderDirection: 'asc' | 'desc';
+  orderDirection: "asc" | "desc";
   showEmptyGroups: boolean;
   visibleProperties: Set<string>;
   graphTagEdges?: boolean;
@@ -84,6 +84,23 @@ interface DisplayPopoverProps {
   extraToggles?: React.ReactNode;
 }
 
+function ConnectionSwitch({
+  label,
+  checked,
+  onCheckedChange,
+}: {
+  label: string;
+  checked: boolean;
+  onCheckedChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  );
+}
+
 function GraphConnections({
   settings,
   update,
@@ -94,35 +111,34 @@ function GraphConnections({
   return (
     <div className="space-y-2.5 border-b p-3">
       <span className="text-xs font-medium">Connections</span>
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Tag connections</span>
-        <Switch checked={settings.graphTagEdges !== false} onCheckedChange={(v) => update({ graphTagEdges: !!v })} />
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Entity connections</span>
-        <Switch
-          checked={settings.graphEntityEdges === true}
-          onCheckedChange={(v) => update({ graphEntityEdges: !!v })}
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Temporal proximity</span>
-        <Switch
-          checked={settings.graphTemporalEdges === true}
-          onCheckedChange={(v) => update({ graphTemporalEdges: !!v })}
-        />
-      </div>
+      <ConnectionSwitch
+        label="Tag connections"
+        checked={settings.graphTagEdges !== false}
+        onCheckedChange={(v) => update({ graphTagEdges: !!v })}
+      />
+      <ConnectionSwitch
+        label="Entity connections"
+        checked={settings.graphEntityEdges === true}
+        onCheckedChange={(v) => update({ graphEntityEdges: !!v })}
+      />
+      <ConnectionSwitch
+        label="Temporal proximity"
+        checked={settings.graphTemporalEdges === true}
+        onCheckedChange={(v) => update({ graphTemporalEdges: !!v })}
+      />
       {settings.graphTemporalEdges && (
         <div className="flex items-center gap-2">
-          <div className="flex min-w-[90px] items-center gap-1.5 text-xs text-muted-foreground">Time gap</div>
+          <div className="flex min-w-[90px] items-center gap-1.5 text-xs text-muted-foreground">
+            Time gap
+          </div>
           <ComboboxSelect
             value={String(settings.graphTemporalGapHours ?? 24)}
             onValueChange={(v) => update({ graphTemporalGapHours: Number(v) })}
             options={[
-              { value: '1', label: '1 hour' },
-              { value: '6', label: '6 hours' },
-              { value: '24', label: '1 day' },
-              { value: '168', label: '7 days' },
+              { value: "1", label: "1 hour" },
+              { value: "6", label: "6 hours" },
+              { value: "24", label: "1 day" },
+              { value: "168", label: "7 days" },
             ]}
             className="flex-1"
           />
@@ -145,7 +161,10 @@ function OptionsSection({
     <div className="space-y-2.5 border-b p-3">
       <div className="flex items-center justify-between">
         <span className="text-xs text-muted-foreground">Show empty groups</span>
-        <Switch checked={settings.showEmptyGroups} onCheckedChange={(v) => update({ showEmptyGroups: !!v })} />
+        <Switch
+          checked={settings.showEmptyGroups}
+          onCheckedChange={(v) => update({ showEmptyGroups: !!v })}
+        />
       </div>
       {extraToggles}
     </div>
@@ -168,7 +187,7 @@ function DisplayPropertiesSection({
         {displayProperties.map((prop) => (
           <Button
             key={prop.id}
-            variant={visibleProperties.has(prop.id) ? 'secondary' : 'outline'}
+            variant={visibleProperties.has(prop.id) ? "secondary" : "outline"}
             className="h-6 px-2 text-[11px]"
             onClick={() => toggleProperty(prop.id)}
           >
@@ -225,26 +244,66 @@ function usePopoverState(
     else next.add(id);
     update({ visibleProperties: next });
   };
-  const isGroupingVisible = settings.view !== 'graph' && settings.view !== 'org';
-  const isGraph = settings.view === 'graph';
+  const isGroupingVisible = settings.view !== "graph" && settings.view !== "org";
+  const isGraph = settings.view === "graph";
   return { update, toggleProperty, isGroupingVisible, isGraph, flags };
 }
 
-export function DisplayPopover({
+function DisplayPopoverPanel({
   settings,
   onSettingsChange,
   groupingOptions,
   orderingOptions,
   displayProperties,
   defaultSettings,
-  enableBoardView = true,
-  enableGraphView = false,
-  enableCalendarView = false,
-  enableOrgView = false,
   extraToggles,
-}: DisplayPopoverProps) {
-  const flags = { board: enableBoardView, graph: enableGraphView, calendar: enableCalendarView, org: enableOrgView };
-  const { update, toggleProperty, isGroupingVisible, isGraph } = usePopoverState(settings, onSettingsChange, flags);
+  flags,
+}: DisplayPopoverProps & {
+  flags: { board: boolean; graph: boolean; calendar: boolean; org: boolean };
+}) {
+  const { update, toggleProperty, isGroupingVisible, isGraph } = usePopoverState(
+    settings,
+    onSettingsChange,
+    flags,
+  );
+  return (
+    <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[320px] p-0" align="end">
+      <PopoverHeader
+        settings={settings}
+        update={update}
+        groupingOptions={groupingOptions}
+        orderingOptions={orderingOptions}
+        flags={flags}
+        isGroupingVisible={isGroupingVisible}
+        isGraph={isGraph}
+      />
+      <OptionsSection settings={settings} update={update} extraToggles={extraToggles} />
+      <DisplayPropertiesSection
+        displayProperties={displayProperties}
+        visibleProperties={settings.visibleProperties}
+        toggleProperty={toggleProperty}
+      />
+      <div className="flex justify-end p-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 text-xs"
+          onClick={() => onSettingsChange(defaultSettings)}
+        >
+          Reset
+        </Button>
+      </div>
+    </PopoverContent>
+  );
+}
+
+export function DisplayPopover(props: DisplayPopoverProps) {
+  const flags = {
+    board: props.enableBoardView ?? true,
+    graph: props.enableGraphView ?? false,
+    calendar: props.enableCalendarView ?? false,
+    org: props.enableOrgView ?? false,
+  };
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -252,28 +311,7 @@ export function DisplayPopover({
           <Settings2 className="h-3.5 w-3.5" /> Display
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[320px] p-0" align="end">
-        <PopoverHeader
-          settings={settings}
-          update={update}
-          groupingOptions={groupingOptions}
-          orderingOptions={orderingOptions}
-          flags={flags}
-          isGroupingVisible={isGroupingVisible}
-          isGraph={isGraph}
-        />
-        <OptionsSection settings={settings} update={update} extraToggles={extraToggles} />
-        <DisplayPropertiesSection
-          displayProperties={displayProperties}
-          visibleProperties={settings.visibleProperties}
-          toggleProperty={toggleProperty}
-        />
-        <div className="flex justify-end p-3">
-          <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => onSettingsChange(defaultSettings)}>
-            Reset
-          </Button>
-        </div>
-      </PopoverContent>
+      <DisplayPopoverPanel {...props} flags={flags} />
     </Popover>
   );
 }

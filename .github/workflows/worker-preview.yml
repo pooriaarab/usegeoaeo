@@ -1,0 +1,397 @@
+name: Worker Preview
+
+# Per-PR Worker Preview at <branch>.preview.staging.usegeoaeo.com: gate on
+# secrets -> verify Access -> isolated KV -> wrangler preview -> live probes;
+# close -> delete Preview and KV. FAILS CLOSED: missing secrets or Access
+# objects exit 1 first, since an unguarded Preview is a public staging site.
+# The contract lives in apps/website/scripts/worker-preview-cache.mjs.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: worker-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+env:
+  WRANGLER_VERSION: "4.127.1"
+  PREVIEW_WORKER: usegeoaeo-website-staging
+  MARKER: "<!-- worker-preview -->"
+  TURBO_API: ${{ vars.TURBO_API }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  preview:
+    name: Deploy Preview
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.repository_owner == 'pooriaarab'
+    runs-on: ubicloud-standard-4
+    timeout-minutes: 30
+    # Access and Worker IDs are repo variables. Tokens and secrets are secrets.
+    env:
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      PREVIEW_URL: https://${{ github.event.pull_request.head.ref }}.preview.staging.usegeoaeo.com
+      CF_PREVIEW_HOSTNAME: ${{ github.event.pull_request.head.ref }}.preview.staging.usegeoaeo.com
+      CF_ACCESS_HOSTNAME_DESTINATION: "*.preview.staging.usegeoaeo.com/*"
+      PREVIEW_DIR: apps/website/cloudflare/app-worker
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CF_ACCESS_API_TOKEN: ${{ secrets.CF_ACCESS_API_TOKEN }}
+      CF_ACCESS_HUMAN_SELECTORS_JSON: ${{ secrets.CF_ACCESS_HUMAN_SELECTORS_JSON }}
+      CF_ACCESS_WORKER_APP_ID: ${{ vars.CF_ACCESS_WORKER_APP_ID }}
+      CF_ACCESS_HOSTNAME_APP_ID: ${{ vars.CF_ACCESS_HOSTNAME_APP_ID }}
+      CF_PREVIEW_WORKER_ID: ${{ vars.CF_PREVIEW_WORKER_ID }}
+      CF_ACCESS_SERVICE_TOKEN_ID: ${{ vars.CF_ACCESS_SERVICE_TOKEN_ID }}
+      CF_ACCESS_CLIENT_ID: ${{ vars.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      CF_ACCESS_WORKER_CI_POLICY_ID: ${{ vars.CF_ACCESS_WORKER_CI_POLICY_ID }}
+      CF_ACCESS_WORKER_HUMAN_POLICY_ID: ${{ vars.CF_ACCESS_WORKER_HUMAN_POLICY_ID }}
+      CF_ACCESS_HOSTNAME_CI_POLICY_ID: ${{ vars.CF_ACCESS_HOSTNAME_CI_POLICY_ID }}
+      CF_ACCESS_HOSTNAME_HUMAN_POLICY_ID: ${{ vars.CF_ACCESS_HOSTNAME_HUMAN_POLICY_ID }}
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - id: branch
+        name: Gate on the PR-standard branch name
+        run: |
+          set -euo pipefail
+          if [[ "$HEAD_REF" =~ ^use-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$ && ${#HEAD_REF} -le 63 ]]; then
+            echo "eligible=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=Preview skipped::Branch $HEAD_REF does not match use-<issue>-<slug>; no Worker Preview will be deployed."
+          fi
+
+      - id: secrets
+        name: Check every required secret before deploying
+        if: steps.branch.outputs.eligible == 'true'
+        run: |
+          missing=""
+          for key in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID CF_ACCESS_API_TOKEN \
+            CF_ACCESS_HUMAN_SELECTORS_JSON CF_ACCESS_WORKER_APP_ID CF_ACCESS_HOSTNAME_APP_ID \
+            CF_PREVIEW_WORKER_ID CF_ACCESS_SERVICE_TOKEN_ID CF_ACCESS_CLIENT_ID \
+            CF_ACCESS_CLIENT_SECRET CF_ACCESS_WORKER_CI_POLICY_ID CF_ACCESS_WORKER_HUMAN_POLICY_ID \
+            CF_ACCESS_HOSTNAME_CI_POLICY_ID CF_ACCESS_HOSTNAME_HUMAN_POLICY_ID; do
+            [ -n "${!key}" ] || { echo "missing $key"; missing="$missing $key"; }
+          done
+          if [ -n "$missing" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "missing=${missing# }" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # A green check would claim a Preview exists; failing is the honest signal.
+      - name: Report missing secrets and fail closed
+        if: steps.secrets.outputs.configured == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Its own marker: the ownership step treats any comment carrying
+          # the Preview MARKER as recorded state, so reusing it here would
+          # block every later deploy, and a loose match could overwrite the
+          # ownership record that close-time cleanup needs.
+          body=$(cat <<'EOF'
+          <!-- worker-preview-missing-secrets -->
+          ## Worker Preview
+
+          **No Preview was deployed for this pull request.**
+
+          This job fails on purpose: required Preview secrets are not
+          configured, so no Worker Preview URL exists to walk. A green
+          check would claim one exists.
+
+          Missing secrets: MISSING_KEYS_MARK
+
+          A human provisions the Cloudflare Access objects and sets the
+          secrets named in .github/workflows/worker-preview.yml.
+          EOF
+          )
+          body=${body/MISSING_KEYS_MARK/${{ steps.secrets.outputs.missing }}}
+          existing=$(gh api --paginate "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" \
+            --jq '[.[] | select(.user.login=="github-actions[bot]" and (.body|contains("<!-- worker-preview-missing-secrets -->"))) | .id] | first // empty')
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$existing" -f body="$body"
+          else
+            gh api -X POST "repos/${{ github.repository }}/issues/${PR_NUMBER}/comments" -f body="$body"
+          fi
+          echo "No Worker Preview exists for this pull request; see the PR comment."
+          exit 1
+
+      # prepare runs verify-access first, then creates the isolated KV
+      # namespace, the runtime config, and the ownership state for the PR.
+      - id: provision
+        name: Provision isolated KV cache
+        if: steps.secrets.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          node apps/website/scripts/worker-preview-source.mjs \
+            "$PREVIEW_DIR/wrangler.jsonc" "$PREVIEW_DIR/wrangler.preview.source.json"
+          node apps/website/scripts/worker-preview-cache.mjs verify-access
+          node apps/website/scripts/worker-preview-cache.mjs prepare \
+            "$HEAD_REF" "$PREVIEW_DIR/wrangler.preview.source.json" \
+            "$PREVIEW_DIR/wrangler.preview.runtime.json" "$PREVIEW_DIR/preview-state.json"
+
+      # Ownership is recorded before any deploy so a failed run still leaves
+      # state for close-time cleanup; a renamed Preview is deleted explicitly.
+      - id: record
+        name: Record ownership on the PR
+        if: steps.secrets.outputs.configured == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          previous=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" \
+            | jq -sr --arg marker "$MARKER" '[.[][] | select(.user.login == "github-actions[bot]") | select((.body // "") | contains($marker))][0] // empty')
+          comment_id=""
+          previous_body=""
+          if [ -n "$previous" ]; then
+            comment_id=$(jq -r '.id // empty' <<<"$previous")
+            previous_body=$(jq -r '.body // empty' <<<"$previous")
+          fi
+          previous_name=$(sed -n 's/^preview_name=//p' <<<"$previous_body")
+          if [ -n "$previous_body" ]; then
+            previous_branch=$(sed -n 's/^branch=//p' <<<"$previous_body")
+            [ -n "$previous_branch" ] || { echo "::error::Recorded Preview comment has no branch ownership; refusing migration."; exit 1; }
+            [ "$previous_branch" = "$HEAD_REF" ] || { echo "::error::Recorded branch $previous_branch does not own this PR branch $HEAD_REF; refusing migration."; exit 1; }
+          fi
+          if [ -n "$previous_name" ] && [ "$previous_name" != "$HEAD_REF" ]; then
+            previous_state=$(sed -n 's/^state=//p' <<<"$previous_body")
+            [ -n "$previous_state" ] || { echo "::error::Recorded Preview $previous_name has no ownership state; refusing to infer deletion."; exit 1; }
+            printf '%s' "$previous_state" | base64 -d > /tmp/previous-state.json
+            jq -e --arg name "$previous_name" '.previewName == $name' /tmp/previous-state.json >/dev/null \
+              || { echo "::error::Recorded ownership state does not match Preview $previous_name; refusing migration."; exit 1; }
+            npx --yes "wrangler@$WRANGLER_VERSION" preview delete --worker-name "$PREVIEW_WORKER" \
+              --name "$previous_name" --ignore-base-config --skip-confirmation
+            node apps/website/scripts/worker-preview-cache.mjs cleanup "$previous_name" /tmp/previous-state.json
+          fi
+          encoded=$(base64 < "$PREVIEW_DIR/preview-state.json" | tr -d '\n')
+          body=$(printf '%s\n### Worker Preview\n\nPreview: %s\nStatus: provisioned\n\nhead_sha=%s\nbranch=%s\npreview_name=%s\nstate=%s' \
+            "$MARKER" "$PREVIEW_URL" "$HEAD_SHA" "$HEAD_REF" "$HEAD_REF" "$encoded")
+          record() {
+            if [ -n "$comment_id" ]; then
+              gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" -f body="$body" >/dev/null
+            else
+              gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" -f body="$body" >/dev/null
+            fi
+          }
+          if ! record; then
+            node apps/website/scripts/worker-preview-cache.mjs cleanup "$HEAD_REF" "$PREVIEW_DIR/preview-state.json" || true
+            exit 1
+          fi
+
+      - run: bun install --frozen-lockfile
+        if: steps.secrets.outputs.configured == 'true'
+
+      # The website imports the geoaeo workspace package; its dist must exist
+      # before the OpenNext build. Same path as deploy.yml.
+      - name: Build website and dependencies
+        if: steps.secrets.outputs.configured == 'true'
+        run: bunx turbo run build --filter @usegeoaeo/website...
+
+      - name: OpenNext build
+        if: steps.secrets.outputs.configured == 'true'
+        working-directory: apps/website
+        run: bun run build:worker
+
+      - id: deploy
+        name: Deploy the branch Preview
+        if: steps.secrets.outputs.configured == 'true'
+        working-directory: apps/website
+        run: |
+          set -euo pipefail
+          wrangler_out=$(mktemp -d)
+          export WRANGLER_OUTPUT_FILE_DIRECTORY="$wrangler_out"
+          set +e
+          npx --yes "wrangler@$WRANGLER_VERSION" preview \
+            --config cloudflare/app-worker/wrangler.preview.runtime.json \
+            --worker-name "$PREVIEW_WORKER" --name "$HEAD_REF" \
+            --ignore-base-config --json > /tmp/preview-deploy.log 2>&1
+          deploy_code=$?
+          set -e
+          cat /tmp/preview-deploy.log
+          if [ "$deploy_code" -ne 0 ]; then
+            echo "wrangler preview failed (exit $deploy_code); failing now"
+            exit "$deploy_code"
+          fi
+          # Verify against the URL Wrangler returned, not the one we computed.
+          json="$(WRANGLER_OUTPUT_DIR="$wrangler_out" node -e 'const fs=require("node:fs"),path=require("node:path"),dir=process.env.WRANGLER_OUTPUT_DIR,c=[];for(const n of fs.readdirSync(dir)){const t=fs.readFileSync(path.join(dir,n),"utf8");try{const v=JSON.parse(t);if(Array.isArray(v))c.push(...v);else c.push(v);continue}catch{}for(const l of t.split("\n")){const s=l.trim();if(!s)continue;try{c.push(JSON.parse(s))}catch{}}}const f=c.find(o=>o&&typeof o==="object"&&(o.preview_urls||(o.preview&&o.preview.urls)));if(!f)process.exit(1);process.stdout.write(JSON.stringify(f))')" \
+            || { echo "wrangler returned no preview_urls; cannot verify the Preview URL"; exit 1; }
+          printf '%s' "$json" | jq -e --arg expected "$PREVIEW_URL" \
+            'any((.preview_urls // .preview.urls // [])[]; rtrimstr("/") == $expected)' >/dev/null \
+            || { echo "expected $PREVIEW_URL absent from wrangler preview_urls"; printf '%s\n' "$json"; exit 1; }
+
+      - id: verify
+        name: Probe the live Preview
+        if: steps.secrets.outputs.configured == 'true'
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          access=(-H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET")
+
+          # New hostnames spend minutes in DNS/TLS; retry only absent or 5xx
+          # answers. An unauthenticated 200 means Access is bypassed — the
+          # Preview is public, so fail fast, never retry.
+          unauth=""
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 20 "$PREVIEW_URL/" || true)
+            case "$code" in
+              200) fail "unauthenticated request returned 200 — Access is not intercepting" ;;
+              302|401|403) unauth=$code; break ;;
+              ""|000|5*) : ;;
+              *) unauth=$code; break ;;
+            esac
+            echo "attempt $attempt: $PREVIEW_URL not answering yet (status ${code:-none})"
+            [ "$attempt" -lt 10 ] && sleep 15
+          done
+          case "$unauth" in
+            302|401|403) ;;
+            *) fail "unauthenticated request returned '${unauth:-no response}', expected Access interception (302/401/403)" ;;
+          esac
+
+          headers=$(mktemp)
+          root=""
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            code=$(curl -s "${access[@]}" -D "$headers" -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 30 "$PREVIEW_URL/" || true)
+            root="$code"
+            [ "$code" = "200" ] && break
+            echo "attempt $attempt: authenticated / returned ${code:-none}"
+            [ "$attempt" -lt 10 ] && sleep 15
+          done
+          [ "$root" = "200" ] || fail "authenticated / returned ${root:-none}, expected 200"
+
+          # grep exits 1 when the header is absent; under pipefail that would
+          # end the step silently, so keep going and let the token check fail.
+          robots_tag=$( (grep -i '^x-robots-tag:' "$headers" || true) | sed 's/^[^:]*://' | tr ',' '\n' | tr -d ' \r')
+          echo "X-Robots-Tag on /: ${robots_tag:-<absent>}" | tr '\n' ' '; echo
+          # Names only: Access answers with a session cookie that must not reach the log.
+          echo "response headers on /: $(sed -n 's/^\([A-Za-z0-9-]*\):.*/\1/p' "$headers" | tr '\n' ' ')"
+          for token in noindex nofollow noarchive nosnippet noimageindex; do
+            printf '%s\n' "$robots_tag" | grep -qx "$token" || fail "X-Robots-Tag missing $token"
+          done
+
+          robots=$(curl -s "${access[@]}" --max-time 30 "$PREVIEW_URL/robots.txt" || true)
+          printf '%s' "$robots" | grep -q 'Disallow: /' || fail "robots.txt missing 'Disallow: /'"
+
+          for path in /llms.txt /agents.md /design.md /sitemap.xml /.well-known/agent-card.json; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "${access[@]}" --max-time 30 "$PREVIEW_URL$path" || true)
+            echo "$path -> ${code:-none}"
+            [ "$code" = "404" ] || fail "$path returned ${code:-none}, expected 404"
+          done
+          echo "root_status=$root" >> "$GITHUB_OUTPUT"
+
+      # On any failure after provisioning, delete the Preview and its KV now —
+      # a broken Preview must not linger. Close-time cleanup retries anyway.
+      - name: Tear down on failure
+        if: failure() && steps.provision.outcome == 'success'
+        run: |
+          npx --yes "wrangler@$WRANGLER_VERSION" preview delete --worker-name "$PREVIEW_WORKER" \
+            --name "$HEAD_REF" --ignore-base-config --skip-confirmation || echo "::warning::Preview delete failed or nothing to delete"
+          node apps/website/scripts/worker-preview-cache.mjs cleanup "$HEAD_REF" "$PREVIEW_DIR/preview-state.json" \
+            || echo "::warning::KV cleanup failed; close-time cleanup will retry"
+
+      - name: Publish verification status on the PR
+        if: always() && steps.record.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY: ${{ steps.deploy.outcome }}
+          VERIFY: ${{ steps.verify.outcome }}
+        run: |
+          set -euo pipefail
+          encoded=$(base64 < "$PREVIEW_DIR/preview-state.json" | tr -d '\n')
+          if [ "$VERIFY" = "success" ]; then status="active"; else status="failed"; fi
+          body=$(printf '%s\n### Worker Preview\n\nPreview: %s\nStatus: %s\n\nDeploy: %s\nVerify: %s\nHTTP: unauth=intercepted root=%s\n\nhead_sha=%s\nbranch=%s\npreview_name=%s\nstate=%s' \
+            "$MARKER" "$PREVIEW_URL" "$status" "$DEPLOY" "$VERIFY" "${{ steps.verify.outputs.root_status }}" \
+            "$HEAD_SHA" "$HEAD_REF" "$HEAD_REF" "$encoded")
+          comment_id=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" \
+            | jq -sr --arg marker "$MARKER" '[.[][] | select(.user.login == "github-actions[bot]") | select((.body // "") | contains($marker))][0].id')
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" -f body="$body" >/dev/null
+
+  cleanup:
+    name: Destroy Preview
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.repository_owner == 'pooriaarab'
+    runs-on: ubicloud-standard-2
+    timeout-minutes: 15
+    env:
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Delete the Preview and recorded KV namespace
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          comment=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments?per_page=100" \
+            | jq -sr --arg marker "$MARKER" '[.[][] | select(.user.login == "github-actions[bot]") | select((.body // "") | contains($marker))][0] // empty')
+          if [ -z "$comment" ]; then
+            echo "::notice::No Worker Preview comment on this PR; nothing was deployed."
+            exit 0
+          fi
+          comment_id=$(jq -er .id <<<"$comment")
+          body=$(jq -er .body <<<"$comment")
+          recorded_branch=$(sed -n 's/^branch=//p' <<<"$body")
+          [ -n "$recorded_branch" ] || { echo "::error::Recorded Preview has no branch ownership; refusing cleanup."; exit 1; }
+          [ "$recorded_branch" = "$HEAD_REF" ] || { echo "::error::Recorded branch $recorded_branch does not own this PR branch $HEAD_REF; refusing cleanup."; exit 1; }
+          encoded=$(sed -n 's/^state=//p' <<<"$body")
+          if [ -z "$encoded" ]; then
+            echo "::notice::Recorded comment carries no Preview state; nothing was deployed."
+            exit 0
+          fi
+          printf '%s' "$encoded" | base64 -d > /tmp/preview-state.json
+          recorded_name=$(sed -n 's/^preview_name=//p' <<<"$body")
+          [ -n "$recorded_name" ] || { echo "::error::Recorded Preview name is missing"; exit 1; }
+          [[ "$recorded_name" =~ ^use-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$ ]] \
+            || { echo "::error::Recorded Preview name $recorded_name is not a safe Preview name"; exit 1; }
+          jq -e --arg name "$recorded_name" '.previewName == $name' /tmp/preview-state.json >/dev/null \
+            || { echo "::error::Recorded ownership state does not match Preview $recorded_name; refusing cleanup."; exit 1; }
+          already_down=0
+          grep -q '^Status: failed' <<<"$body" && already_down=1
+          failed=0
+          npx --yes "wrangler@$WRANGLER_VERSION" preview delete --worker-name "$PREVIEW_WORKER" \
+            --name "$recorded_name" --ignore-base-config --skip-confirmation || failed=1
+          node apps/website/scripts/worker-preview-cache.mjs cleanup "$recorded_name" /tmp/preview-state.json || failed=1
+          if [ "$failed" -ne 0 ]; then
+            if [ "$already_down" -ne 1 ]; then
+              echo "::error::Preview cleanup failed"
+              exit 1
+            fi
+            echo "::warning::Cleanup reported an error for a Preview already torn down; treating as already deleted."
+          fi
+          expired=$(printf '%s\n### Worker Preview\n\nStatus: expired\n\nhead_sha=%s\nbranch=%s\npreview_name=%s' \
+            "$MARKER" "$HEAD_SHA" "$HEAD_REF" "$recorded_name")
+          gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" -f body="$expired" >/dev/null

@@ -1,4 +1,4 @@
-import { Group, Panel, Separator } from 'react-resizable-panels';
+import { Group, Panel, Separator } from "react-resizable-panels";
 
 export const ResizablePanelGroup = Group;
 export const ResizablePanel = Panel;

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Badge } from "@template/ui/primitives/badge";
 import { Separator } from "@template/ui/primitives/separator";
+import { DocsBreadcrumb } from "@/components/docs/docs-breadcrumb";
 
 type HarnessDocPageProps = {
   /** Route segment under /docs/harnesses, e.g. "claude-code". */
@@ -22,45 +23,36 @@ type HarnessDocPageProps = {
  */
 export function HarnessDocPage({ slug, name, intro, children }: HarnessDocPageProps) {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
-        <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            Home
-          </Link>
-          <span className="mx-2">/</span>
-          <Link href="/docs" className="hover:text-foreground transition-colors">
-            Docs
-          </Link>
-          <span className="mx-2">/</span>
-          <Link href={`/docs/harnesses/${slug}`} className="hover:text-foreground transition-colors">
-            Harnesses
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-foreground">{name}</span>
-        </nav>
+    <div className="mx-auto max-w-3xl">
+      <DocsBreadcrumb
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Docs", href: "/docs" },
+          { label: "Harnesses", href: `/docs/harnesses/${slug}` },
+          { label: name },
+        ]}
+      />
 
-        <Badge variant="secondary" className="mb-3">
-          {`Harness: ${name}`}
-        </Badge>
-        <h1 className="text-3xl font-bold tracking-tight">{`geoaeo for ${name}`}</h1>
-        <p className="mt-3 text-muted-foreground leading-relaxed">{intro}</p>
+      <Badge variant="secondary" className="mb-3">
+        {`Harness: ${name}`}
+      </Badge>
+      <h1 className="text-3xl font-bold tracking-tight">{`geoaeo for ${name}`}</h1>
+      <p className="mt-3 text-muted-foreground leading-relaxed">{intro}</p>
 
-        <Separator className="my-8" />
+      <Separator className="my-8" />
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
-          {children}
-        </div>
+      <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
+        {children}
+      </div>
 
-        <div className="mt-8 flex gap-3 text-sm">
-          <Link href="/docs/mcp" className="text-primary hover:underline underline-offset-4">
-            MCP overview &rarr;
-          </Link>
-          <span className="text-muted-foreground">·</span>
-          <Link href="/docs/cli" className="text-primary hover:underline underline-offset-4">
-            CLI reference &rarr;
-          </Link>
-        </div>
+      <div className="mt-8 flex gap-3 text-sm">
+        <Link href="/docs/mcp" className="text-primary hover:underline underline-offset-4">
+          MCP overview &rarr;
+        </Link>
+        <span className="text-muted-foreground">·</span>
+        <Link href="/docs/cli" className="text-primary hover:underline underline-offset-4">
+          CLI reference &rarr;
+        </Link>
       </div>
     </div>
   );

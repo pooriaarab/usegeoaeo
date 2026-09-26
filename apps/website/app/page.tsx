@@ -11,11 +11,13 @@ import { Footer } from "@/components/landing/footer";
 import { Button } from "@template/ui/primitives/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata = {
   title: "geoaeo | Make any site quotable by AI answer engines",
   description:
     "geoaeo audits any site for SEO, GEO, and AEO, scores it 0 to 100, and generates llms.txt, sitemap, robots, JSON-LD, WebMCP, and Markdown mirrors. CLI, MCP server, and library. Free and open source under the MIT license.",
+  alternates: pageAlternates("/"),
 };
 
 /**
@@ -47,8 +49,8 @@ function CTAFooter() {
             Make your site answerable
           </h2>
           <p className="text-muted-foreground mb-8">
-            Install geoaeo and audit your first site in a minute. Free and open
-            source under the MIT license.
+            Install geoaeo and audit your first site in a minute. Free and open source under the MIT
+            license.
           </p>
           <Button asChild size="lg">
             <Link href="/docs">

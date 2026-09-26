@@ -29,7 +29,6 @@ export const metadata: Metadata = {
   description,
   authors: [{ name: "Pooria Arab", url: "https://github.com/pooriaarab" }],
   creator: "Pooria Arab",
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "https://usegeoaeo.com",
@@ -107,7 +106,11 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <body className="antialiased">
         {children}
         <script

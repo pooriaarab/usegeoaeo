@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
 import { InstallThePlugin } from "@/components/docs/install-the-plugin";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo in Cursor — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Cursor with the geoaeo-mcp server. Configure .cursor/mcp.json, verify three tools, audit your site, and generate artifacts from Chat.",
+  alternates: pageAlternates("/docs/harnesses/cursor"),
 };
 
 const intro =
@@ -69,8 +71,8 @@ function ConfigureMcpServer() {
       <h2>Configure the MCP server</h2>
       <p>
         Cursor reads MCP servers from <code>.cursor/mcp.json</code> (project scope) or{" "}
-        <code>~/.cursor/mcp.json</code> (global scope). Use <code>mcpServers</code> with <code>command</code> and{" "}
-        <code>args</code>.
+        <code>~/.cursor/mcp.json</code> (global scope). Use <code>mcpServers</code> with{" "}
+        <code>command</code> and <code>args</code>.
       </p>
       <p>
         Create <code>.cursor/mcp.json</code> in the repo root:
@@ -93,7 +95,8 @@ function ConfigureMcpServer() {
         <li>Paste the block above. Validate JSON.</li>
         <li>Reload Cursor (Developer: Reload Window) or restart Cursor.</li>
         <li>
-          Open Cursor Settings &gt; Features &gt; MCP. Confirm <code>geoaeo</code> shows as connected with 3 tools.
+          Open Cursor Settings &gt; Features &gt; MCP. Confirm <code>geoaeo</code> shows as
+          connected with 3 tools.
         </li>
       </ol>
       <p>
@@ -156,7 +159,8 @@ function GenWalkthrough() {
     <>
       <h2>Walkthrough 2 — generate an artifact with gen</h2>
       <p>
-        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current directory.
+        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current
+        directory.
       </p>
       <ol>
         <li>
@@ -169,7 +173,10 @@ cat geoaeo.config.ts`}</code>
         <li>
           Prompt Cursor:
           <blockquote>
-            <p>Use geoaeo gen to create robots.txt for this site. Show the content and write it to public/robots.txt.</p>
+            <p>
+              Use geoaeo gen to create robots.txt for this site. Show the content and write it to
+              public/robots.txt.
+            </p>
           </blockquote>
         </li>
       </ol>
@@ -206,8 +213,8 @@ function GenArtifactReference() {
           <code>{`{"artifact": "webmcp"}`}</code>
         </li>
         <li>
-          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be <code>software</code>,{" "}
-          <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
+          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be{" "}
+          <code>software</code>, <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
         </li>
       </ul>
       <p>Equivalent CLI:</p>
@@ -217,7 +224,8 @@ npx geoaeo gen robots -o ./public/robots.txt
 npx geoaeo gen jsonld --type product`}</code>
       </pre>
       <p>
-        The <code>humanize</code> tool is also available: <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
+        The <code>humanize</code> tool is also available:{" "}
+        <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
       </p>
     </>
   );
@@ -228,14 +236,15 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>MCP shows Failed to connect or ENOENT npx.</strong> Check Node is on PATH inside Cursor. Run{" "}
-        <code>node --version</code> in Cursor&apos;s terminal. On macOS, ensure Cursor was launched after Node was
-        installed. Try absolute command: <code>&quot;/opt/homebrew/bin/npx&quot;</code> or where{" "}
-        <code>which npx</code> points.
+        <strong>MCP shows Failed to connect or ENOENT npx.</strong> Check Node is on PATH inside
+        Cursor. Run <code>node --version</code> in Cursor&apos;s terminal. On macOS, ensure Cursor
+        was launched after Node was installed. Try absolute command:{" "}
+        <code>&quot;/opt/homebrew/bin/npx&quot;</code> or where <code>which npx</code> points.
       </p>
       <p>
-        <strong>Config not picked up.</strong> Confirm the file is <code>.cursor/mcp.json</code> (note the dot).
-        Run <code>cat .cursor/mcp.json | jq .</code> to validate JSON. Reload the window.
+        <strong>Config not picked up.</strong> Confirm the file is <code>.cursor/mcp.json</code>{" "}
+        (note the dot). Run <code>cat .cursor/mcp.json | jq .</code> to validate JSON. Reload the
+        window.
       </p>
       <p>
         <strong>audit returns low score or empty pages.</strong> Audit the repo root that contains{" "}
@@ -247,8 +256,8 @@ function Troubleshooting() {
         <code>geoaeo.config.ts</code>. Then retry.
       </p>
       <p>
-        <strong>Server starts then exits.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal. It should wait
-        on stdin. If it exits, update to Node 20+ and reinstall geoaeo.
+        <strong>Server starts then exits.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal.
+        It should wait on stdin. If it exits, update to Node 20+ and reinstall geoaeo.
       </p>
     </>
   );
@@ -264,9 +273,9 @@ function Reference() {
         </li>
         <li>Transport: stdio only.</li>
         <li>
-          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes <code>artifact</code>{" "}
-          enum and optional <code>type</code>. <code>humanize</code> takes <code>glob</code> and optional{" "}
-          <code>write</code> (boolean).
+          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes{" "}
+          <code>artifact</code> enum and optional <code>type</code>. <code>humanize</code> takes{" "}
+          <code>glob</code> and optional <code>write</code> (boolean).
         </li>
       </ul>
     </>

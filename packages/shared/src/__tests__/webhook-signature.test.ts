@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  signWebhookPayload,
-  verifyWebhookSignature,
-} from "../webhook-signature";
+import { signWebhookPayload, verifyWebhookSignature } from "../webhook-signature";
 
 describe("signWebhookPayload", () => {
   it("returns a sha256= prefixed hex digest", () => {
@@ -17,15 +14,11 @@ describe("signWebhookPayload", () => {
   });
 
   it("produces different signatures for different secrets", () => {
-    expect(signWebhookPayload("a", "body")).not.toBe(
-      signWebhookPayload("b", "body"),
-    );
+    expect(signWebhookPayload("a", "body")).not.toBe(signWebhookPayload("b", "body"));
   });
 
   it("produces different signatures for different bodies", () => {
-    expect(signWebhookPayload("shh", "a")).not.toBe(
-      signWebhookPayload("shh", "b"),
-    );
+    expect(signWebhookPayload("shh", "a")).not.toBe(signWebhookPayload("shh", "b"));
   });
 });
 
