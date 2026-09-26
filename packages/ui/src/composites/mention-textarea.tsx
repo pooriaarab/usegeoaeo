@@ -2,14 +2,14 @@
  * MentionTextarea — contentEditable div with @ mention support
  */
 
-'use client';
+"use client";
 
-import { forwardRef } from 'react';
-import { MentionDropdown } from './mention-dropdown';
-import { MentionEditorSurface, PlaceholderOverlay, LiveRegion } from './mention-editor-surface';
-import { useMentionContainer } from './use-mention-container';
+import { forwardRef } from "react";
+import { MentionDropdown } from "./mention-dropdown";
+import { MentionEditorSurface, PlaceholderOverlay, LiveRegion } from "./mention-editor-surface";
+import { useMentionContainer } from "./use-mention-container";
 
-export type MentionCategory = 'agent' | 'flow' | 'template' | 'tool';
+export type MentionCategory = "agent" | "flow" | "template" | "tool";
 export interface MentionEntity {
   category: MentionCategory;
   id: string;
@@ -24,12 +24,12 @@ export interface MentionTextareaProps {
   onChange: (value: string) => void;
   entities: MentionEntity[];
   placeholder?: string;
-  'aria-label'?: string;
+  "aria-label"?: string;
   className?: string;
   minRows?: number;
   maxHeight?: number;
   onKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
-  renderEntityIcon?: (entity: MentionEntity, size: 'sm' | 'md') => React.ReactNode;
+  renderEntityIcon?: (entity: MentionEntity, size: "sm" | "md") => React.ReactNode;
   renderEntityIconDOM?: (entity: MentionEntity) => HTMLElement | null;
 }
 export interface MentionTextareaRef {
@@ -37,20 +37,31 @@ export interface MentionTextareaRef {
   textarea: HTMLTextAreaElement | null;
 }
 
-export const MentionTextarea = forwardRef<MentionTextareaRef, MentionTextareaProps>(
-  function MentionTextarea(
-    { value, onChange, entities, placeholder, 'aria-label': ariaLabel, className, minRows = 4, maxHeight = 300,
-      onKeyDown, renderEntityIcon, renderEntityIconDOM },
-    ref,
-  ) {
-  const { refs, state, derived, cbs } = useMentionContainer({
-    value,
-    entities,
-    renderEntityIconDOM,
-    onChange,
-    externalKeyDown: onKeyDown,
-    ref,
-  });
+type MentionBodyProps = {
+  placeholder?: string;
+  ariaLabel?: string;
+  className?: string;
+  minRows: number;
+  maxHeight: number;
+  renderEntityIcon?: MentionTextareaProps["renderEntityIcon"];
+  refs: ReturnType<typeof useMentionContainer>["refs"];
+  state: ReturnType<typeof useMentionContainer>["state"];
+  derived: ReturnType<typeof useMentionContainer>["derived"];
+  cbs: ReturnType<typeof useMentionContainer>["cbs"];
+};
+
+function MentionTextareaBody({
+  placeholder,
+  ariaLabel,
+  className,
+  minRows,
+  maxHeight,
+  renderEntityIcon,
+  refs,
+  state,
+  derived,
+  cbs,
+}: MentionBodyProps) {
   return (
     <div className="relative">
       {state.isEmpty && placeholder && <PlaceholderOverlay placeholder={placeholder} />}
@@ -71,8 +82,13 @@ export const MentionTextarea = forwardRef<MentionTextareaRef, MentionTextareaPro
         onPaste={cbs.handlePaste}
         onClick={cbs.handleClick}
         onBlur={cbs.handleBlur}
-        onCompositionStart={() => { refs.isComposing.current = true; }}
-        onCompositionEnd={() => { refs.isComposing.current = false; cbs.handleInput(); }}
+        onCompositionStart={() => {
+          refs.isComposing.current = true;
+        }}
+        onCompositionEnd={() => {
+          refs.isComposing.current = false;
+          cbs.handleInput();
+        }}
         ariaLabel={ariaLabel}
         hasSuggestions={derived.hasSuggestions}
         activeDescendantId={derived.activeDescendantId}
@@ -82,4 +98,31 @@ export const MentionTextarea = forwardRef<MentionTextareaRef, MentionTextareaPro
       />
     </div>
   );
-});
+}
+
+export const MentionTextarea = forwardRef<MentionTextareaRef, MentionTextareaProps>(
+  function MentionTextarea(props, ref) {
+    const { refs, state, derived, cbs } = useMentionContainer({
+      value: props.value,
+      entities: props.entities,
+      renderEntityIconDOM: props.renderEntityIconDOM,
+      onChange: props.onChange,
+      externalKeyDown: props.onKeyDown,
+      ref,
+    });
+    return (
+      <MentionTextareaBody
+        placeholder={props.placeholder}
+        ariaLabel={props["aria-label"]}
+        className={props.className}
+        minRows={props.minRows ?? 4}
+        maxHeight={props.maxHeight ?? 300}
+        renderEntityIcon={props.renderEntityIcon}
+        refs={refs}
+        state={state}
+        derived={derived}
+        cbs={cbs}
+      />
+    );
+  },
+);
