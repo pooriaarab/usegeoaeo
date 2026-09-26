@@ -40,6 +40,7 @@ export function LandingHeader() {
           onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground"
           aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
