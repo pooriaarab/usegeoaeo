@@ -95,8 +95,8 @@ cat ~/.codex/config.toml
 codex --help`}</code>
       </pre>
       <p>
-        Start a new Codex session and confirm the server loads. Run <code>codex mcp list</code> if your build
-        supports it, or check the startup log for <code>geoaeo: connected</code>.
+        Start a new Codex session and confirm the server loads. Run <code>codex mcp list</code> if
+        your build supports it, or check the startup log for <code>geoaeo: connected</code>.
       </p>
     </>
   );
@@ -112,7 +112,8 @@ function VerifyConnection() {
         </li>
         <li>Ask: &quot;List available MCP tools.&quot;</li>
         <li>
-          Confirm <code>audit</code>, <code>gen</code>, and <code>humanize</code> appear under <code>geoaeo</code>.
+          Confirm <code>audit</code>, <code>gen</code>, and <code>humanize</code> appear under{" "}
+          <code>geoaeo</code>.
         </li>
       </ol>
       <p>If no tools appear, see Troubleshooting.</p>
@@ -126,7 +127,10 @@ function AuditWalkthrough() {
       <h2>Walkthrough 1 — audit a site</h2>
       <p>Prompt the agent:</p>
       <blockquote>
-        <p>Use geoaeo audit on https://example.com and summarize the score and the top 3 fixes. If that URL is not reachable, audit ./ instead.</p>
+        <p>
+          Use geoaeo audit on https://example.com and summarize the score and the top 3 fixes. If
+          that URL is not reachable, audit ./ instead.
+        </p>
       </blockquote>
       <p>What the agent does:</p>
       <ol>
@@ -156,7 +160,8 @@ function GenWalkthrough() {
     <>
       <h2>Walkthrough 2 — generate an artifact with gen</h2>
       <p>
-        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> in the current working directory.
+        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> in the current working
+        directory.
       </p>
       <ol>
         <li>
@@ -169,7 +174,10 @@ cat geoaeo.config.ts`}</code>
         <li>
           Prompt the agent:
           <blockquote>
-            <p>Use geoaeo gen to create the sitemap for this site. Then write it to public/sitemap.xml.</p>
+            <p>
+              Use geoaeo gen to create the sitemap for this site. Then write it to
+              public/sitemap.xml.
+            </p>
           </blockquote>
         </li>
       </ol>
@@ -206,8 +214,8 @@ function GenArtifactReference() {
           <code>{`{"artifact": "webmcp"}`}</code>
         </li>
         <li>
-          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be <code>software</code>,{" "}
-          <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
+          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be{" "}
+          <code>software</code>, <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
         </li>
       </ul>
       <p>Equivalent CLI:</p>
@@ -217,7 +225,8 @@ npx geoaeo gen sitemap -o ./public/sitemap.xml
 npx geoaeo gen jsonld --type faq`}</code>
       </pre>
       <p>
-        The <code>humanize</code> tool is also available: <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
+        The <code>humanize</code> tool is also available:{" "}
+        <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
       </p>
     </>
   );
@@ -228,24 +237,27 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>Config file not loaded.</strong> Confirm the path is <code>~/.codex/config.toml</code>. Run{" "}
-        <code>ls -la ~/.codex/config.toml</code> and <code>cat ~/.codex/config.toml</code>. Ensure the header is
-        exactly <code>[mcp_servers.geoaeo]</code>. Restart Codex.
+        <strong>Config file not loaded.</strong> Confirm the path is{" "}
+        <code>~/.codex/config.toml</code>. Run <code>ls -la ~/.codex/config.toml</code> and{" "}
+        <code>cat ~/.codex/config.toml</code>. Ensure the header is exactly{" "}
+        <code>[mcp_servers.geoaeo]</code>. Restart Codex.
       </p>
       <p>
-        <strong>npx fails or hangs.</strong> Run <code>npx -y geoaeo mcp</code> manually. It should wait on stdin.
-        Press Ctrl+C. If it fails, update Node to 20+ and check npm registry access.
+        <strong>npx fails or hangs.</strong> Run <code>npx -y geoaeo mcp</code> manually. It should
+        wait on stdin. Press Ctrl+C. If it fails, update Node to 20+ and check npm registry access.
       </p>
       <p>
-        <strong>audit returns Cannot find target.</strong> Use an absolute path or a full https URL. For local dirs,
-        run from the repo root so <code>./</code> resolves correctly.
+        <strong>audit returns Cannot find target.</strong> Use an absolute path or a full https URL.
+        For local dirs, run from the repo root so <code>./</code> resolves correctly.
       </p>
       <p>
-        <strong>gen returns Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in the project root.
+        <strong>gen returns Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in the
+        project root.
       </p>
       <p>
-        <strong>Tools appear but calls time out.</strong> Check that stdio is not blocked by a wrapper script. Use
-        the exact command <code>npx</code> with args <code>[&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
+        <strong>Tools appear but calls time out.</strong> Check that stdio is not blocked by a
+        wrapper script. Use the exact command <code>npx</code> with args{" "}
+        <code>[&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
       </p>
     </>
   );
@@ -261,9 +273,9 @@ function Reference() {
         </li>
         <li>Transport: stdio only.</li>
         <li>
-          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes <code>artifact</code>{" "}
-          enum and optional <code>type</code> enum. <code>humanize</code> takes <code>glob</code> (string) and
-          optional <code>write</code> (boolean).
+          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes{" "}
+          <code>artifact</code> enum and optional <code>type</code> enum. <code>humanize</code>{" "}
+          takes <code>glob</code> (string) and optional <code>write</code> (boolean).
         </li>
       </ul>
     </>

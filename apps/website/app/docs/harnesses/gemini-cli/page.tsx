@@ -66,8 +66,8 @@ function ConfigureMcpServer() {
     <>
       <h2>Configure the MCP server</h2>
       <p>
-        Gemini CLI reads MCP servers from <code>~/.gemini/settings.json</code> under <code>mcpServers</code>. Use{" "}
-        <code>command</code> and <code>args</code>.
+        Gemini CLI reads MCP servers from <code>~/.gemini/settings.json</code> under{" "}
+        <code>mcpServers</code>. Use <code>command</code> and <code>args</code>.
       </p>
       <p>
         Add this entry to <code>~/.gemini/settings.json</code>:
@@ -83,12 +83,12 @@ function ConfigureMcpServer() {
 }`}</code>
       </pre>
       <p>
-        If <code>~/.gemini/settings.json</code> already exists, merge the <code>geoaeo</code> key under{" "}
-        <code>mcpServers</code>. If it does not exist, create the file with the block above.
+        If <code>~/.gemini/settings.json</code> already exists, merge the <code>geoaeo</code> key
+        under <code>mcpServers</code>. If it does not exist, create the file with the block above.
       </p>
       <p>
-        Project scope alternative: create <code>.gemini/settings.json</code> in the repo root with the same block.
-        Global scope takes precedence in some builds.
+        Project scope alternative: create <code>.gemini/settings.json</code> in the repo root with
+        the same block. Global scope takes precedence in some builds.
       </p>
       <p>Steps:</p>
       <ol>
@@ -102,7 +102,8 @@ function ConfigureMcpServer() {
           Restart Gemini CLI: exit and run <code>gemini</code> again.
         </li>
         <li>
-          Run <code>/mcp</code> or <code>gemini mcp list</code> and confirm <code>geoaeo</code> shows with 3 tools.
+          Run <code>/mcp</code> or <code>gemini mcp list</code> and confirm <code>geoaeo</code>{" "}
+          shows with 3 tools.
         </li>
       </ol>
     </>
@@ -133,7 +134,10 @@ function AuditWalkthrough() {
       <h2>Walkthrough 1 — audit a site</h2>
       <p>Prompt the agent:</p>
       <blockquote>
-        <p>Use geoaeo audit on ./ and summarize the score and the top fixes. If ./ is empty, use https://example.com.</p>
+        <p>
+          Use geoaeo audit on ./ and summarize the score and the top fixes. If ./ is empty, use
+          https://example.com.
+        </p>
       </blockquote>
       <p>What the agent does:</p>
       <ol>
@@ -164,7 +168,8 @@ function GenWalkthrough() {
     <>
       <h2>Walkthrough 2 — generate an artifact with gen</h2>
       <p>
-        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current directory.
+        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current
+        directory.
       </p>
       <ol>
         <li>
@@ -177,7 +182,10 @@ cat geoaeo.config.ts`}</code>
         <li>
           Prompt the agent:
           <blockquote>
-            <p>Use geoaeo gen to create the JSON-LD for this site as type software. Show the JSON and explain where to place it.</p>
+            <p>
+              Use geoaeo gen to create the JSON-LD for this site as type software. Show the JSON and
+              explain where to place it.
+            </p>
           </blockquote>
         </li>
       </ol>
@@ -188,8 +196,8 @@ cat geoaeo.config.ts`}</code>
         </li>
         <li>Returns formatted JSON-LD.</li>
         <li>
-          Advises placement (for example, a <code>&lt;script type=&quot;application/ld+json&quot;&gt;</code> tag in
-          the page head).
+          Advises placement (for example, a{" "}
+          <code>&lt;script type=&quot;application/ld+json&quot;&gt;</code> tag in the page head).
         </li>
       </ol>
     </>
@@ -225,7 +233,8 @@ npx geoaeo gen sitemap -o ./public/sitemap.xml
 npx geoaeo gen webmcp`}</code>
       </pre>
       <p>
-        The <code>humanize</code> tool is also available: <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
+        The <code>humanize</code> tool is also available:{" "}
+        <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
       </p>
     </>
   );
@@ -236,26 +245,28 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>MCP server not found.</strong> Confirm <code>~/.gemini/settings.json</code> is valid JSON. Run{" "}
-        <code>cat ~/.gemini/settings.json | jq .</code>. Check Node 20+ with <code>node --version</code>.
+        <strong>MCP server not found.</strong> Confirm <code>~/.gemini/settings.json</code> is valid
+        JSON. Run <code>cat ~/.gemini/settings.json | jq .</code>. Check Node 20+ with{" "}
+        <code>node --version</code>.
       </p>
       <p>
-        <strong>npx ENOENT or permission error.</strong> Run <code>npx -y geoaeo mcp</code> by hand. It should wait
-        on stdin. If it fails, fix npm cache perms or install Node via nvm.
+        <strong>npx ENOENT or permission error.</strong> Run <code>npx -y geoaeo mcp</code> by hand.
+        It should wait on stdin. If it fails, fix npm cache perms or install Node via nvm.
       </p>
       <p>
-        <strong>audit returns empty or low score.</strong> Ensure you audit the repo root that contains{" "}
-        <code>geoaeo.config.ts</code> and site files. Use <code>{`{"target": "./"}`}</code> when the agent&apos;s
-        cwd is the repo root.
+        <strong>audit returns empty or low score.</strong> Ensure you audit the repo root that
+        contains <code>geoaeo.config.ts</code> and site files. Use <code>{`{"target": "./"}`}</code>{" "}
+        when the agent&apos;s cwd is the repo root.
       </p>
       <p>
-        <strong>gen fails with Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in the repo root,
-        then retry.
+        <strong>gen fails with Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in
+        the repo root, then retry.
       </p>
       <p>
-        <strong>Tools appear but calls hang.</strong> Check that no wrapper overrides stdio. Use exact{" "}
-        <code>command: npx</code> with <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>. Restart Gemini
-        CLI after edits.
+        <strong>Tools appear but calls hang.</strong> Check that no wrapper overrides stdio. Use
+        exact <code>command: npx</code> with{" "}
+        <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>. Restart Gemini CLI
+        after edits.
       </p>
     </>
   );
@@ -271,9 +282,9 @@ function Reference() {
         </li>
         <li>Transport: stdio only.</li>
         <li>
-          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes <code>artifact</code>{" "}
-          enum and optional <code>type</code>. <code>humanize</code> takes <code>glob</code> and optional{" "}
-          <code>write</code> (boolean).
+          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes{" "}
+          <code>artifact</code> enum and optional <code>type</code>. <code>humanize</code> takes{" "}
+          <code>glob</code> and optional <code>write</code> (boolean).
         </li>
       </ul>
     </>

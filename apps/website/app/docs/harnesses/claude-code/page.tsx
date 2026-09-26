@@ -68,8 +68,9 @@ function ConfigureMcpServer() {
     <>
       <h2>Configure the MCP server</h2>
       <p>
-        Claude Code reads MCP servers from <code>.mcp.json</code> in the project root or from your global Claude
-        Code config. Use <code>command: npx</code> with <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
+        Claude Code reads MCP servers from <code>.mcp.json</code> in the project root or from your
+        global Claude Code config. Use <code>command: npx</code> with{" "}
+        <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
       </p>
 
       <h3>Option A — project scope (recommended)</h3>
@@ -99,12 +100,13 @@ claude mcp list`}</code>
         <code>mcpServers</code>.
       </p>
       <p>
-        Restart Claude Code after you change the config. Run <code>/mcp</code> to confirm <code>geoaeo</code> shows
-        with tools <code>audit</code>, <code>gen</code>, <code>humanize</code>.
+        Restart Claude Code after you change the config. Run <code>/mcp</code> to confirm{" "}
+        <code>geoaeo</code> shows with tools <code>audit</code>, <code>gen</code>,{" "}
+        <code>humanize</code>.
       </p>
       <p>
-        If you use a skill in this repo, add <code>.claude/skills/geoaeo/SKILL.md</code> as well. Claude Code loads
-        skills automatically.
+        If you use a skill in this repo, add <code>.claude/skills/geoaeo/SKILL.md</code> as well.
+        Claude Code loads skills automatically.
       </p>
     </>
   );
@@ -182,7 +184,8 @@ function GenWalkthrough() {
     <>
       <h2>Walkthrough 2 — generate an artifact with gen</h2>
       <p>
-        This shows the <code>gen</code> tool. It reads <code>geoaeo.config.ts</code> in the current directory.
+        This shows the <code>gen</code> tool. It reads <code>geoaeo.config.ts</code> in the current
+        directory.
       </p>
       <ol>
         <li>
@@ -195,7 +198,9 @@ cat geoaeo.config.ts`}</code>
         <li>
           Prompt the agent:
           <blockquote>
-            <p>Use geoaeo gen to create the llms.txt for this site and show me the first 30 lines.</p>
+            <p>
+              Use geoaeo gen to create the llms.txt for this site and show me the first 30 lines.
+            </p>
           </blockquote>
         </li>
       </ol>
@@ -204,7 +209,10 @@ cat geoaeo.config.ts`}</code>
         <li>
           Calls <code>gen</code> with <code>{`{"artifact": "llms"}`}</code>.
         </li>
-        <li>Returns the file content as text. The agent can write it to public/llms.txt or show it inline.</li>
+        <li>
+          Returns the file content as text. The agent can write it to public/llms.txt or show it
+          inline.
+        </li>
       </ol>
     </>
   );
@@ -226,8 +234,8 @@ function GenArtifactReference() {
           <code>{`{"artifact": "robots"}`}</code>
         </li>
         <li>
-          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be <code>software</code>,{" "}
-          <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
+          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be{" "}
+          <code>software</code>, <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
         </li>
         <li>
           <code>{`{"artifact": "webmcp"}`}</code>
@@ -241,8 +249,9 @@ npx geoaeo gen sitemap -o ./public/sitemap.xml
 npx geoaeo gen robots -o ./public/robots.txt`}</code>
       </pre>
       <p>
-        The <code>humanize</code> tool is also available: <code>{`{"glob": "content/**/*.md", "write": false}`}</code>
-        . Set <code>write: true</code> to rewrite files in place.
+        The <code>humanize</code> tool is also available:{" "}
+        <code>{`{"glob": "content/**/*.md", "write": false}`}</code>. Set <code>write: true</code>{" "}
+        to rewrite files in place.
       </p>
     </>
   );
@@ -253,26 +262,29 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>Server shows as disconnected in /mcp.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal. It
-        should wait on stdin. Press Ctrl+C. If npx fails, check Node 20+ and network access to npm.
+        <strong>Server shows as disconnected in /mcp.</strong> Run <code>npx -y geoaeo mcp</code> in
+        a terminal. It should wait on stdin. Press Ctrl+C. If npx fails, check Node 20+ and network
+        access to npm.
       </p>
       <p>
-        <strong>Config file not picked up.</strong> Confirm the file is named <code>.mcp.json</code> in the repo
-        root. Validate JSON with <code>cat .mcp.json | jq .</code>. Restart Claude Code. Check{" "}
-        <code>claude mcp list</code> shows geoaeo.
+        <strong>Config file not picked up.</strong> Confirm the file is named <code>.mcp.json</code>{" "}
+        in the repo root. Validate JSON with <code>cat .mcp.json | jq .</code>. Restart Claude Code.
+        Check <code>claude mcp list</code> shows geoaeo.
       </p>
       <p>
-        <strong>Audit returns empty or low score on a Next.js app.</strong> Ensure you audit the project root that
-        contains <code>geoaeo.config.ts</code>. For local directories, geoaeo scans HTML, TSX, and MDX files and
-        looks for <code>public/llms.txt</code>, <code>app/llms.txt/route.ts</code>, and similar paths.
+        <strong>Audit returns empty or low score on a Next.js app.</strong> Ensure you audit the
+        project root that contains <code>geoaeo.config.ts</code>. For local directories, geoaeo
+        scans HTML, TSX, and MDX files and looks for <code>public/llms.txt</code>,{" "}
+        <code>app/llms.txt/route.ts</code>, and similar paths.
       </p>
       <p>
-        <strong>gen returns Cannot find config.</strong> Run <code>npx geoaeo init ./</code> to scaffold{" "}
-        <code>geoaeo.config.ts</code>.
+        <strong>gen returns Cannot find config.</strong> Run <code>npx geoaeo init ./</code> to
+        scaffold <code>geoaeo.config.ts</code>.
       </p>
       <p>
-        <strong>Permission or EACCES on npx cache.</strong> Run <code>npm config get cache</code> and ensure the
-        directory is writable. Try <code>npx --yes geoaeo mcp</code> once to prime the cache.
+        <strong>Permission or EACCES on npx cache.</strong> Run <code>npm config get cache</code>{" "}
+        and ensure the directory is writable. Try <code>npx --yes geoaeo mcp</code> once to prime
+        the cache.
       </p>
     </>
   );
