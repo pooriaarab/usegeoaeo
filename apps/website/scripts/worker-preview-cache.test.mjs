@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { afterEach, test } from "node:test";
 
 import { cacheTitle, cleanupCache, listAll, prepareCache, renderRuntimeConfig, validateAccess, validatePreviewName } from "./worker-preview-cache.mjs";
+import { previewSource } from "./worker-preview-source.mjs";
 
 const originalFetch = globalThis.fetch;
 const originalEnv = { ...process.env };
@@ -146,6 +147,50 @@ test("renders one structurally exact isolated KV binding", () => {
     }),
   ])
     assert.throws(() => renderRuntimeConfig(unsafe, id));
+});
+
+test("worker-preview-source renders a template renderRuntimeConfig accepts", () => {
+  const config = {
+    name: "usegeoaeo-website",
+    main: "w.js",
+    compatibility_flags: ["nodejs_compat"],
+    kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "prod-id" }],
+    vars: { ENVIRONMENT: "development" },
+    env: { staging: { name: "w-staging" }, production: { name: "w" } },
+    routes: [{ pattern: "usegeoaeo.com", custom_domain: true }],
+    d1_databases: [{ binding: "DB", database_id: "x" }],
+  };
+  const source = previewSource(config);
+  assert.equal(source.name, "w-staging");
+  assert.equal(source.workers_dev, false);
+  assert.equal(source.preview_urls, false);
+  assert.deepEqual(source.vars, { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" });
+  for (const key of ["env", "routes", "d1_databases"]) assert.equal(source[key], undefined);
+  const id = "a".repeat(32);
+  const rendered = renderRuntimeConfig(`${JSON.stringify(source, null, 2)}\n`, id);
+  assert.deepEqual(JSON.parse(rendered).kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id }]);
+  assert.equal(previewSource({ ...config, env: { staging: { name: "other" } } }).name, "other");
+  assert.throws(() => previewSource({ ...config, env: {} }), /env\.staging\.name/);
+});
+
+test("worker-preview-source CLI strips comments and trailing commas", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "preview-source-"));
+  try {
+    const input = join(dir, "wrangler.jsonc");
+    const output = join(dir, "source.json");
+    await writeFile(input, `{ // comment
+      "main": "w.js", "vars": { "URL": "https://a.test//b" },
+      "env": { "staging": { "name": "w-staging", }, },
+      /* block */ "compatibility_flags": ["nodejs_compat",], }`);
+    const script = new URL("./worker-preview-source.mjs", import.meta.url).pathname;
+    const result = spawnSync(process.execPath, [script, input, output]);
+    assert.equal(result.status, 0, result.stderr.toString());
+    const source = JSON.parse(await readTextFile(output, "utf8"));
+    assert.equal(source.name, "w-staging");
+    assert.deepEqual(source.vars, { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 // prettier-ignore
