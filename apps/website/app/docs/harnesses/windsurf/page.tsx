@@ -83,8 +83,8 @@ function ConfigureMcpServer() {
 }`}</code>
       </pre>
       <p>
-        If the file does not exist, create it with the block above. If it exists, merge the <code>geoaeo</code> key
-        under <code>mcpServers</code>.
+        If the file does not exist, create it with the block above. If it exists, merge the{" "}
+        <code>geoaeo</code> key under <code>mcpServers</code>.
       </p>
       <p>Steps:</p>
       <ol>
@@ -92,14 +92,15 @@ function ConfigureMcpServer() {
           Open <code>~/.codeium/windsurf/mcp_config.json</code>.
         </li>
         <li>
-          Paste the block. Validate JSON with <code>cat ~/.codeium/windsurf/mcp_config.json | jq .</code>.
+          Paste the block. Validate JSON with{" "}
+          <code>cat ~/.codeium/windsurf/mcp_config.json | jq .</code>.
         </li>
         <li>Restart Windsurf.</li>
         <li>Open Cascade and check MCP servers. Confirm geoaeo shows as connected with 3 tools.</li>
       </ol>
       <p>
-        Alternative project config some builds read: <code>.windsurf/mcp_config.json</code> with the same shape. Use
-        the global file first.
+        Alternative project config some builds read: <code>.windsurf/mcp_config.json</code> with the
+        same shape. Use the global file first.
       </p>
     </>
   );
@@ -127,7 +128,10 @@ function AuditWalkthrough() {
       <h2>Walkthrough 1 — audit a site</h2>
       <p>Prompt Cascade:</p>
       <blockquote>
-        <p>Audit ./ with geoaeo and give me the score plus the 3 most important fixes. If you need a URL, use https://example.com.</p>
+        <p>
+          Audit ./ with geoaeo and give me the score plus the 3 most important fixes. If you need a
+          URL, use https://example.com.
+        </p>
       </blockquote>
       <p>What the agent does:</p>
       <ol>
@@ -157,7 +161,8 @@ function GenWalkthrough() {
     <>
       <h2>Walkthrough 2 — generate an artifact with gen</h2>
       <p>
-        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current directory.
+        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current
+        directory.
       </p>
       <ol>
         <li>
@@ -170,7 +175,10 @@ cat geoaeo.config.ts`}</code>
         <li>
           Prompt Cascade:
           <blockquote>
-            <p>Use geoaeo gen to create llms.txt for this site. Show the first 40 lines and write the full file to public/llms.txt.</p>
+            <p>
+              Use geoaeo gen to create llms.txt for this site. Show the first 40 lines and write the
+              full file to public/llms.txt.
+            </p>
           </blockquote>
         </li>
       </ol>
@@ -207,8 +215,8 @@ function GenArtifactReference() {
           <code>{`{"artifact": "webmcp"}`}</code>
         </li>
         <li>
-          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be <code>software</code>,{" "}
-          <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
+          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be{" "}
+          <code>software</code>, <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
         </li>
       </ul>
       <p>Equivalent CLI:</p>
@@ -218,7 +226,8 @@ npx geoaeo gen llms -o ./public/llms.txt
 npx geoaeo gen jsonld --type breadcrumb -o ./public/jsonld.json`}</code>
       </pre>
       <p>
-        The <code>humanize</code> tool is also available: <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
+        The <code>humanize</code> tool is also available:{" "}
+        <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
       </p>
     </>
   );
@@ -230,8 +239,8 @@ function Troubleshooting() {
       <h2>Troubleshooting</h2>
       <p>
         <strong>MCP server shows Failed to start or ENOENT.</strong> Run <code>which npx</code> and{" "}
-        <code>node --version</code> in Windsurf&apos;s terminal. If Node is not on PATH, add it or use the absolute
-        path to npx in <code>command</code>.
+        <code>node --version</code> in Windsurf&apos;s terminal. If Node is not on PATH, add it or
+        use the absolute path to npx in <code>command</code>.
       </p>
       <p>
         <strong>Config file not found.</strong> Confirm the path is{" "}
@@ -239,16 +248,17 @@ function Troubleshooting() {
         <code>ls -la ~/.codeium/windsurf/mcp_config.json</code>.
       </p>
       <p>
-        <strong>JSON parse error.</strong> Validate with <code>jq</code>. Ensure no trailing comma after the last
-        entry in <code>mcpServers</code>.
+        <strong>JSON parse error.</strong> Validate with <code>jq</code>. Ensure no trailing comma
+        after the last entry in <code>mcpServers</code>.
       </p>
       <p>
-        <strong>audit returns empty result.</strong> Use <code>{`{"target": "./"}`}</code> from the workspace root.
-        Ensure the directory contains site files. For a URL, include the scheme <code>https://</code>.
+        <strong>audit returns empty result.</strong> Use <code>{`{"target": "./"}`}</code> from the
+        workspace root. Ensure the directory contains site files. For a URL, include the scheme{" "}
+        <code>https://</code>.
       </p>
       <p>
-        <strong>gen fails with Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in the workspace
-        root, then retry <code>gen</code>.
+        <strong>gen fails with Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in
+        the workspace root, then retry <code>gen</code>.
       </p>
     </>
   );
@@ -264,9 +274,9 @@ function Reference() {
         </li>
         <li>Transport: stdio only.</li>
         <li>
-          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes <code>artifact</code>{" "}
-          enum and optional <code>type</code>. <code>humanize</code> takes <code>glob</code> and optional{" "}
-          <code>write</code> (boolean).
+          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes{" "}
+          <code>artifact</code> enum and optional <code>type</code>. <code>humanize</code> takes{" "}
+          <code>glob</code> and optional <code>write</code> (boolean).
         </li>
       </ul>
     </>
