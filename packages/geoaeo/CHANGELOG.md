@@ -6,6 +6,52 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-26
+
+### Fixed
+
+- The `geoaeo-mcp` bin starts the server. npm installs a bin as a symlink,
+  so the auto-start guard compared the invoked path against the resolved
+  file and never matched: the process exited 0 with no output and no
+  error. It is the package's whole MCP surface, so it was unreachable for
+  every installed user. A test spawns the bin through a symlink, because
+  one that calls `dist/mcp.js` by its real path cannot fail on this.
+- A URL audit fetches pages on the target's origin. Sitemaps carry
+  absolute production URLs, so auditing a preview, a staging host or
+  localhost fetched production and scored that instead. A redirect served
+  by the target can no longer carry the fetch off-host either.
+- The artifact checks judge a fetched body on what it is rather than on
+  whether geoaeo generated it. `/llms-full.txt` passed only on bodies
+  holding the headings this package emits, so a full site map written by
+  a human or another tool failed. Empty bodies, HTML error pages and
+  heading-only stubs still fail.
+- `answerability` counts rendered prose on a directory audit. It counted
+  raw source, so a page of imports and `className` strings with twelve
+  words of copy cleared the floor.
+- Every document that told a user to run `npx -y geoaeo-mcp` names a
+  command that exists. That one is a 404 — `geoaeo-mcp` is a bin of the
+  `geoaeo` package, not a package name.
+
+### Added
+
+- `answerability` folds in a 100-word floor, so the report's heaviest
+  check means "opens with a direct answer and has something to quote".
+- The MCP `gen` and `humanize` tools take an optional `directory`. A stdio
+  server's working directory is wherever the client launched it, which is
+  rarely the project the user means.
+- `audit` and `humanize` return `structuredContent` alongside a short text
+  summary, and both declare an open `outputSchema`.
+- Every MCP tool carries a title, safety annotations and described input
+  fields. `humanize` is marked destructive: it rewrites files in place
+  when `write` is true.
+- The MCP server declares session instructions and `listChanged: false`.
+- `gen` returns a typed tool error with a stable `CONFIG_MISSING` or
+  `CONFIG_INVALID` code instead of an unhandled exception, and the text
+  names the command that fixes it.
+- geoaeo installs as an agent plugin. `plugins/geoaeo/` carries manifests
+  for Claude Code, Cursor and Codex, and a generated copy of the product
+  skill that a check keeps in step with its source.
+
 ## [0.4.0] - 2026-09-25
 
 ### Fixed
@@ -106,7 +152,7 @@ All notable changes to geoaeo are recorded here. The format follows
 - `humanize` — find and rewrite AI-writing tells in copy.
 - `geoaeo-mcp` — an MCP server exposing `audit`, `gen`, and `humanize`.
 
-[Unreleased]: https://github.com/pooriaarab/geoaeo/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/pooriaarab/geoaeo/compare/v0.5.0...HEAD
 [0.2.1]: https://github.com/pooriaarab/geoaeo/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/pooriaarab/geoaeo/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/pooriaarab/geoaeo/releases/tag/v0.1.0

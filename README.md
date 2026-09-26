@@ -3,7 +3,7 @@
 <p align="center">Scores a site 0-100 and generates GEO/AEO files for owners who want AI citations.</p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.4.0"/></a>
+  <a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.5.0"/></a>
   <a href="https://github.com/pooriaarab/usegeoaeo/actions"><img src="https://github.com/pooriaarab/usegeoaeo/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License MIT"/></a>
   <a href="docs/GEO-AEO-CHECKLIST.md"><img src="https://img.shields.io/badge/checks-25-informational" alt="25 weighted audit checks"/></a>
