@@ -14,7 +14,7 @@ describe("Jobs Helpers", () => {
     } as any;
 
     expect(sendJob(mockQueue, invalidMsg)).rejects.toThrow(
-      "Idempotency key 'id' is required for all queue messages."
+      "Idempotency key 'id' is required for all queue messages.",
     );
   });
 

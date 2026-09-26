@@ -10,9 +10,10 @@ import { ONBOARDING_STEP_IDS } from "../domain/onboarding";
  * keys are tracked and the default `{}` typechecks under Zod v4.
  */
 export const OnboardingStepsRecordSchema = z.object(
-  Object.fromEntries(
-    ONBOARDING_STEP_IDS.map((id) => [id, z.boolean().optional()]),
-  ) as Record<(typeof ONBOARDING_STEP_IDS)[number], z.ZodOptional<z.ZodBoolean>>,
+  Object.fromEntries(ONBOARDING_STEP_IDS.map((id) => [id, z.boolean().optional()])) as Record<
+    (typeof ONBOARDING_STEP_IDS)[number],
+    z.ZodOptional<z.ZodBoolean>
+  >,
 );
 
 export const WorkspaceSchema = z.object({

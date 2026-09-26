@@ -10,8 +10,7 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined
     : {
-        command:
-          "bunx wrangler dev -c cloudflare/app-worker/wrangler.jsonc --local --port 8788",
+        command: "bunx wrangler dev -c cloudflare/app-worker/wrangler.jsonc --local --port 8788",
         url: "http://localhost:8788/api/v1/health",
         reuseExistingServer: true,
         timeout: 180_000,

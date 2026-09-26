@@ -33,9 +33,7 @@ describe("Worker Preview indexing", () => {
     });
     protectWorkerPreview("/docs", response, "true");
     expect(response.headers.get("Link")).toBeNull();
-    expect(response.headers.get("Cache-Control")).toBe(
-      "private, no-store, max-age=0",
-    );
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store, max-age=0");
     expect(response.headers.get("X-Robots-Tag")).toContain("noimageindex");
   });
 });

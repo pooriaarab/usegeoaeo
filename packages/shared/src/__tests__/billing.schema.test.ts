@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  BillingInfoSchema,
-  BillingEventSchema,
-  PlanIdSchema,
-} from "../schemas/billing";
+import { BillingInfoSchema, BillingEventSchema, PlanIdSchema } from "../schemas/billing";
 
 describe("BillingInfoSchema", () => {
   it("accepts a free workspace with no Stripe relationship", () => {
