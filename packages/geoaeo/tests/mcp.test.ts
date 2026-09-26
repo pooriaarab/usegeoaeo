@@ -115,6 +115,15 @@ describe('MCP tools over an in-memory transport', () => {
     });
   });
 
+  it('reports fixed tools and session instructions on initialize', async () => {
+    await withClient(async client => {
+      expect(client.getServerCapabilities()?.tools?.listChanged).toBe(false);
+      expect(client.getInstructions()).toBe(
+        'Call only audit, gen, or humanize. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. Ask the user before you set write.'
+      );
+    });
+  });
+
   it('publishes titles, annotations, and described fields for every tool', async () => {
     await withClient(async client => {
       const { tools } = await client.listTools();

@@ -21,6 +21,16 @@ const artifactTypeSchema = genTypeSchema.optional().describe('Applies only when 
 export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
 export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
+const MCP_INSTRUCTIONS = [
+  'Call only audit, gen, or humanize.',
+  'Audit a local directory or an http(s) URL first.',
+  'audit returns a report and writes no files.',
+  'gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text.',
+  'It writes no file.',
+  'humanize writes a file only when write is true and the text changes.',
+  'Ask the user before you set write.',
+].join(' ');
+
 async function auditHandler({ target }: { target: string }) {
   const report = await auditTarget(target);
   // Text is the same report the CLI prints. structuredContent is the object
@@ -51,7 +61,10 @@ async function genHandler({ artifact, type, directory }: {
 }
 
 export function createMcpServer(): McpServer {
-  const server = new McpServer({ name: PKG_NAME, version: VERSION });
+  const server = new McpServer({ name: PKG_NAME, version: VERSION }, {
+    capabilities: { tools: { listChanged: false } },
+    instructions: MCP_INSTRUCTIONS,
+  });
   // The SDK's registerTool types its inputSchema against a bundled zod version that this
   // package's zod (v4) does not structurally match, so we erase the type here to call it.
   // That erasure also removes the compiler's link between each inputSchema and its handler
@@ -91,6 +104,8 @@ export function createMcpServer(): McpServer {
     },
     humanizeHandler
   );
+  // registerTool merges tools.listChanged back to true. These three tools never change.
+  server.server.registerCapabilities({ tools: { listChanged: false } });
   return server;
 }
 
