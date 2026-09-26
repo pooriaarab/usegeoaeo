@@ -21,9 +21,7 @@ describe("GET /.well-known/mcp/server-card.json", () => {
     const response = getServerCard();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "application/json; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("application/json; charset=utf-8");
     await expect(response.text()).resolves.toBe(canonical);
   });
 });
@@ -61,9 +59,7 @@ describe("GET /.well-known/agent-skills/[skill]/SKILL.md", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "text/markdown; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
     await expect(response.text()).resolves.toBe(canonical);
   });
 
@@ -89,9 +85,7 @@ describe("GET /docs.md", () => {
     const response = getDocsMirror();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "text/markdown; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
     await expect(response.text()).resolves.toContain("# geoaeo documentation");
   });
 });
@@ -101,9 +95,7 @@ describe("GET /checklist.md", () => {
     const response = getChecklistMirror();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "text/markdown; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
     await expect(response.text()).resolves.toContain("# GEO/AEO checklist");
   });
 });
@@ -113,9 +105,7 @@ describe("GET /examples.md", () => {
     const response = getExamplesMirror();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "text/markdown; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
     await expect(response.text()).resolves.toContain(
       "# Examples — three GeoWeather targets, three audit scores",
     );
@@ -127,9 +117,7 @@ describe("GET /tools.md", () => {
     const response = getToolsMirror();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "text/markdown; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
     await expect(response.text()).resolves.toContain("# Free GEO & AEO tools");
   });
 });

@@ -6,7 +6,7 @@
  * action to increase the budget.
  */
 
-'use client';
+"use client";
 
 import {
   Dialog,
@@ -15,9 +15,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../primitives/dialog';
-import { Button } from '../primitives/button';
-import { Badge } from '../primitives/badge';
+} from "../primitives/dialog";
+import { Button } from "../primitives/button";
+import { Badge } from "../primitives/badge";
 
 interface BudgetReachedDialogProps {
   open: boolean;
@@ -49,7 +49,10 @@ function BudgetProgress({
         <span>${monthlyBudget.toFixed(2)}</span>
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-        <div className="h-full rounded-full bg-destructive transition-[width]" style={{ width: `${progressWidth}%` }} />
+        <div
+          className="h-full rounded-full bg-destructive transition-[width]"
+          style={{ width: `${progressWidth}%` }}
+        />
       </div>
     </div>
   );
@@ -80,11 +83,16 @@ export function BudgetReachedDialog({
         <DialogHeader>
           <DialogTitle>Budget Limit Reached</DialogTitle>
           <DialogDescription>
-            {agentName} has used ${currentSpend.toFixed(2)} of its ${monthlyBudget.toFixed(2)} monthly budget.
+            {agentName} has used ${currentSpend.toFixed(2)} of its ${monthlyBudget.toFixed(2)}{" "}
+            monthly budget.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
-          <BudgetProgress currentSpend={currentSpend} monthlyBudget={monthlyBudget} progressWidth={progressWidth} />
+          <BudgetProgress
+            currentSpend={currentSpend}
+            monthlyBudget={monthlyBudget}
+            progressWidth={progressWidth}
+          />
           <UtilizationBadge utilization={utilization} />
         </div>
         <DialogFooter>
