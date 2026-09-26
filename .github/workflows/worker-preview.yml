@@ -281,7 +281,12 @@ jobs:
           done
           [ "$root" = "200" ] || fail "authenticated / returned ${root:-none}, expected 200"
 
-          robots_tag=$(grep -i '^x-robots-tag:' "$headers" | sed 's/^[^:]*://' | tr ',' '\n' | tr -d ' \r')
+          # grep exits 1 when the header is absent; under pipefail that would
+          # end the step silently, so keep going and let the token check fail.
+          robots_tag=$( (grep -i '^x-robots-tag:' "$headers" || true) | sed 's/^[^:]*://' | tr ',' '\n' | tr -d ' \r')
+          echo "X-Robots-Tag on /: ${robots_tag:-<absent>}" | tr '\n' ' '; echo
+          # Names only: Access answers with a session cookie that must not reach the log.
+          echo "response headers on /: $(sed -n 's/^\([A-Za-z0-9-]*\):.*/\1/p' "$headers" | tr '\n' ' ')"
           for token in noindex nofollow noarchive nosnippet noimageindex; do
             printf '%s\n' "$robots_tag" | grep -qx "$token" || fail "X-Robots-Tag missing $token"
           done
