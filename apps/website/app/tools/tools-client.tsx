@@ -5,8 +5,16 @@ import { Button } from "@template/ui/primitives/button";
 import { auditUrl, genLlms, genJsonLd, type AuditResult } from "./actions";
 
 const JSONLD_KINDS = [
-  "software", "product", "faq", "breadcrumb", "organization",
-  "website", "article", "howto", "person", "review",
+  "software",
+  "product",
+  "faq",
+  "breadcrumb",
+  "organization",
+  "website",
+  "article",
+  "howto",
+  "person",
+  "review",
 ] as const;
 
 type JsonLdKind = (typeof JSONLD_KINDS)[number];
@@ -19,7 +27,15 @@ const field =
 const pre =
   "mt-4 max-h-96 overflow-auto rounded-md border border-border bg-muted p-4 text-xs whitespace-pre-wrap font-mono";
 
-function Card({ title, hint, children }: { title: string; hint: string; children: React.ReactNode }) {
+function Card({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="rounded-xl border border-border bg-card p-6">
       <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
@@ -80,13 +96,38 @@ function AuditCard() {
   );
 }
 
-function SiteFactsCard({ cfg, onChange }: { cfg: SiteFacts; onChange: (patch: Partial<SiteFacts>) => void }) {
+function SiteFactsCard({
+  cfg,
+  onChange,
+}: {
+  cfg: SiteFacts;
+  onChange: (patch: Partial<SiteFacts>) => void;
+}) {
   return (
     <Card title="Site facts" hint="Used by the generators below.">
       <div className="grid gap-3">
-        <input className={field} placeholder="Site name" aria-label="Site name" value={cfg.siteName} onChange={(e) => onChange({ siteName: e.target.value })} />
-        <input className={field} placeholder="https://your-site.com" aria-label="Site URL" value={cfg.siteUrl} onChange={(e) => onChange({ siteUrl: e.target.value })} />
-        <textarea className={field} rows={2} placeholder="One-line description" aria-label="One-line description" value={cfg.description} onChange={(e) => onChange({ description: e.target.value })} />
+        <input
+          className={field}
+          placeholder="Site name"
+          aria-label="Site name"
+          value={cfg.siteName}
+          onChange={(e) => onChange({ siteName: e.target.value })}
+        />
+        <input
+          className={field}
+          placeholder="https://your-site.com"
+          aria-label="Site URL"
+          value={cfg.siteUrl}
+          onChange={(e) => onChange({ siteUrl: e.target.value })}
+        />
+        <textarea
+          className={field}
+          rows={2}
+          placeholder="One-line description"
+          aria-label="One-line description"
+          value={cfg.description}
+          onChange={(e) => onChange({ description: e.target.value })}
+        />
       </div>
     </Card>
   );
@@ -110,9 +151,16 @@ function JsonLdCard({ cfg }: { cfg: SiteFacts }) {
   return (
     <Card title="Generate JSON-LD" hint="schema.org structured data.">
       <div className="flex gap-2">
-        <select className={field} aria-label="JSON-LD kind" value={kind} onChange={(e) => setKind(e.target.value as JsonLdKind)}>
+        <select
+          className={field}
+          aria-label="JSON-LD kind"
+          value={kind}
+          onChange={(e) => setKind(e.target.value as JsonLdKind)}
+        >
           {JSONLD_KINDS.map((k) => (
-            <option key={k} value={k}>{k}</option>
+            <option key={k} value={k}>
+              {k}
+            </option>
           ))}
         </select>
         <Button onClick={async () => setJsonld(await genJsonLd(cfg, kind))}>Generate</Button>
