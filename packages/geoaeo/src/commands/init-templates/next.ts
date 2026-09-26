@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { PKG_NAME } from '../../constants.js';
-import { configImport } from './helpers.js';
+import path from "node:path";
+import { PKG_NAME } from "../../constants.js";
+import { configImport } from "./helpers.js";
 
 function nextLlmsRoute(llmsImport: string): string {
   return `import { generateLlms } from '${PKG_NAME}';
@@ -115,20 +115,20 @@ Read more: \${siteConfig.siteUrl}/\${page}
 }
 
 export function nextTemplates(root: string): Map<string, string> {
-  const llmsImport = configImport(root, path.join(root, 'src/app/llms.txt/route.ts'));
-  const llmsFullImport = configImport(root, path.join(root, 'src/app/llms-full.txt/route.ts'));
-  const webmcpImport = configImport(root, path.join(root, 'src/app/webmcp/route.ts'));
-  const sitemapImport = configImport(root, path.join(root, 'src/app/sitemap.ts'));
-  const robotsImport = configImport(root, path.join(root, 'src/app/robots.ts'));
-  const jsonLdImport = configImport(root, path.join(root, 'src/components/seo/json-ld.tsx'));
-  const mirrorImport = configImport(root, path.join(root, 'src/app/[page].md/route.ts'));
+  const llmsImport = configImport(root, path.join(root, "src/app/llms.txt/route.ts"));
+  const llmsFullImport = configImport(root, path.join(root, "src/app/llms-full.txt/route.ts"));
+  const webmcpImport = configImport(root, path.join(root, "src/app/webmcp/route.ts"));
+  const sitemapImport = configImport(root, path.join(root, "src/app/sitemap.ts"));
+  const robotsImport = configImport(root, path.join(root, "src/app/robots.ts"));
+  const jsonLdImport = configImport(root, path.join(root, "src/components/seo/json-ld.tsx"));
+  const mirrorImport = configImport(root, path.join(root, "src/app/[page].md/route.ts"));
   return new Map([
-    ['src/app/llms.txt/route.ts', nextLlmsRoute(llmsImport)],
-    ['src/app/llms-full.txt/route.ts', nextLlmsFullRoute(llmsFullImport)],
-    ['src/app/webmcp/route.ts', nextWebmcpRoute(webmcpImport)],
-    ['src/app/sitemap.ts', nextSitemapRoute(sitemapImport)],
-    ['src/app/robots.ts', nextRobotsRoute(robotsImport)],
-    ['src/components/seo/json-ld.tsx', nextJsonLdComponent(jsonLdImport)],
-    ['src/app/[page].md/route.ts', nextMirrorRoute(mirrorImport)],
+    ["src/app/llms.txt/route.ts", nextLlmsRoute(llmsImport)],
+    ["src/app/llms-full.txt/route.ts", nextLlmsFullRoute(llmsFullImport)],
+    ["src/app/webmcp/route.ts", nextWebmcpRoute(webmcpImport)],
+    ["src/app/sitemap.ts", nextSitemapRoute(sitemapImport)],
+    ["src/app/robots.ts", nextRobotsRoute(robotsImport)],
+    ["src/components/seo/json-ld.tsx", nextJsonLdComponent(jsonLdImport)],
+    ["src/app/[page].md/route.ts", nextMirrorRoute(mirrorImport)],
   ]);
 }
