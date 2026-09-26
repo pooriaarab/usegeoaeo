@@ -3,6 +3,27 @@ import { pathToFileURL } from "node:url";
 
 const PLACEHOLDER = "__PREVIEW_KV_ID__";
 
+// Keep in sync with DISCOVERY_PATHS in src/utils/worker-preview-indexing.ts.
+// Assets serve before the Worker, so these paths must run it first or the
+// Preview middleware never sees the public files it intercepts. A boolean
+// `true` would 404 every other asset: the bundle compiles
+// __ASSETS_RUN_WORKER_FIRST__ from wrangler.jsonc at build time, where it
+// stays off, so the asset resolver cannot serve files the Worker sees first.
+export const WORKER_FIRST_PATHS = [
+  "/robots.txt",
+  "/agents.md",
+  "/auth.md",
+  "/design.md",
+  "/llms-full.txt",
+  "/llms.txt",
+  "/manifest.json",
+  "/openapi.json",
+  "/site.webmanifest",
+  "/sitemap.xml",
+  "/webmcp.json",
+  "/.well-known/*",
+];
+
 // JSONC allows comments and trailing commas; strip both while leaving string
 // contents untouched. "//" inside a URL must not be rewritten, so this scans
 // character by character instead of regexing.
@@ -44,11 +65,17 @@ export function previewSource(config) {
   for (const key of ["main", "compatibility_date", "compatibility_flags", "minify", "assets", "observability", "placement"]) {
     if (config[key] !== undefined) source[key] = config[key];
   }
+  if (source.assets && typeof source.assets === "object")
+    source.assets = { ...source.assets, run_worker_first: WORKER_FIRST_PATHS };
   source.name = name;
   source.workers_dev = false;
   source.preview_urls = false;
-  source.kv_namespaces = [{ binding: "NEXT_INC_CACHE_KV", id: PLACEHOLDER }];
-  source.vars = { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" };
+  // wrangler preview ignores top-level vars and kv_namespaces; Preview
+  // bindings and variables apply only under previews.
+  source.previews = {
+    vars: { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" },
+    kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: PLACEHOLDER }],
+  };
   return source;
 }
 

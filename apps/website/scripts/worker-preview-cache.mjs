@@ -40,11 +40,13 @@ const CONFIG_KEYS = new Set([
   "assets",
   "observability",
   "placement",
-  "kv_namespaces",
-  "vars",
+  "previews",
   "workers_dev",
   "preview_urls",
 ]);
+// wrangler preview reads vars and kv_namespaces only inside previews; the
+// top-level copies it ignores are rejected so the file cannot look bound.
+const PREVIEW_KEYS = new Set(["vars", "kv_namespaces"]);
 
 export function validatePreviewName(name) {
   if (!NAME.test(name) || name.length > 63) throw new Error(`Unsafe Preview name: ${name}`);
@@ -77,18 +79,23 @@ export function renderRuntimeConfig(source, namespaceId) {
   } catch {
     throw new Error("Preview runtime template must be strict JSON");
   }
+  const previews = config?.previews;
   if (
     !config ||
     Array.isArray(config) ||
     Object.keys(config).some((key) => !CONFIG_KEYS.has(key)) ||
-    canonical(config.vars) !== canonical({ ENVIRONMENT: "preview", WORKER_PREVIEW: "true" })
+    !previews ||
+    typeof previews !== "object" ||
+    Array.isArray(previews) ||
+    Object.keys(previews).some((key) => !PREVIEW_KEYS.has(key)) ||
+    canonical(previews.vars) !== canonical({ ENVIRONMENT: "preview", WORKER_PREVIEW: "true" })
   )
     throw new Error("Preview runtime contains an unapproved setting");
   const bindings = scanBindings(config);
   const binding = bindings[0]?.[0];
   if (
     bindings.length !== 1 ||
-    bindings[0] !== config.kv_namespaces ||
+    bindings[0] !== previews.kv_namespaces ||
     bindings[0].length !== 1 ||
     canonical(binding) !== canonical({ binding: "NEXT_INC_CACHE_KV", id: namespaceId })
   )
