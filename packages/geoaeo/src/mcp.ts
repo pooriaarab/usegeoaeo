@@ -6,8 +6,9 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { auditTarget, type AuditCheck, type AuditReport } from './audit.js';
 import { formatAuditReport } from './audit/format.js';
-import { VERSION, PKG_NAME } from './constants.js';
+import { VERSION, PKG_NAME, CONFIG_FILENAME } from './constants.js';
 import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from './commands/gen.js';
+import { ConfigLoadError } from './commands/load-config.js';
 import { JSON_LD_KINDS, type JsonLdKind } from './generators/index.js';
 import { humanizeGlob } from './commands/humanize.js';
 import type { HumanizeFinding } from './humanize.js';
@@ -87,12 +88,35 @@ async function humanizeHandler({ glob, write, directory }: { glob: string; write
   };
 }
 
-async function genHandler({ artifact, type, directory }: {
+function configToolError(error: ConfigLoadError, directory: string | undefined) {
+  const root = directory ?? error.directory;
+  if (error.code === 'CONFIG_MISSING') {
+    return {
+      isError: true,
+      content: [{ type: 'text', text: `No ${CONFIG_FILENAME} in ${root}. Run geoaeo init in that directory, replace the placeholder facts, then call gen again.` }],
+      structuredContent: { status: 'error', error: { code: 'CONFIG_MISSING', message: `No ${CONFIG_FILENAME}` } },
+    };
+  }
+  return {
+    isError: true,
+    content: [{ type: 'text', text: `${error.filename} in ${root} has no default export. Export a default config or siteConfig, then call gen again.` }],
+    structuredContent: { status: 'error', error: { code: 'CONFIG_INVALID', message: 'No default export' } },
+  };
+}
+
+// Known config states return a tool result. Every other failure stays a throw.
+export async function genHandler({ artifact, type, directory }: {
   artifact: GeneratedArtifact;
   type?: JsonLdKind;
   directory?: string;
 }) {
-  return { content: [{ type: 'text', text: await generateArtifact(artifact, directory, type ?? 'software') }] };
+  try {
+    const text = await generateArtifact(artifact, directory, type ?? 'software');
+    return { content: [{ type: 'text', text }] };
+  } catch (error) {
+    if (error instanceof ConfigLoadError) return configToolError(error, directory);
+    throw error;
+  }
 }
 
 export function createMcpServer(): McpServer {
