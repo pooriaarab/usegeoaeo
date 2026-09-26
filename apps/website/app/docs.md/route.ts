@@ -8,7 +8,7 @@ geoaeo makes any app discoverable and quotable by AI answer engines. SEO plus GE
 
 - Install — https://usegeoaeo.com/docs/install — npm install geoaeo and scaffold your first config.
 - CLI reference — https://usegeoaeo.com/docs/cli — audit, init, gen, humanize, mcp, with flags and examples.
-- MCP server — https://usegeoaeo.com/docs/mcp — run geoaeo-mcp over stdio; tools: audit, gen, humanize.
+- MCP server — https://usegeoaeo.com/docs/mcp — run \`npx geoaeo mcp\` over stdio; tools: audit, gen, humanize.
 
 ## Harness guides
 

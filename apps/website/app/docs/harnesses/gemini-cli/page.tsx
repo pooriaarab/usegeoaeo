@@ -53,10 +53,10 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>Gemini CLI starts geoaeo-mcp over stdio. You do not run it by hand.</p>
+      <p>Gemini CLI starts geoaeo mcp over stdio. You do not run it by hand.</p>
     </>
   );
 }
@@ -77,7 +77,7 @@ function ConfigureMcpServer() {
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>
@@ -240,7 +240,7 @@ function Troubleshooting() {
         <code>cat ~/.gemini/settings.json | jq .</code>. Check Node 20+ with <code>node --version</code>.
       </p>
       <p>
-        <strong>npx ENOENT or permission error.</strong> Run <code>npx -y geoaeo-mcp</code> by hand. It should wait
+        <strong>npx ENOENT or permission error.</strong> Run <code>npx -y geoaeo mcp</code> by hand. It should wait
         on stdin. If it fails, fix npm cache perms or install Node via nvm.
       </p>
       <p>
@@ -254,7 +254,7 @@ function Troubleshooting() {
       </p>
       <p>
         <strong>Tools appear but calls hang.</strong> Check that no wrapper overrides stdio. Use exact{" "}
-        <code>command: npx</code> with <code>args: [&quot;-y&quot;, &quot;geoaeo-mcp&quot;]</code>. Restart Gemini
+        <code>command: npx</code> with <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>. Restart Gemini
         CLI after edits.
       </p>
     </>

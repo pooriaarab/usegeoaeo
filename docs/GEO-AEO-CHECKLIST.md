@@ -435,7 +435,7 @@ npx geoaeo humanize 'content/**/*.md' --write
 npx geoaeo audit ./apps/website
 ```
 
-Same loop through MCP: tools `audit`, `gen`, `humanize` on `npx geoaeo-mcp`.
+Same loop through MCP: tools `audit`, `gen`, `humanize` on `npx geoaeo mcp`.
 
 ---
 

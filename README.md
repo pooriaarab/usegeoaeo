@@ -57,7 +57,7 @@ npx geoaeo audit https://example.com
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }
@@ -69,7 +69,7 @@ Paste this prompt into your agent:
 
 ```
 Set up geoaeo in this agent. Detect the harness, then configure the
-geoaeo MCP server with command `npx` and args `-y geoaeo-mcp`.
+geoaeo MCP server with command `npx` and args `-y geoaeo mcp`.
 Run an audit on the current directory. Report the score and the
 top three fixes.
 ```
@@ -211,7 +211,7 @@ tools:
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }

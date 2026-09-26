@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
@@ -149,7 +151,24 @@ export async function startMcpServer(): Promise<void> {
   await server.connect(new StdioServerTransport());
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) startMcpServer().catch(error => {
+// npm installs a bin as a symlink (node_modules/.bin/geoaeo-mcp -> ../geoaeo/dist/mcp.js).
+// Node reports argv[1] as the invoked symlink and import.meta.url as the real file, so a
+// raw string compare is never true for an installed user — the process exited silently.
+// Compare resolved real paths instead, which also absorbs macOS /tmp vs /private/tmp.
+// This module is additionally bundled into dist/cli.js, where import.meta.url points at
+// cli.js — so argv[1] is checked against the sibling mcp.js file, not this bundle's URL.
+function invokedAsEntrypoint(): boolean {
+  const invoked = process.argv[1];
+  if (!invoked) return false;
+  try {
+    const mcpEntry = fileURLToPath(new URL('./mcp.js', import.meta.url));
+    return realpathSync(invoked) === realpathSync(mcpEntry);
+  } catch {
+    return false;
+  }
+}
+
+if (invokedAsEntrypoint()) startMcpServer().catch(error => {
   process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
   process.exitCode = 1;
 });

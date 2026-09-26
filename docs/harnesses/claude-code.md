@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to Claude Code. Use it to audit a site and generat
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -27,15 +27,15 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary resolves
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
 The MCP server starts over stdio. You do not run it by hand when you use Claude Code.
 
 ## Configure the MCP server
 
-Claude Code reads MCP servers from `.mcp.json` in the project root or from your global Claude Code config. Use `command: npx` with `args: ["-y", "geoaeo-mcp"]`.
+Claude Code reads MCP servers from `.mcp.json` in the project root or from your global Claude Code config. Use `command: npx` with `args: ["-y", "geoaeo", "mcp"]`.
 
 ### Option A — project scope (recommended)
 
@@ -46,7 +46,7 @@ Create `.mcp.json` in the repo root:
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }
@@ -55,7 +55,7 @@ Create `.mcp.json` in the repo root:
 ### Option B — CLI helper
 
 ```bash
-claude mcp add geoaeo -- npx -y geoaeo-mcp
+claude mcp add geoaeo -- npx -y geoaeo mcp
 claude mcp list
 ```
 
@@ -154,7 +154,7 @@ The `humanize` tool is also available: `{"glob": "content/** /*.md", "write": fa
 ## Troubleshooting
 
 **Server shows as disconnected in `/mcp`.**
-Run `npx -y geoaeo-mcp` in a terminal. It should wait on stdin (no output). Press Ctrl+C. If npx fails, check Node >= 20 with `node --version` and check network access to npm.
+Run `npx -y geoaeo mcp` in a terminal. It should wait on stdin (no output). Press Ctrl+C. If npx fails, check Node >= 20 with `node --version` and check network access to npm.
 
 **Config file not picked up.**
 Confirm the file is named `.mcp.json` in the repo root (not `mcp.json`). Validate JSON with `cat .mcp.json | jq .`. Restart Claude Code. Check `claude mcp list` shows geoaeo.
@@ -166,7 +166,7 @@ Ensure you audit the project root that contains `geoaeo.config.ts`. For local di
 Run `npx geoaeo init ./` to scaffold `geoaeo.config.ts`. Then retry `gen` with the same `artifact` value.
 
 **Permission or EACCES on npx cache.**
-Run `npm config get cache` and ensure the directory is writable. Try `npx --yes geoaeo-mcp` once to prime the cache.
+Run `npm config get cache` and ensure the directory is writable. Try `npx --yes geoaeo mcp` once to prime the cache.
 
 ## Reference
 

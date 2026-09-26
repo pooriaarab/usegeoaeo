@@ -22,7 +22,7 @@ const faqs = [
   {
     question: "How do I use geoaeo with coding agents?",
     answer:
-      "Run the MCP server with npx geoaeo-mcp over stdio. It exposes audit, gen, and humanize tools directly to Claude Code, Cursor, Windsurf, Codex, Gemini CLI, Copilot, and Continue.",
+      "Run the MCP server with npx geoaeo mcp over stdio. It exposes audit, gen, and humanize tools directly to Claude Code, Cursor, Windsurf, Codex, Gemini CLI, Copilot, and Continue.",
   },
   {
     question: "Is geoaeo free?",

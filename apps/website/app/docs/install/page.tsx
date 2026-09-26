@@ -93,7 +93,8 @@ function VerifyBothBins() {
       <p>The package provides two bins. Check that both resolve:</p>
       <pre>
         <code>{`npx geoaeo --help
-npx geoaeo-mcp --help`}</code>
+# the geoaeo-mcp bin starts the server and waits on stdin; Ctrl+C to stop
+npx -y --package=geoaeo geoaeo-mcp`}</code>
       </pre>
       <p>
         <code>geoaeo</code> is the CLI. <code>geoaeo-mcp</code> is the MCP server over stdio. You do not run the

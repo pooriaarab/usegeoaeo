@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to Muse. Use it to audit a site and generate GEO/A
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -25,11 +25,11 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
-You do not run `geoaeo-mcp` by hand when Codex manages it.
+You do not run `geoaeo mcp` by hand when Codex manages it.
 
 ## Configure the MCP server
 
@@ -40,7 +40,7 @@ Copy this block into `~/.codex/config.toml`:
 ```toml
 [mcp_servers.geoaeo]
 command = "npx"
-args = ["-y", "geoaeo-mcp"]
+args = ["-y", "geoaeo", "mcp"]
 ```
 
 If your Codex build reads JSON config, the equivalent JSON is:
@@ -50,7 +50,7 @@ If your Codex build reads JSON config, the equivalent JSON is:
   "mcp_servers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }
@@ -140,7 +140,7 @@ The `humanize` tool is also available: `{"glob": "content/**/* .md", "write": fa
 Confirm the path is `~/.codex/config.toml`. Run `ls -la ~/.codex/config.toml` and `cat ~/.codex/config.toml`. Ensure the header is exactly `[mcp_servers.geoaeo]`. Restart Codex.
 
 **npx fails or hangs.**
-Run `npx -y geoaeo-mcp` manually. It should wait on stdin. Press Ctrl+C. If it fails, update Node to >= 20 and check npm registry access.
+Run `npx -y geoaeo mcp` manually. It should wait on stdin. Press Ctrl+C. If it fails, update Node to >= 20 and check npm registry access.
 
 **audit returns "Cannot find target".**
 Use an absolute path or a full https URL. For local dirs, run from the repo root so `./` resolves correctly.
@@ -149,7 +149,7 @@ Use an absolute path or a full https URL. For local dirs, run from the repo root
 Run `npx geoaeo init ./` in the project root. Then retry `gen`.
 
 **Tools appear but calls time out.**
-Check that stdio is not blocked by a wrapper script. Use the exact command `npx` with args `["-y", "geoaeo-mcp"]`. Remove extra env wrappers.
+Check that stdio is not blocked by a wrapper script. Use the exact command `npx` with args `["-y", "geoaeo", "mcp"]`. Remove extra env wrappers.
 
 ## Reference
 

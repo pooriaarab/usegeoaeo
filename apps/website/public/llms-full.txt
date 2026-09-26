@@ -10,7 +10,7 @@ geoaeo makes any app discoverable, quotable, and usable by AI answer engines and
 
 - [Install](https://usegeoaeo.com/docs/install): `npm install geoaeo`, `npx geoaeo init`, `geoaeo.config.ts`
 - [CLI reference](https://usegeoaeo.com/docs/cli): `audit <url|dir>`, `init`, `gen <artifact>`, `humanize`, `mcp`
-- [MCP server](https://usegeoaeo.com/docs/mcp): `npx geoaeo-mcp` over stdio, tools `audit`, `gen`, `humanize`
+- [MCP server](https://usegeoaeo.com/docs/mcp): `npx geoaeo mcp` over stdio, tools `audit`, `gen`, `humanize`
 - [Harnesses](https://usegeoaeo.com/docs): Claude Code, Cursor, Windsurf, Codex, Gemini CLI, GitHub Copilot, Continue setup
 - [GEO/AEO checklist](https://usegeoaeo.com/checklist): 25 checks with fixes
 - [Examples](https://usegeoaeo.com/examples): static-html 80, nextjs-app 48, astro-site 46
@@ -23,7 +23,7 @@ geoaeo is an npm library, not a hosted API:
 - Library: `import { auditTarget, generateLlms, humanizeText } from 'geoaeo'`
 - npm: https://www.npmjs.com/package/geoaeo
 - GitHub: https://github.com/pooriaarab/usegeoaeo
-- MCP: `npx geoaeo-mcp` (bin `geoaeo-mcp`, also `npx geoaeo mcp`) over stdio
+- MCP: `npx geoaeo mcp` (bin `geoaeo-mcp`) over stdio
 
 ## Pricing
 

@@ -191,8 +191,9 @@ function McpCommand() {
       </h2>
       <p>Run the MCP server over stdio. The binary is also available as <code>geoaeo-mcp</code>.</p>
       <pre>
-        <code>{`npx geoaeo mcp
-npx geoaeo-mcp`}</code>
+        <code>{`npx -y geoaeo mcp
+# equivalent: run the geoaeo-mcp bin
+npx -y --package=geoaeo geoaeo-mcp`}</code>
       </pre>
       <p>
         The server exposes three tools: <code>audit</code>, <code>gen</code>, and <code>humanize</code>. See the{" "}

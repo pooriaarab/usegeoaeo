@@ -80,7 +80,7 @@ One doc per harness, each showing how to wire the geoaeo **MCP server** and (whe
 applies) the skill, with a copy-paste config block and a first-run example:
 `docs/harnesses/{claude-code,codex,cursor,windsurf,gemini-cli,github-copilot,continue}.md`.
 Each: install, MCP config JSON, one `audit` + one `gen` walkthrough, troubleshooting.
-The MCP command is `npx geoaeo-mcp` (stdio); tools are `audit`, `gen`, `humanize`.
+The MCP command is `npx geoaeo mcp` (stdio); tools are `audit`, `gen`, `humanize`.
 
 ### Unit D — examples  (owner: gemini-personal)
 Paths: `examples/**` only.

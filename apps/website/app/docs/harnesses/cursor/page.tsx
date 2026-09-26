@@ -53,10 +53,10 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>Cursor starts geoaeo-mcp for you. You do not run it by hand.</p>
+      <p>Cursor starts geoaeo mcp for you. You do not run it by hand.</p>
     </>
   );
 }
@@ -78,7 +78,7 @@ function ConfigureMcpServer() {
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>
@@ -245,7 +245,7 @@ function Troubleshooting() {
         <code>geoaeo.config.ts</code>. Then retry.
       </p>
       <p>
-        <strong>Server starts then exits.</strong> Run <code>npx -y geoaeo-mcp</code> in a terminal. It should wait
+        <strong>Server starts then exits.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal. It should wait
         on stdin. If it exits, update to Node 20+ and reinstall geoaeo.
       </p>
     </>
