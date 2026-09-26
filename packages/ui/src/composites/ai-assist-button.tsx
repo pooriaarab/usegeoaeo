@@ -1,18 +1,14 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Sparkles } from 'lucide-react';
-import { Button } from '../primitives/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../primitives/popover';
-import { cn } from '../utils';
-import { AiAssistPopoverContent } from './ai-assist-popover-content';
-import type { AiAssistPreset } from './ai-assist-popover-content';
+import * as React from "react";
+import { Sparkles } from "lucide-react";
+import { Button } from "../primitives/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../primitives/popover";
+import { cn } from "../utils";
+import { AiAssistPopoverContent } from "./ai-assist-popover-content";
+import type { AiAssistPreset } from "./ai-assist-popover-content";
 
-export type { AiAssistPreset } from './ai-assist-popover-content';
+export type { AiAssistPreset } from "./ai-assist-popover-content";
 
 interface AiAssistButtonProps {
   presets: AiAssistPreset[];
@@ -48,7 +44,12 @@ function doDoubleClick(
 }
 
 function useCleanupTimer(timerRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>) {
-  React.useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, [timerRef]);
+  React.useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    [timerRef],
+  );
 }
 
 function useAiAssistState(
@@ -58,7 +59,7 @@ function useAiAssistState(
   disabled: boolean,
 ) {
   const [open, setOpen] = React.useState(false);
-  const [customInstruction, setCustomInstruction] = React.useState('');
+  const [customInstruction, setCustomInstruction] = React.useState("");
   const clickCount = React.useRef(0);
   const clickTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   useCleanupTimer(clickTimer);
@@ -75,7 +76,7 @@ function useAiAssistState(
   const handlePresetClick = React.useCallback(
     (value: string) => {
       setOpen(false);
-      setCustomInstruction('');
+      setCustomInstruction("");
       onGenerate(value);
     },
     [onGenerate],
@@ -85,10 +86,16 @@ function useAiAssistState(
     if (!trimmed) return;
     setOpen(false);
     onGenerate(trimmed);
-    setCustomInstruction('');
+    setCustomInstruction("");
   }, [customInstruction, onGenerate]);
   return {
-    open, setOpen, customInstruction, setCustomInstruction, handleClick, handlePresetClick, handleCustomSubmit,
+    open,
+    setOpen,
+    customInstruction,
+    setCustomInstruction,
+    handleClick,
+    handlePresetClick,
+    handleCustomSubmit,
   };
 }
 
@@ -116,16 +123,16 @@ export function AiAssistButton({
           type="button"
           variant="ghost"
           size="icon"
-          className={cn('h-6 w-6', className)}
+          className={cn("h-6 w-6", className)}
           disabled={disabled || loading}
           onClick={handleClick}
           title="Double-click for quick AI assist"
         >
           <Sparkles
             className={cn(
-              'h-3.5 w-3.5',
-              loading && 'animate-pulse text-primary',
-              !loading && 'text-muted-foreground hover:text-foreground',
+              "h-3.5 w-3.5",
+              loading && "animate-pulse text-primary",
+              !loading && "text-muted-foreground hover:text-foreground",
             )}
           />
         </Button>
