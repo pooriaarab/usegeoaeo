@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { lstatSync, mkdirSync, symlinkSync, writeFileSync } from "node:fs";
+import { lstatSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, test } from "node:test";
 
 import {
@@ -10,6 +11,27 @@ import {
   checkPluginSkill,
   syncPluginSkill,
 } from "./sync-plugin-skill.mjs";
+
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const PLUGIN_MANIFESTS = [
+  ".claude-plugin/marketplace.json",
+  ".cursor-plugin/marketplace.json",
+  "plugins/geoaeo/mcp.json",
+  "plugins/geoaeo/.claude-plugin/plugin.json",
+  "plugins/geoaeo/.cursor-plugin/plugin.json",
+  "plugins/geoaeo/.codex-plugin/plugin.json",
+];
+
+test("plugin manifests are valid JSON", () => {
+  for (const rel of PLUGIN_MANIFESTS) {
+    const contents = readFileSync(join(repoRoot, rel), "utf8");
+    try {
+      JSON.parse(contents);
+    } catch (error) {
+      assert.fail(`${rel} is not valid JSON: ${error.message}`);
+    }
+  }
+});
 
 const temps = [];
 afterEach(() => {
