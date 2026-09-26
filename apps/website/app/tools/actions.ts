@@ -48,7 +48,7 @@ export async function genLlms(input: {
 
 export async function genJsonLd(
   input: { siteName: string; siteUrl: string; description: string },
-  kind: JsonLdKind
+  kind: JsonLdKind,
 ): Promise<string> {
   return `${JSON.stringify(generateJsonLd(buildConfig(input), kind), null, 2)}\n`;
 }
