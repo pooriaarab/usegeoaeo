@@ -11,9 +11,9 @@
  * ```
  */
 
-import { cn } from '../utils';
+import { cn } from "../utils";
 
-export type StatusVariant = 'active' | 'paused' | 'error' | 'idle' | 'deleted';
+export type StatusVariant = "active" | "paused" | "error" | "idle" | "deleted";
 
 interface StatusBadgeProps {
   /** Status string to display (known variants get colored styling, unknown values get a fallback) */
@@ -31,29 +31,29 @@ interface StatusStyle {
 
 const statusStyles: Record<string, StatusStyle> = {
   active: {
-    dot: 'bg-success',
-    text: 'text-success-foreground',
-    bg: 'bg-success-subtle',
+    dot: "bg-success",
+    text: "text-success-foreground",
+    bg: "bg-success-subtle",
   },
   paused: {
-    dot: 'bg-warning',
-    text: 'text-warning-foreground',
-    bg: 'bg-warning-subtle',
+    dot: "bg-warning",
+    text: "text-warning-foreground",
+    bg: "bg-warning-subtle",
   },
   error: {
-    dot: 'bg-error',
-    text: 'text-error-foreground',
-    bg: 'bg-error-subtle',
+    dot: "bg-error",
+    text: "text-error-foreground",
+    bg: "bg-error-subtle",
   },
   idle: {
-    dot: 'bg-muted-foreground/70',
-    text: 'text-muted-foreground',
-    bg: 'bg-muted/50',
+    dot: "bg-muted-foreground/70",
+    text: "text-muted-foreground",
+    bg: "bg-muted/50",
   },
   deleted: {
-    dot: 'bg-muted-foreground/70',
-    text: 'text-muted-foreground',
-    bg: 'bg-muted/50',
+    dot: "bg-muted-foreground/70",
+    text: "text-muted-foreground",
+    bg: "bg-muted/50",
   },
 };
 
@@ -66,13 +66,13 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium',
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium",
         style.bg,
         style.text,
-        className
+        className,
       )}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', style.dot)} />
+      <span className={cn("h-1.5 w-1.5 rounded-full", style.dot)} />
       {label}
     </span>
   );
