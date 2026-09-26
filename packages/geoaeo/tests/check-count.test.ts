@@ -1,6 +1,6 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 /**
  * The audit's check count is quoted in prose all over this repo, including in
@@ -16,24 +16,39 @@ import { describe, expect, it } from 'vitest';
  * surface to it.
  */
 
-const REPO = resolve(__dirname, '../../..');
-const CHECKS = join(REPO, 'packages/geoaeo/src/audit/checks.ts');
+const REPO = resolve(__dirname, "../../..");
+const CHECKS = join(REPO, "packages/geoaeo/src/audit/check-definitions.ts");
 
 function definedChecks(): { id: string; weight: number }[] {
-  const src = readFileSync(CHECKS, 'utf8');
-  return [...src.matchAll(/\{\s*id:\s*'([^']+)',\s*label:[\s\S]*?weight:\s*(\d+)/g)].map(m => ({
-    id: m[1],
-    weight: Number(m[2]),
-  }));
+  const src = readFileSync(CHECKS, "utf8");
+  return [...src.matchAll(/\{\s*id:\s*['"]([^'"]+)['"],\s*label:[\s\S]*?weight:\s*(\d+)/g)].map(
+    (m) => ({
+      id: m[1],
+      weight: Number(m[2]),
+    }),
+  );
 }
 
 /** Every tracked text file that a reader or an answer engine can see. */
 function proseFiles(): string[] {
-  const roots = ['README.md', 'AGENTS.md', 'WEBSITE-CONTENT.md', 'docs', 'apps/website/app', 'apps/website/src', 'apps/website/public', 'packages/geoaeo/README.md'];
+  const roots = [
+    "README.md",
+    "AGENTS.md",
+    "WEBSITE-CONTENT.md",
+    "docs",
+    "apps/website/app",
+    "apps/website/src",
+    "apps/website/public",
+    "packages/geoaeo/README.md",
+  ];
   const out: string[] = [];
   const walk = (p: string) => {
     let s;
-    try { s = statSync(p); } catch { return; }
+    try {
+      s = statSync(p);
+    } catch {
+      return;
+    }
     if (s.isDirectory()) {
       if (/node_modules|\.next|\.open-next|dist/.test(p)) return;
       for (const e of readdirSync(p)) walk(join(p, e));
@@ -45,18 +60,18 @@ function proseFiles(): string[] {
   return out;
 }
 
-describe('audit check count', () => {
-  it('the weights sum to exactly 100', () => {
+describe("audit check count", () => {
+  it("the weights sum to exactly 100", () => {
     const total = definedChecks().reduce((n, c) => n + c.weight, 0);
     expect(total).toBe(100);
   });
 
-  it('every check id is unique', () => {
-    const ids = definedChecks().map(c => c.id);
+  it("every check id is unique", () => {
+    const ids = definedChecks().map((c) => c.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('no doc or artifact quotes a stale check count', () => {
+  it("no doc or artifact quotes a stale check count", () => {
     const actual = definedChecks().length;
     expect(actual).toBeGreaterThan(0);
 
@@ -64,14 +79,24 @@ describe('audit check count', () => {
     // matched digits, and missed "Twenty weighted checks" in the root README
     // -- the one place a new reader looks first.
     const WORDS: Record<string, number> = {
-      ten: 10, twelve: 12, fifteen: 15, sixteen: 16, eighteen: 18, twenty: 20,
-      'twenty-one': 21, 'twenty-two': 22, 'twenty-three': 23, 'twenty-four': 24,
-      'twenty-five': 25, 'twenty-six': 26, thirty: 30,
+      ten: 10,
+      twelve: 12,
+      fifteen: 15,
+      sixteen: 16,
+      eighteen: 18,
+      twenty: 20,
+      "twenty-one": 21,
+      "twenty-two": 22,
+      "twenty-three": 23,
+      "twenty-four": 24,
+      "twenty-five": 25,
+      "twenty-six": 26,
+      thirty: 30,
     };
 
     const stale: string[] = [];
     for (const file of proseFiles()) {
-      const text = readFileSync(file, 'utf8');
+      const text = readFileSync(file, "utf8");
       const pattern = /([0-9]+|[a-z]+(?:-[a-z]+)?)[\s]+(?:weighted\s+)?checks\b/gi;
       for (const m of text.matchAll(pattern)) {
         const raw = m[1].toLowerCase();
@@ -82,6 +107,6 @@ describe('audit check count', () => {
         }
       }
     }
-    expect(stale, `Stale check counts:\n${stale.join('\n')}`).toEqual([]);
+    expect(stale, `Stale check counts:\n${stale.join("\n")}`).toEqual([]);
   });
 });
