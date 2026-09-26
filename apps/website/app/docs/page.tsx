@@ -26,7 +26,7 @@ const sections = [
   {
     title: "MCP Server",
     href: "/docs/mcp",
-    description: "Run geoaeo-mcp over stdio and expose audit, gen, humanize to agents.",
+    description: "Run geoaeo mcp over stdio and expose audit, gen, humanize to agents.",
     label: "MCP",
   },
 ];

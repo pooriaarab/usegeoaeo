@@ -18,7 +18,7 @@ export function HarnessWhatYouGet() {
           <code>mcp</code>. No other commands exist.
         </li>
         <li>
-          MCP server command: <code>npx geoaeo-mcp</code> over stdio
+          MCP server command: <code>npx -y geoaeo mcp</code> over stdio
         </li>
         <li>
           MCP tools: <code>audit</code>, <code>gen</code>, <code>humanize</code>

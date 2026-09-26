@@ -96,7 +96,7 @@ Use the stdio server in an MCP client such as Claude Code or Cursor:
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }

@@ -55,10 +55,10 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>VS Code starts geoaeo-mcp for you. You do not run it by hand.</p>
+      <p>VS Code starts geoaeo mcp for you. You do not run it by hand.</p>
     </>
   );
 }
@@ -82,7 +82,7 @@ function ConfigureMcpServer() {
   "servers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"],
+      "args": ["-y", "geoaeo", "mcp"],
       "type": "stdio"
     }
   }
@@ -94,7 +94,7 @@ function ConfigureMcpServer() {
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>

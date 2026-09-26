@@ -22,7 +22,7 @@ Indie hackers to enterprise teams who want their site cited by ChatGPT, Claude, 
 
 - Library: `import { auditTarget, generateLlms, humanizeText } from 'geoaeo'`
 - CLI: `npx geoaeo audit|init|gen|humanize|mcp`
-- MCP: `npx geoaeo-mcp` over stdio (same as `npx geoaeo mcp`)
+- MCP: `npx geoaeo mcp` over stdio (also shipped as the `geoaeo-mcp` bin)
 
 ## MCP tools
 

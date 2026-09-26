@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to GitHub Copilot in VS Code. Use it to audit a si
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -26,11 +26,11 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
-VS Code starts `geoaeo-mcp` for you. You do not run it by hand.
+VS Code starts `geoaeo mcp` for you. You do not run it by hand.
 
 ## Configure the MCP server
 
@@ -45,7 +45,7 @@ Create `.vscode/mcp.json` in the repo root:
   "servers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"],
+      "args": ["-y", "geoaeo", "mcp"],
       "type": "stdio"
     }
   }
@@ -59,7 +59,7 @@ Some VS Code builds use `mcpServers` as the top-level key instead of `servers`. 
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }
