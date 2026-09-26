@@ -1,7 +1,7 @@
 import type { AuditCheck, PageSignals, PageSnapshot, TargetSnapshot } from './types.js';
 import { AI_AGENTS } from '../generators/robots.js';
 import { analyzePage } from './analyze-page.js';
-import { ANSWERABILITY_WORD_FLOOR } from './constants.js';
+import { ANSWERABILITY_WORD_FLOOR, LLMS_FULL_MIN_CHARS } from './constants.js';
 import { blockedAgents } from './robots-policy.js';
 
 interface CheckContext {
@@ -94,14 +94,57 @@ function answerabilityDetails(ctx: CheckContext): string {
   return `No concise direct answer under a clear H1, and not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`;
 }
 
+/** A body that opens as an HTML document is an error or login page, not the artifact. */
+function looksLikeHtmlDocument(text: string): boolean {
+  return /^\s*(?:<!--[\s\S]*?-->\s*)*(?:<!doctype\s+html|<html)[\s>]/i.test(text);
+}
+
+/**
+ * The artifact checks judge a fetched body on what it is, not on whether
+ * geoaeo wrote it: a markdown document means at least one line-anchored ATX
+ * heading. Directory audits can instead read the route source that generates
+ * the artifact (app/llms-full.txt/route.ts), which is why the generator-call
+ * branches in the predicates below still count.
+ */
+function isMarkdownDoc(text: string): boolean {
+  const body = text.replace(/^\uFEFF/, '').trim();
+  return body.length > 0 && !looksLikeHtmlDocument(body) && /^#{1,6}\s+\S/m.test(body);
+}
+
+function isShortSiteMap(body: string | undefined): boolean {
+  const text = body ?? '';
+  return /generateLlms/i.test(text) || isMarkdownDoc(text);
+}
+
+function isFullSiteMap(body: string | undefined): boolean {
+  const text = (body ?? '').replace(/^\uFEFF/, '').trim();
+  return /generateLlmsFull/i.test(text) || (isMarkdownDoc(text) && text.length >= LLMS_FULL_MIN_CHARS);
+}
+
+/** A sitemap index file is as much a sitemap as a urlset is. */
+function isSitemapXml(body: string | undefined): boolean {
+  return /<urlset|<sitemapindex|generateSitemap|sitemap\s*\(/i.test(body ?? '');
+}
+
+function isRobotsPolicy(body: string | undefined): boolean {
+  const text = body ?? '';
+  // generateRobots() output always ends with a Sitemap line, so source that
+  // names the call counts even though it contains no directives itself.
+  return /generateRobots/i.test(text) || (/user-agent\s*:/i.test(text) && /sitemap\s*:/i.test(text));
+}
+
+function isWebmcpManifest(body: string | undefined): boolean {
+  return /generateWebmcp|"tools"\s*:|tools\s*[:=]/i.test(body ?? '');
+}
+
 function getCheckDefinitions(): CheckDef[] {
   return [
-    { id: 'llms', label: '/llms.txt', weight: 6, details: 'Short site map is present.', passed: ctx => /generateLlms|#\s+\S+/i.test(ctx.artifacts.get('__llms') ?? '') },
-    { id: 'llms-full', label: '/llms-full.txt', weight: 6, details: 'Full site map is present.', passed: ctx => /generateLlmsFull|##\s+(What it is|Common questions)/i.test(ctx.artifacts.get('__llmsFull') ?? '') },
-    { id: 'sitemap', label: '/sitemap.xml', weight: 6, details: 'A sitemap artifact is present.', passed: ctx => /<urlset|generateSitemap|sitemap\s*\(/i.test(ctx.artifacts.get('__sitemap') ?? '') },
-    { id: 'robots', label: '/robots.txt', weight: 1, details: 'Robots policy includes a sitemap URL.', passed: ctx => /User-agent:|generateRobots/i.test(ctx.artifacts.get('__robots') ?? '') && /Sitemap:|sitemap\s*:/i.test(ctx.artifacts.get('__robots') ?? '') },
+    { id: 'llms', label: '/llms.txt', weight: 6, details: 'Short site map is present.', passed: ctx => isShortSiteMap(ctx.artifacts.get('__llms')) },
+    { id: 'llms-full', label: '/llms-full.txt', weight: 6, details: 'Full site map is present.', passed: ctx => isFullSiteMap(ctx.artifacts.get('__llmsFull')) },
+    { id: 'sitemap', label: '/sitemap.xml', weight: 6, details: 'A sitemap artifact is present.', passed: ctx => isSitemapXml(ctx.artifacts.get('__sitemap')) },
+    { id: 'robots', label: '/robots.txt', weight: 1, details: 'Robots policy includes a sitemap URL.', passed: ctx => isRobotsPolicy(ctx.artifacts.get('__robots')) },
     { id: 'ai-crawlers', label: 'AI crawler access', weight: 3, details: 'No named AI crawler is disallowed from /.', passed: ctx => ctx.blockedAiAgents.length === 0 },
-    { id: 'webmcp', label: 'WebMCP manifest', weight: 4, details: 'A WebMCP-style tool manifest is present.', passed: ctx => /generateWebmcp|"tools"|tools\s*[:=]/i.test(ctx.artifacts.get('__webmcp') ?? '') },
+    { id: 'webmcp', label: 'WebMCP manifest', weight: 4, details: 'A WebMCP-style tool manifest is present.', passed: ctx => isWebmcpManifest(ctx.artifacts.get('__webmcp')) },
     { id: 'markdown', label: 'Markdown mirrors', weight: 4, details: '', passed: ctx => ctx.mirrors.length > 0 },
     { id: 'title', label: 'Page titles', weight: 4, details: 'Every inspected page has a title.', passed: ctx => ctx.allPage(page => page.title) },
     { id: 'description', label: 'Meta descriptions', weight: 4, details: 'Every inspected page has a meta description.', passed: ctx => ctx.allPage(page => page.description) },

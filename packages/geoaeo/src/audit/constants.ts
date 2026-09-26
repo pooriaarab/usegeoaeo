@@ -17,3 +17,15 @@ export const PAGE_EXTENSIONS = new Set(['.html', '.htm', '.tsx', '.jsx', '.mdx']
  * can quote.
  */
 export const ANSWERABILITY_WORD_FLOOR = 100;
+
+/**
+ * Minimum trimmed length folded into the `llms-full` artifact check.
+ *
+ * The full map is the whole site in one markdown file, so a body that cannot
+ * hold more than a stub is not a map. The floor has to sit under the smallest
+ * artifact geoaeo itself generates -- a minimal `generateLlmsFull` output is
+ * 186 bytes -- or the audit would reject files this package writes. 160 keeps
+ * that output passing while still failing empty bodies, `Not Found` text,
+ * and heading-only stubs.
+ */
+export const LLMS_FULL_MIN_CHARS = 160;
