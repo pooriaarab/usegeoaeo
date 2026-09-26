@@ -68,8 +68,8 @@ function ConfigureMcpServer() {
       <h2>Configure the MCP server</h2>
       <p>
         Continue reads MCP servers from its config file. In recent builds this is{" "}
-        <code>~/.continue/config.yaml</code> (preferred) or <code>~/.continue/config.json</code>. Both formats are
-        shown.
+        <code>~/.continue/config.yaml</code> (preferred) or <code>~/.continue/config.json</code>.
+        Both formats are shown.
       </p>
 
       <h3>Option A — config.yaml (preferred)</h3>
@@ -90,7 +90,6 @@ function ConfigureMcpServer() {
       command: npx
       args: ["-y", "geoaeo", "mcp"]`}</code>
       </pre>
-
     </>
   );
 }
@@ -122,13 +121,13 @@ function ConfigureMcpServerOptionB() {
         <li>Paste one block above. Validate YAML or JSON.</li>
         <li>Reload the editor window or restart the IDE.</li>
         <li>
-          Open Continue Chat and check MCP servers. Confirm <code>geoaeo</code> shows with <code>audit</code>,{" "}
-          <code>gen</code>, <code>humanize</code>.
+          Open Continue Chat and check MCP servers. Confirm <code>geoaeo</code> shows with{" "}
+          <code>audit</code>, <code>gen</code>, <code>humanize</code>.
         </li>
       </ol>
       <p>
-        Project scope: some builds also read <code>.continue/config.yaml</code> in the repo root. Use the global
-        file first.
+        Project scope: some builds also read <code>.continue/config.yaml</code> in the repo root.
+        Use the global file first.
       </p>
     </>
   );
@@ -156,7 +155,10 @@ function AuditWalkthrough() {
       <h2>Walkthrough 1 — audit a site</h2>
       <p>Prompt Continue:</p>
       <blockquote>
-        <p>Use geoaeo audit on ./ and summarize the score and top fixes. If ./ is not a site, try https://example.com.</p>
+        <p>
+          Use geoaeo audit on ./ and summarize the score and top fixes. If ./ is not a site, try
+          https://example.com.
+        </p>
       </blockquote>
       <p>What the agent does:</p>
       <ol>
@@ -187,7 +189,8 @@ function GenWalkthrough() {
     <>
       <h2>Walkthrough 2 — generate an artifact with gen</h2>
       <p>
-        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current directory.
+        This uses <code>gen</code>, which reads <code>geoaeo.config.ts</code> from the current
+        directory.
       </p>
       <ol>
         <li>
@@ -234,8 +237,8 @@ function GenArtifactReference() {
           <code>{`{"artifact": "webmcp"}`}</code>
         </li>
         <li>
-          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be <code>software</code>,{" "}
-          <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
+          <code>{`{"artifact": "jsonld", "type": "software"}`}</code> — type may be{" "}
+          <code>software</code>, <code>product</code>, <code>faq</code>, or <code>breadcrumb</code>
         </li>
       </ul>
       <p>Equivalent CLI:</p>
@@ -245,7 +248,8 @@ npx geoaeo gen sitemap -o ./public/sitemap.xml
 npx geoaeo gen jsonld --type faq`}</code>
       </pre>
       <p>
-        The <code>humanize</code> tool is also available: <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
+        The <code>humanize</code> tool is also available:{" "}
+        <code>{`{"glob": "content/**/*.md", "write": false}`}</code>.
       </p>
     </>
   );
@@ -256,26 +260,27 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>MCP server not shown.</strong> Check the config file path: <code>~/.continue/config.yaml</code> vs{" "}
-        <code>~/.continue/config.json</code>. Continue loads one file. Validate YAML with{" "}
-        <code>cat ~/.continue/config.yaml</code> and check indent.
+        <strong>MCP server not shown.</strong> Check the config file path:{" "}
+        <code>~/.continue/config.yaml</code> vs <code>~/.continue/config.json</code>. Continue loads
+        one file. Validate YAML with <code>cat ~/.continue/config.yaml</code> and check indent.
       </p>
       <p>
-        <strong>YAML indent error.</strong> <code>mcpServers</code> is a list. Each entry starts with{" "}
-        <code>- name:</code>. Keep <code>command</code> and <code>args</code> indented 4 spaces under the entry.
+        <strong>YAML indent error.</strong> <code>mcpServers</code> is a list. Each entry starts
+        with <code>- name:</code>. Keep <code>command</code> and <code>args</code> indented 4 spaces
+        under the entry.
       </p>
       <p>
-        <strong>npx ENOENT.</strong> Run <code>node --version</code> and <code>which npx</code> in the IDE
-        terminal. If Node is not on PATH, use the absolute path in <code>command</code>, for example{" "}
-        <code>&quot;/opt/homebrew/bin/npx&quot;</code>.
+        <strong>npx ENOENT.</strong> Run <code>node --version</code> and <code>which npx</code> in
+        the IDE terminal. If Node is not on PATH, use the absolute path in <code>command</code>, for
+        example <code>&quot;/opt/homebrew/bin/npx&quot;</code>.
       </p>
       <p>
-        <strong>audit returns empty.</strong> Use <code>{`{"target": "./"}`}</code> from the workspace root. Ensure
-        the directory contains site files.
+        <strong>audit returns empty.</strong> Use <code>{`{"target": "./"}`}</code> from the
+        workspace root. Ensure the directory contains site files.
       </p>
       <p>
-        <strong>gen fails with Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in the workspace
-        root, then retry <code>gen</code>.
+        <strong>gen fails with Cannot find config.</strong> Run <code>npx geoaeo init ./</code> in
+        the workspace root, then retry <code>gen</code>.
       </p>
     </>
   );
@@ -291,9 +296,9 @@ function Reference() {
         </li>
         <li>Transport: stdio only.</li>
         <li>
-          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes <code>artifact</code>{" "}
-          enum and optional <code>type</code>. <code>humanize</code> takes <code>glob</code> and optional{" "}
-          <code>write</code> (boolean).
+          Tools: <code>audit</code> takes <code>target</code> (string). <code>gen</code> takes{" "}
+          <code>artifact</code> enum and optional <code>type</code>. <code>humanize</code> takes{" "}
+          <code>glob</code> and optional <code>write</code> (boolean).
         </li>
       </ul>
     </>
