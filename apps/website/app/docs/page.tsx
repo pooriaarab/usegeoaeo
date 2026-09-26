@@ -4,11 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@temp
 import { Badge } from "@template/ui/primitives/badge";
 import { Separator } from "@template/ui/primitives/separator";
 import { DocsBreadcrumb } from "@/components/docs/docs-breadcrumb";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo Docs — CLI, MCP, and harnesses for AI discoverability",
   description:
     "Start with geoaeo in minutes. Install the npm package, run the audit and generators from the CLI, connect the MCP server, and wire it into your AI harness.",
+  alternates: pageAlternates("/docs"),
 };
 
 const sections = [
