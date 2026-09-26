@@ -1,12 +1,8 @@
-'use client';
+"use client";
 
-import { Info } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '../primitives/tooltip';
-import { cn } from '../utils';
+import { Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../primitives/tooltip";
+import { cn } from "../utils";
 
 interface InfoTooltipProps {
   content: string;
@@ -19,7 +15,7 @@ export function InfoTooltip({ content, className }: InfoTooltipProps) {
       <TooltipTrigger asChild>
         <Info
           className={cn(
-            'h-3.5 w-3.5 text-muted-foreground/50 hover:text-muted-foreground cursor-help inline-block ml-1',
+            "h-3.5 w-3.5 text-muted-foreground/50 hover:text-muted-foreground cursor-help inline-block ml-1",
             className,
           )}
         />

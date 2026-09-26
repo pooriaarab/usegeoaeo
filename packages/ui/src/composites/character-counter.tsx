@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { cn } from '../utils';
+import { cn } from "../utils";
 
 interface CharacterCounterProps {
   current: number;
@@ -14,14 +14,10 @@ export function CharacterCounter({ current, max, className }: CharacterCounterPr
   if (ratio < 0.8) return null;
 
   const colorClass =
-    ratio >= 1
-      ? 'text-error'
-      : ratio >= 0.9
-        ? 'text-warning'
-        : 'text-muted-foreground';
+    ratio >= 1 ? "text-error" : ratio >= 0.9 ? "text-warning" : "text-muted-foreground";
 
   return (
-    <p className={cn('text-xs', colorClass, className)}>
+    <p className={cn("text-xs", colorClass, className)}>
       {current.toLocaleString()} / {max.toLocaleString()}
     </p>
   );
