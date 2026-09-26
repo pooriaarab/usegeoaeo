@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { cn } from '../utils';
+import { cn } from "../utils";
 
 function EditorAttributes({
   hasSuggestions,
@@ -12,13 +12,13 @@ function EditorAttributes({
   ariaLabel?: string;
 }) {
   return {
-    'aria-label': ariaLabel,
-    'aria-expanded': hasSuggestions,
-    'aria-controls': hasSuggestions ? 'mention-listbox' : undefined,
-    'aria-activedescendant': activeDescendantId,
-    role: 'textbox' as const,
-    'aria-multiline': 'true' as const,
-    'aria-autocomplete': 'list' as const,
+    "aria-label": ariaLabel,
+    "aria-expanded": hasSuggestions,
+    "aria-controls": hasSuggestions ? "mention-listbox" : undefined,
+    "aria-activedescendant": activeDescendantId,
+    role: "textbox" as const,
+    "aria-multiline": "true" as const,
+    "aria-autocomplete": "list" as const,
   };
 }
 
@@ -55,16 +55,16 @@ function EditorBoxInner(props: {
       onBlur={props.onBlur}
       onCompositionStart={props.onCompositionStart}
       onCompositionEnd={props.onCompositionEnd}
-      aria-label={attrs['aria-label']}
-      aria-expanded={attrs['aria-expanded']}
-      aria-controls={attrs['aria-controls']}
-      aria-activedescendant={attrs['aria-activedescendant']}
+      aria-label={attrs["aria-label"]}
+      aria-expanded={attrs["aria-expanded"]}
+      aria-controls={attrs["aria-controls"]}
+      aria-activedescendant={attrs["aria-activedescendant"]}
       role={attrs.role}
-      aria-multiline={attrs['aria-multiline']}
-      aria-autocomplete={attrs['aria-autocomplete']}
+      aria-multiline={attrs["aria-multiline"]}
+      aria-autocomplete={attrs["aria-autocomplete"]}
       className={cn(
-        'w-full bg-transparent text-sm outline-none overflow-y-auto',
-        'px-3 py-2 whitespace-pre-wrap break-words',
+        "w-full bg-transparent text-sm outline-none overflow-y-auto",
+        "px-3 py-2 whitespace-pre-wrap break-words",
         props.className,
       )}
       style={{ minHeight: `${props.minRows * 1.5 + 1}em`, maxHeight: `${props.maxHeight}px` }}
@@ -106,7 +106,7 @@ export function PlaceholderOverlay({ placeholder }: { placeholder?: string }) {
 export function LiveRegion({ hasSuggestions, count }: { hasSuggestions: boolean; count: number }) {
   return (
     <div className="sr-only" aria-live="polite" role="status">
-      {hasSuggestions ? `${count} mention suggestions available` : ''}
+      {hasSuggestions ? `${count} mention suggestions available` : ""}
     </div>
   );
 }
