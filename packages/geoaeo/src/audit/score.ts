@@ -1,4 +1,4 @@
-import type { AuditCheck } from './types.js';
+import type { AuditCheck } from "./types.js";
 
 export function scoreAuditChecks(checks: AuditCheck[]): number {
   const total = checks.reduce((sum, check) => sum + check.weight, 0);
