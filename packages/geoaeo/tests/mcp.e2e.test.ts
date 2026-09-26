@@ -1,21 +1,21 @@
-import { describe, expect, it } from 'vitest';
-import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync, symlinkSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from "vitest";
+import { spawn } from "node:child_process";
+import { existsSync, mkdtempSync, rmSync, symlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const mcp = path.join(root, 'dist', 'mcp.js');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const mcp = path.join(root, "dist", "mcp.js");
 
 const INITIALIZE = JSON.stringify({
-  jsonrpc: '2.0',
+  jsonrpc: "2.0",
   id: 1,
-  method: 'initialize',
+  method: "initialize",
   params: {
-    protocolVersion: '2025-06-18',
+    protocolVersion: "2025-06-18",
     capabilities: {},
-    clientInfo: { name: 'geoaeo-e2e', version: '0.0.0' },
+    clientInfo: { name: "geoaeo-e2e", version: "0.0.0" },
   },
 });
 
@@ -32,11 +32,14 @@ interface JsonRpcReply {
 // end the process before the server answers.
 function requestInitialize(binPath: string): Promise<JsonRpcReply> {
   return new Promise((resolve, reject) => {
-    const child = spawn('node', [binPath], { stdio: ['pipe', 'pipe', 'pipe'] });
-    let stdout = '';
-    let stderr = '';
+    const child = spawn("node", [binPath], { stdio: ["pipe", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
     let settled = false;
-    const timer = setTimeout(() => done(new Error(`no reply within 10s. stderr: ${stderr}`)), 10_000);
+    const timer = setTimeout(
+      () => done(new Error(`no reply within 10s. stderr: ${stderr}`)),
+      10_000,
+    );
     const done = (error?: Error, reply?: JsonRpcReply) => {
       if (settled) return;
       settled = true;
@@ -45,9 +48,9 @@ function requestInitialize(binPath: string): Promise<JsonRpcReply> {
       if (error) reject(error);
       else resolve(reply as JsonRpcReply);
     };
-    child.stdout.on('data', (chunk: Buffer | string) => {
+    child.stdout.on("data", (chunk: Buffer | string) => {
       stdout += chunk.toString();
-      const newline = stdout.indexOf('\n');
+      const newline = stdout.indexOf("\n");
       if (newline === -1) return;
       try {
         done(undefined, JSON.parse(stdout.slice(0, newline)) as JsonRpcReply);
@@ -55,31 +58,33 @@ function requestInitialize(binPath: string): Promise<JsonRpcReply> {
         done(error instanceof Error ? error : new Error(String(error)));
       }
     });
-    child.stderr.on('data', (chunk: Buffer | string) => {
+    child.stderr.on("data", (chunk: Buffer | string) => {
       stderr += chunk.toString();
     });
-    child.on('error', error => done(error));
-    child.on('exit', code => done(new Error(`exited ${code} before replying. stderr: ${stderr}`)));
-    child.stdin.on('error', () => {});
+    child.on("error", (error) => done(error));
+    child.on("exit", (code) =>
+      done(new Error(`exited ${code} before replying. stderr: ${stderr}`)),
+    );
+    child.stdin.on("error", () => {});
     child.stdin.write(`${INITIALIZE}\n`);
   });
 }
 
-describe('geoaeo-mcp bin end-to-end', () => {
-  it('has a built mcp.js (run npm run build first)', () => {
+describe("geoaeo-mcp bin end-to-end", () => {
+  it("has a built mcp.js (run npm run build first)", () => {
     expect(existsSync(mcp)).toBe(true);
   });
 
-  it('answers an initialize handshake when invoked through a symlink', async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), 'geoaeo-mcp-bin-'));
-    const link = path.join(dir, 'geoaeo-mcp');
+  it("answers an initialize handshake when invoked through a symlink", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "geoaeo-mcp-bin-"));
+    const link = path.join(dir, "geoaeo-mcp");
     symlinkSync(mcp, link);
     try {
       const reply = await requestInitialize(link);
-      expect(reply.jsonrpc).toBe('2.0');
+      expect(reply.jsonrpc).toBe("2.0");
       expect(reply.id).toBe(1);
       expect(reply.error).toBeUndefined();
-      expect(reply.result?.serverInfo?.name).toBe('geoaeo');
+      expect(reply.result?.serverInfo?.name).toBe("geoaeo");
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
