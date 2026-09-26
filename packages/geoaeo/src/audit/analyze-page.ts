@@ -1,10 +1,12 @@
 import { load } from 'cheerio';
 import type { PageSignals } from './types.js';
+import { extractSourceProse } from './source-prose.js';
 import { sourceHas } from './utils.js';
 
 interface HtmlContext {
   source: string;
   visible: string;
+  prose: string;
   top: string;
   jsonLdTypes: string[];
   firstParagraph: string;
@@ -35,9 +37,20 @@ function extractJsonLdTypes($: ReturnType<typeof load>): string[] {
     });
 }
 
+// $.root().text() concatenates every descendant text node, including the
+// contents of <script>, <style>, and <noscript> tags. A page's word count
+// must come from a clone with those stripped, or a JSON-LD block or an
+// analytics snippet -- not prose -- clears the answerability word floor.
+function extractProse($: ReturnType<typeof load>): string {
+  const clone = $.root().clone();
+  clone.find('script, style, noscript').remove();
+  return clone.text();
+}
+
 function buildHtmlContext(source: string): HtmlContext {
   const $ = load(source);
   const visible = $.root().text();
+  const prose = extractProse($);
   const top = visible.slice(0, 3000);
   const jsonLdTypes = extractJsonLdTypes($);
   const firstParagraph = $('p').first().text().trim();
@@ -45,7 +58,13 @@ function buildHtmlContext(source: string): HtmlContext {
     .toArray()
     .some((element: unknown) => $(element as string).text().trim().endsWith('?'));
   const images = $('img').toArray();
-  return { source, visible, top, jsonLdTypes, firstParagraph, questionHeadings, images, $ };
+  return { source, visible, prose, top, jsonLdTypes, firstParagraph, questionHeadings, images, $ };
+}
+
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
 }
 
 function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[keyof PageSignals] {
@@ -60,6 +79,7 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     h1: () => ctx.$('h1').length > 0,
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(ctx.visible.slice(0, 5000)),
     directAnswer: () => ctx.firstParagraph.length >= 40 && ctx.firstParagraph.length <= 600,
+    wordCount: () => countWords(ctx.prose),
     questionHeadings: () => ctx.questionHeadings,
     freshness: () => checkHtmlFreshness(ctx),
     author: () => checkHtmlAuthor(ctx),
@@ -93,7 +113,7 @@ function analyzeHtml(source: string): PageSignals {
   const ctx = buildHtmlContext(source);
   const keys: Array<keyof PageSignals> = [
     'title', 'description', 'canonical', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
-    'h1', 'earlyFaq', 'directAnswer', 'questionHeadings', 'freshness', 'author',
+    'h1', 'earlyFaq', 'directAnswer', 'wordCount', 'questionHeadings', 'freshness', 'author',
     'headingOrder', 'imageAlt', 'metaRobotsOk', 'hreflang',
   ];
   const result = {} as PageSignals;
@@ -113,6 +133,12 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
     h1: () => sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
     directAnswer: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
+    // Source files have no DOM. Count leftover tokens after extractSourceProse
+    // (imports, attribute values, tags stripped) — not raw source. That
+    // undercounts interpolated text, which is safe. The HTML path above
+    // counts visible text and is the one that decides a URL audit. The paths
+    // differ only in how they get the string they count.
+    wordCount: () => countWords(extractSourceProse(source)),
     questionHeadings: () => /<h[23][^>]*>[^<]*\?/i.test(source),
     freshness: () => sourceHas(source, [/date(Published|Modified)/i, /<time[\s>]/i, /(updated|published|last modified)[^.]{0,40}\b20\d{2}\b/i]),
     author: () => sourceHas(source, [/name=["']author["']/i, /rel=["']author["']/i, /itemprop=["']author["']/i, /"@type"\s*:\s*"Person"/i]),
@@ -127,7 +153,7 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
 function analyzeSource(source: string): PageSignals {
   const keys: Array<keyof PageSignals> = [
     'title', 'description', 'canonical', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
-    'h1', 'earlyFaq', 'directAnswer', 'questionHeadings', 'freshness', 'author',
+    'h1', 'earlyFaq', 'directAnswer', 'wordCount', 'questionHeadings', 'freshness', 'author',
     'headingOrder', 'imageAlt', 'metaRobotsOk', 'hreflang',
   ];
   const result = {} as PageSignals;

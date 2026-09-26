@@ -54,6 +54,7 @@ function AuditCard() {
         <input
           className={field}
           placeholder="https://example.com"
+          aria-label="Live site URL to audit"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
         />
@@ -83,9 +84,9 @@ function SiteFactsCard({ cfg, onChange }: { cfg: SiteFacts; onChange: (patch: Pa
   return (
     <Card title="Site facts" hint="Used by the generators below.">
       <div className="grid gap-3">
-        <input className={field} placeholder="Site name" value={cfg.siteName} onChange={(e) => onChange({ siteName: e.target.value })} />
-        <input className={field} placeholder="https://your-site.com" value={cfg.siteUrl} onChange={(e) => onChange({ siteUrl: e.target.value })} />
-        <textarea className={field} rows={2} placeholder="One-line description" value={cfg.description} onChange={(e) => onChange({ description: e.target.value })} />
+        <input className={field} placeholder="Site name" aria-label="Site name" value={cfg.siteName} onChange={(e) => onChange({ siteName: e.target.value })} />
+        <input className={field} placeholder="https://your-site.com" aria-label="Site URL" value={cfg.siteUrl} onChange={(e) => onChange({ siteUrl: e.target.value })} />
+        <textarea className={field} rows={2} placeholder="One-line description" aria-label="One-line description" value={cfg.description} onChange={(e) => onChange({ description: e.target.value })} />
       </div>
     </Card>
   );
@@ -109,7 +110,7 @@ function JsonLdCard({ cfg }: { cfg: SiteFacts }) {
   return (
     <Card title="Generate JSON-LD" hint="schema.org structured data.">
       <div className="flex gap-2">
-        <select className={field} value={kind} onChange={(e) => setKind(e.target.value as JsonLdKind)}>
+        <select className={field} aria-label="JSON-LD kind" value={kind} onChange={(e) => setKind(e.target.value as JsonLdKind)}>
           {JSONLD_KINDS.map((k) => (
             <option key={k} value={k}>{k}</option>
           ))}

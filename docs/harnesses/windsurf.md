@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to Windsurf. Use it to audit a site and generate G
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -25,11 +25,11 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
-Windsurf starts `geoaeo-mcp` for you. You do not run it by hand.
+Windsurf starts `geoaeo mcp` for you. You do not run it by hand.
 
 ## Configure the MCP server
 
@@ -42,7 +42,7 @@ Add this entry to `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }

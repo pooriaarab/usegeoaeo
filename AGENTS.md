@@ -12,7 +12,7 @@ This project follows the `agentification` skill (pooriaarab/skills).
 
 ## What geoaeo does
 
-geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates answer-engine artifacts: llms.txt, sitemaps, robots, JSON-LD, WebMCP, and Markdown mirrors.
+geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates these artifacts: `llms`, `llms-full`, `jsonld`, `webmcp`, `sitemap`, `robots`, `ogimage`, `rss`, `hreflang`, `mdmirror`.
 
 ## Who it is for
 
@@ -22,7 +22,7 @@ Indie hackers to enterprise teams who want their site cited by ChatGPT, Claude, 
 
 - Library: `import { auditTarget, generateLlms, humanizeText } from 'geoaeo'`
 - CLI: `npx geoaeo audit|init|gen|humanize|mcp`
-- MCP: `npx geoaeo-mcp` over stdio (same as `npx geoaeo mcp`)
+- MCP: `npx geoaeo mcp` over stdio (also shipped as the `geoaeo-mcp` bin)
 
 ## MCP tools
 
@@ -58,12 +58,43 @@ Indie hackers to enterprise teams who want their site cited by ChatGPT, Claude, 
 
 Free and open-source (MIT). `npm i geoaeo`. Hosted tools at https://usegeoaeo.com/tools are free. No paid tier.
 
-## Rules
+## The parity rule
 
-- Do not invent CLI commands, MCP tools, or JSON-LD kinds the code does not ship.
-- MCP tools today: `audit`, `gen`, `humanize`. Bins: `geoaeo`, `geoaeo-mcp`.
-- Library, CLI, and MCP must stay at parity.
-- Generators take a config object. They do not read files themselves.
+The library, the CLI, and the MCP server expose the same capabilities in every release. When you add or change a capability:
+
+1. Implement it in the library and export it from `packages/geoaeo/src/index.ts`.
+2. Wire it into the CLI in `packages/geoaeo/src/cli.ts` or a file in `packages/geoaeo/src/commands/`.
+3. Wire it into the MCP server in `packages/geoaeo/src/mcp.ts`.
+4. Cover the behavior with tests in `packages/geoaeo/tests/`.
+
+A change that ships in one face but not the others is not done.
+
+Generators take a config object. They do not read files themselves.
+
+## The never-invent-capabilities rule
+
+Docs, help text, comments, and commit messages must describe only what the code does today.
+
+- CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`.
+- npm bins: `geoaeo` and `geoaeo-mcp`.
+- MCP tools: `audit`, `gen`, `humanize`.
+- JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`, `organization`, `website`, `article`, `howto`, `person`, `review`.
+
+If a doc needs a capability that is not built yet, mark it `<!-- TODO(v0.5): not built -->`. Do not pretend it works.
+
+## Conventions
+
+- TypeScript, ESM. Import local modules with the `.js` suffix.
+- kebab-case file names.
+- Site facts live in `SiteConfig` (`packages/geoaeo/src/config.ts`).
+- Target config files are `geoaeo.config.ts`, `.js`, or `.mjs`, loaded with jiti.
+
+## Definition of done
+
+- `bun run ci:local` passes: lint, typecheck, and tests.
+- New behavior has tests.
+- The parity rule holds for every new capability.
+- Docs touched by the change follow the never-invent-capabilities rule.
 
 <!-- pr-standards:start -->
 

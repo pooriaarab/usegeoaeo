@@ -1,9 +1,14 @@
-import type { AuditCheck, TargetSnapshot } from './types.js';
+import type { AuditCheck, PageSignals, PageSnapshot, TargetSnapshot } from './types.js';
+import { AI_AGENTS } from '../generators/robots.js';
 import { analyzePage } from './analyze-page.js';
+import { ANSWERABILITY_WORD_FLOOR, LLMS_FULL_MIN_CHARS } from './constants.js';
+import { blockedAgents } from './robots-policy.js';
 
 interface CheckContext {
   artifacts: Map<string, string>;
   mirrors: string[];
+  pages: PageSnapshot[];
+  blockedAiAgents: string[];
   pageSignals: ReturnType<typeof analyzePage>[];
   jsonTypes: string[];
   has: (value: string) => boolean;
@@ -44,16 +49,102 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
   const allPage = (predicate: (page: ReturnType<typeof analyzePage>) => boolean) => pageSignals.length > 0 && pageSignals.every(predicate);
   const jsonTypes = [...new Set(pageSignals.flatMap(page => page.jsonLdTypes))];
   const has = (value: string) => value.trim().length > 0;
-  return { artifacts, mirrors: snapshot.mirrors, pageSignals, jsonTypes, has, anyPage, allPage };
+  const blockedAiAgents = blockedAgents(robots, AI_AGENTS);
+  return { artifacts, mirrors: snapshot.mirrors, pages: snapshot.pages, blockedAiAgents, pageSignals, jsonTypes, has, anyPage, allPage };
+}
+
+function headerNoindex(pages: PageSnapshot[]): boolean {
+  return pages.some(page => /noindex/i.test(page.xRobotsTag ?? ''));
+}
+
+function metaTagNoindex(signals: CheckContext['pageSignals']): boolean {
+  return signals.some(page => !page.metaRobotsOk);
+}
+
+function noindexReasons(header: boolean, meta: boolean): string {
+  const reasons = [
+    header ? 'noindex set by X-Robots-Tag header' : '',
+    meta ? 'noindex set by meta tag' : '',
+  ];
+  return reasons.filter(reason => reason.length > 0).join('; ');
+}
+
+function hasOpeningAnswer(page: PageSignals): boolean {
+  return page.directAnswer && page.h1;
+}
+
+function hasQuoteBody(page: PageSignals): boolean {
+  return page.wordCount >= ANSWERABILITY_WORD_FLOOR;
+}
+
+function isAnswerable(page: PageSignals): boolean {
+  return hasOpeningAnswer(page) && hasQuoteBody(page);
+}
+
+/** Name which half of answerability failed. A generic miss hides the cause. */
+function answerabilityDetails(ctx: CheckContext): string {
+  const opening = ctx.anyPage(hasOpeningAnswer);
+  const quote = ctx.anyPage(hasQuoteBody);
+  if (ctx.anyPage(isAnswerable)) {
+    return 'A page opens with a concise, direct answer under a clear H1 and has enough body text to quote.';
+  }
+  if (opening && !quote) return `Not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`;
+  if (!opening && quote) return 'No concise direct answer under a clear H1.';
+  if (opening && quote) return 'No single page has both a direct opening answer and enough words to quote.';
+  return `No concise direct answer under a clear H1, and not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`;
+}
+
+/** A body that opens as an HTML document is an error or login page, not the artifact. */
+function looksLikeHtmlDocument(text: string): boolean {
+  return /^\s*(?:<!--[\s\S]*?-->\s*)*(?:<!doctype\s+html|<html)[\s>]/i.test(text);
+}
+
+/**
+ * The artifact checks judge a fetched body on what it is, not on whether
+ * geoaeo wrote it: a markdown document means at least one line-anchored ATX
+ * heading. Directory audits can instead read the route source that generates
+ * the artifact (app/llms-full.txt/route.ts), which is why the generator-call
+ * branches in the predicates below still count.
+ */
+function isMarkdownDoc(text: string): boolean {
+  const body = text.replace(/^\uFEFF/, '').trim();
+  return body.length > 0 && !looksLikeHtmlDocument(body) && /^#{1,6}\s+\S/m.test(body);
+}
+
+function isShortSiteMap(body: string | undefined): boolean {
+  const text = body ?? '';
+  return /generateLlms/i.test(text) || isMarkdownDoc(text);
+}
+
+function isFullSiteMap(body: string | undefined): boolean {
+  const text = (body ?? '').replace(/^\uFEFF/, '').trim();
+  return /generateLlmsFull/i.test(text) || (isMarkdownDoc(text) && text.length >= LLMS_FULL_MIN_CHARS);
+}
+
+/** A sitemap index file is as much a sitemap as a urlset is. */
+function isSitemapXml(body: string | undefined): boolean {
+  return /<urlset|<sitemapindex|generateSitemap|sitemap\s*\(/i.test(body ?? '');
+}
+
+function isRobotsPolicy(body: string | undefined): boolean {
+  const text = body ?? '';
+  // generateRobots() output always ends with a Sitemap line, so source that
+  // names the call counts even though it contains no directives itself.
+  return /generateRobots/i.test(text) || (/user-agent\s*:/i.test(text) && /sitemap\s*:/i.test(text));
+}
+
+function isWebmcpManifest(body: string | undefined): boolean {
+  return /generateWebmcp|"tools"\s*:|tools\s*[:=]/i.test(body ?? '');
 }
 
 function getCheckDefinitions(): CheckDef[] {
   return [
-    { id: 'llms', label: '/llms.txt', weight: 6, details: 'Short site map is present.', passed: ctx => /generateLlms|#\s+\S+/i.test(ctx.artifacts.get('__llms') ?? '') },
-    { id: 'llms-full', label: '/llms-full.txt', weight: 6, details: 'Full site map is present.', passed: ctx => /generateLlmsFull|##\s+(What it is|Common questions)/i.test(ctx.artifacts.get('__llmsFull') ?? '') },
-    { id: 'sitemap', label: '/sitemap.xml', weight: 6, details: 'A sitemap artifact is present.', passed: ctx => /<urlset|generateSitemap|sitemap\s*\(/i.test(ctx.artifacts.get('__sitemap') ?? '') },
-    { id: 'robots', label: '/robots.txt', weight: 4, details: 'Robots policy includes a sitemap URL.', passed: ctx => /User-agent:|generateRobots/i.test(ctx.artifacts.get('__robots') ?? '') && /Sitemap:|sitemap\s*:/i.test(ctx.artifacts.get('__robots') ?? '') },
-    { id: 'webmcp', label: 'WebMCP manifest', weight: 4, details: 'A WebMCP-style tool manifest is present.', passed: ctx => /generateWebmcp|"tools"|tools\s*[:=]/i.test(ctx.artifacts.get('__webmcp') ?? '') },
+    { id: 'llms', label: '/llms.txt', weight: 6, details: 'Short site map is present.', passed: ctx => isShortSiteMap(ctx.artifacts.get('__llms')) },
+    { id: 'llms-full', label: '/llms-full.txt', weight: 6, details: 'Full site map is present.', passed: ctx => isFullSiteMap(ctx.artifacts.get('__llmsFull')) },
+    { id: 'sitemap', label: '/sitemap.xml', weight: 6, details: 'A sitemap artifact is present.', passed: ctx => isSitemapXml(ctx.artifacts.get('__sitemap')) },
+    { id: 'robots', label: '/robots.txt', weight: 1, details: 'Robots policy includes a sitemap URL.', passed: ctx => isRobotsPolicy(ctx.artifacts.get('__robots')) },
+    { id: 'ai-crawlers', label: 'AI crawler access', weight: 3, details: 'No named AI crawler is disallowed from /.', passed: ctx => ctx.blockedAiAgents.length === 0 },
+    { id: 'webmcp', label: 'WebMCP manifest', weight: 4, details: 'A WebMCP-style tool manifest is present.', passed: ctx => isWebmcpManifest(ctx.artifacts.get('__webmcp')) },
     { id: 'markdown', label: 'Markdown mirrors', weight: 4, details: '', passed: ctx => ctx.mirrors.length > 0 },
     { id: 'title', label: 'Page titles', weight: 4, details: 'Every inspected page has a title.', passed: ctx => ctx.allPage(page => page.title) },
     { id: 'description', label: 'Meta descriptions', weight: 4, details: 'Every inspected page has a meta description.', passed: ctx => ctx.allPage(page => page.description) },
@@ -62,10 +153,10 @@ function getCheckDefinitions(): CheckDef[] {
     { id: 'twitter', label: 'Twitter tags', weight: 2, details: 'Twitter card tags are present.', passed: ctx => ctx.anyPage(page => page.twitter) },
     { id: 'json-ld', label: 'JSON-LD', weight: 7, details: '', passed: ctx => ctx.anyPage(page => page.jsonLd) },
     { id: 'hreflang', label: 'hreflang alternates', weight: 3, details: 'Language alternates are declared.', passed: ctx => ctx.anyPage(page => page.hreflang) },
-    { id: 'meta-robots', label: 'Indexable', weight: 2, details: 'No page is set to noindex.', passed: ctx => ctx.allPage(page => page.metaRobotsOk) },
+    { id: 'meta-robots', label: 'Indexable', weight: 2, details: 'No page is set to noindex.', passed: ctx => ctx.allPage(page => page.metaRobotsOk) && !headerNoindex(ctx.pages) },
     { id: 'image-alt', label: 'Image alt text', weight: 1, details: 'Every image has alt text.', passed: ctx => ctx.allPage(page => page.imageAlt) },
     { id: 'heading-order', label: 'Heading structure', weight: 3, details: 'A page has one H1 and section H2s.', passed: ctx => ctx.anyPage(page => page.headingOrder) },
-    { id: 'answerability', label: 'Answer-first content', weight: 9, details: 'A page opens with a concise, direct answer under a clear H1.', passed: ctx => ctx.anyPage(page => page.directAnswer && page.h1) },
+    { id: 'answerability', label: 'Answer-first content', weight: 9, details: 'A page opens with a concise, direct answer under a clear H1 and has enough body text to quote.', passed: ctx => ctx.anyPage(isAnswerable) },
     { id: 'qa-framing', label: 'Question framing', weight: 5, details: 'Content is framed as questions an engine can quote.', passed: ctx => ctx.anyPage(page => page.questionHeadings || page.earlyFaq) },
     { id: 'freshness', label: 'Freshness signals', weight: 6, details: 'Pages show a published or updated date.', passed: ctx => ctx.anyPage(page => page.freshness) },
     { id: 'author', label: 'Author and E-E-A-T', weight: 6, details: 'Pages name an author or organization.', passed: ctx => ctx.anyPage(page => page.author) },
@@ -79,7 +170,18 @@ function getCheckDefinitions(): CheckDef[] {
 function detailFor(check: CheckDef, ctx: CheckContext): string {
   if (check.id === 'markdown') return ctx.mirrors.length ? `${ctx.mirrors.length} mirror file(s) found.` : 'No page markdown mirrors were found.';
   if (check.id === 'json-ld') return ctx.jsonTypes.length ? `Types: ${ctx.jsonTypes.join(', ')}.` : 'No schema.org JSON-LD was found.';
+  if (check.id === 'meta-robots') {
+    const reasons = noindexReasons(headerNoindex(ctx.pages), metaTagNoindex(ctx.pageSignals));
+    return reasons || check.details;
+  }
+  if (check.id === 'ai-crawlers' && ctx.blockedAiAgents.length) return `Blocked: ${ctx.blockedAiAgents.join(', ')}.`;
+  if (check.id === 'answerability') return answerabilityDetails(ctx);
   return check.details;
+}
+
+function applyFailurePrefix(check: AuditCheck): AuditCheck {
+  if (check.passed || check.id === 'ai-crawlers' || check.id === 'answerability' || check.details.startsWith('noindex set by ')) return check;
+  return { ...check, details: `Missing: ${check.details.toLowerCase()}` };
 }
 
 export function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
@@ -92,5 +194,5 @@ export function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
     weight: def.weight,
     details: detailFor(def, ctx),
   }));
-  return checks.map(check => ({ ...check, details: check.passed ? check.details : `Missing: ${check.details.toLowerCase()}` }));
+  return checks.map(applyFailurePrefix);
 }

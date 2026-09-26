@@ -1,17 +1,21 @@
 import type { FaqConfig, SiteConfig } from '../config.js';
 import { absoluteUrl } from '../config.js';
 
-export type JsonLdKind =
-  | 'software'
-  | 'product'
-  | 'faq'
-  | 'breadcrumb'
-  | 'organization'
-  | 'website'
-  | 'article'
-  | 'howto'
-  | 'person'
-  | 'review';
+// Single source for the library type, the CLI --type list, and the MCP Zod enum.
+export const JSON_LD_KINDS = [
+  'software',
+  'product',
+  'faq',
+  'breadcrumb',
+  'organization',
+  'website',
+  'article',
+  'howto',
+  'person',
+  'review',
+] as const;
+
+export type JsonLdKind = (typeof JSON_LD_KINDS)[number];
 
 export interface ArticleInput {
   headline?: string;

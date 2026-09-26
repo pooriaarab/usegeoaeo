@@ -73,7 +73,7 @@ export function FixLoopSection() {
         <code className="font-mono text-xs">audit</code>,{" "}
         <code className="font-mono text-xs">gen</code>,{" "}
         <code className="font-mono text-xs">humanize</code> on{" "}
-        <code className="font-mono text-xs">npx geoaeo-mcp</code>.
+        <code className="font-mono text-xs">npx geoaeo mcp</code>.
       </p>
       <pre className="overflow-x-auto rounded-lg border border-border bg-muted/50 p-4 text-xs font-mono leading-relaxed">{`# 1. Measure
 npx geoaeo audit https://example.com

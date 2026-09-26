@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
+import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 
 export const metadata: Metadata = {
   title: "geoaeo in Claude Code — MCP setup, audit, and gen guide",
@@ -16,6 +17,7 @@ export default function ClaudeCodeHarnessPage() {
     <HarnessDocPage slug="claude-code" name="Claude Code" intro={intro}>
       <HarnessWhatYouGet />
       <Prerequisites />
+      <InstallThePlugin harness="claude-code" />
       <InstallGeoaeo />
       <ConfigureMcpServer />
       <VerifyConnection />
@@ -53,8 +55,8 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary resolves
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
       <p>The MCP server starts over stdio. You do not run it by hand when you use Claude Code.</p>
     </>
@@ -67,7 +69,7 @@ function ConfigureMcpServer() {
       <h2>Configure the MCP server</h2>
       <p>
         Claude Code reads MCP servers from <code>.mcp.json</code> in the project root or from your global Claude
-        Code config. Use <code>command: npx</code> with <code>args: [&quot;-y&quot;, &quot;geoaeo-mcp&quot;]</code>.
+        Code config. Use <code>command: npx</code> with <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
       </p>
 
       <h3>Option A — project scope (recommended)</h3>
@@ -79,7 +81,7 @@ function ConfigureMcpServer() {
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>
@@ -87,7 +89,7 @@ function ConfigureMcpServer() {
 
       <h3>Option B — CLI helper</h3>
       <pre>
-        <code>{`claude mcp add geoaeo -- npx -y geoaeo-mcp
+        <code>{`claude mcp add geoaeo -- npx -y geoaeo mcp
 claude mcp list`}</code>
       </pre>
 
@@ -251,7 +253,7 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>Server shows as disconnected in /mcp.</strong> Run <code>npx -y geoaeo-mcp</code> in a terminal. It
+        <strong>Server shows as disconnected in /mcp.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal. It
         should wait on stdin. Press Ctrl+C. If npx fails, check Node 20+ and network access to npm.
       </p>
       <p>
@@ -270,7 +272,7 @@ function Troubleshooting() {
       </p>
       <p>
         <strong>Permission or EACCES on npx cache.</strong> Run <code>npm config get cache</code> and ensure the
-        directory is writable. Try <code>npx --yes geoaeo-mcp</code> once to prime the cache.
+        directory is writable. Try <code>npx --yes geoaeo mcp</code> once to prime the cache.
       </p>
     </>
   );

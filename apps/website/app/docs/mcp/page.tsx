@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DocsPageHeader } from "@/components/docs/docs-page-header";
+import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@template/ui/primitives/card";
 
@@ -21,11 +22,13 @@ export default function McpPage() {
         <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
           <WhatYouGet />
           <Prerequisites />
+          <InstallThePlugin harness="shared" />
           <Install />
           <Transport />
           <Tools />
           <RunDirectly />
           <ConfigureAHarness />
+          <SetupPrompt />
           <Troubleshooting />
         </div>
 
@@ -60,7 +63,7 @@ function WhatYouGet() {
           <code>mcp</code> — no other commands exist
         </li>
         <li>
-          MCP server command: <code>npx geoaeo-mcp</code> over stdio
+          MCP server command: <code>npx -y geoaeo mcp</code> over stdio
         </li>
         <li>
           MCP tools: <code>audit</code>, <code>gen</code>, <code>humanize</code>
@@ -95,10 +98,10 @@ npx geoaeo audit ./ --json
 npm install geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>You do not run geoaeo-mcp by hand when the harness manages it. The harness starts it over stdio.</p>
+      <p>You do not run geoaeo mcp by hand when the harness manages it. The harness starts it over stdio.</p>
     </>
   );
 }
@@ -109,7 +112,7 @@ function Transport() {
       <h2>Transport</h2>
       <p>
         stdio only. No SSE or HTTP transport exists. The server reads from stdin and writes to stdout. The harness
-        spawns it with <code>command: npx</code> and <code>args: [&quot;-y&quot;, &quot;geoaeo-mcp&quot;]</code>.
+        spawns it with <code>command: npx</code> and <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
       </p>
     </>
   );
@@ -145,8 +148,10 @@ function Tools() {
 { "artifact": "jsonld", "type": "software" }`}</code>
       </pre>
       <p>
-        <code>artifact</code> enum: llms, llms-full, jsonld, webmcp, sitemap, robots. For jsonld, <code>type</code>{" "}
-        may be software, product, faq, or breadcrumb. Reads <code>geoaeo.config.ts</code> in the current directory.
+        <code>artifact</code> enum: llms, llms-full, jsonld, webmcp, sitemap, robots, ogimage, rss, hreflang,
+        mdmirror. For jsonld, <code>type</code>{" "}
+        may be software, product, faq, breadcrumb, organization, website, article, howto, person, or review. Reads{" "}
+        <code>geoaeo.config.ts</code> in the current directory.
       </p>
 
       <h3>
@@ -165,9 +170,9 @@ function RunDirectly() {
     <>
       <h2>Run directly</h2>
       <pre>
-        <code>{`npx geoaeo mcp
-# equivalent
-npx geoaeo-mcp`}</code>
+        <code>{`npx -y geoaeo mcp
+# equivalent: run the geoaeo-mcp bin
+npx -y --package=geoaeo geoaeo-mcp`}</code>
       </pre>
       <p>The process waits on stdin. You only run this for manual testing. Harnesses spawn it for you.</p>
     </>
@@ -178,13 +183,16 @@ function ConfigureAHarness() {
   return (
     <>
       <h2>Configure a harness</h2>
-      <p>Minimal MCP config. The harness starts the server for you:</p>
+      <p>
+        JSON paste is the fallback for Windsurf, Gemini CLI, Continue, and Copilot. The harness starts the server
+        for you:
+      </p>
       <pre>
         <code>{`{
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>
@@ -221,12 +229,39 @@ function ConfigureAHarness() {
   );
 }
 
+function SetupPrompt() {
+  return (
+    <>
+      <h2>Set up in your agent</h2>
+      <p>
+        Claude Code, Cursor, and Codex install the plugin above. Windsurf, Gemini CLI, Continue, and Copilot have
+        no plugin dialect. Paste this prompt instead:
+      </p>
+      <pre>
+        <code>{`Set up geoaeo in this agent. Detect the harness, then configure the
+geoaeo MCP server with command \`npx\` and args \`-y geoaeo mcp\`.
+Run an audit on the current directory. Report the score and the
+top three fixes.`}</code>
+      </pre>
+      <p>Then try one of these:</p>
+      <ul>
+        <li>
+          <code>Audit https://example.com and list the top 3 fixes.</code>
+        </li>
+        <li>
+          <code>Generate llms.txt for this repo.</code>
+        </li>
+      </ul>
+    </>
+  );
+}
+
 function Troubleshooting() {
   return (
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>Server shows as disconnected.</strong> Run <code>npx -y geoaeo-mcp</code> in a terminal. It should
+        <strong>Server shows as disconnected.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal. It should
         wait on stdin. Press Ctrl+C. If npx fails, check Node 20+ and npm registry access.
       </p>
       <p>

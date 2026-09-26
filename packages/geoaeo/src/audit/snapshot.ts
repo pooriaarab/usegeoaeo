@@ -50,13 +50,33 @@ export async function snapshotDirectory(directory: string): Promise<TargetSnapsh
   return { artifacts, pages, mirrors };
 }
 
-async function fetchText(url: string): Promise<{ status: number; text: string }> {
+interface FetchedText {
+  status: number;
+  text: string;
+  xRobotsTag: string;
+}
+
+async function fetchText(url: string): Promise<FetchedText> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    return { status: response.status, text: await response.text() };
+    // response.url reflects the post-redirect URL: a target-served redirect can
+    // otherwise carry the fetch off the pinned host while the result is still
+    // recorded under the pinned URL. Compare host, not origin, so a same-host
+    // http->https upgrade (routine on most sites) still passes. Empty
+    // response.url (e.g. a stubbed Response in tests) skips this check rather
+    // than throwing on new URL('').
+    if (response.url && new URL(response.url).host !== new URL(url).host) {
+      return { status: 0, text: '', xRobotsTag: '' };
+    }
+    const xRobotsTag = response.headers.get('x-robots-tag') ?? '';
+    return { status: response.status, text: await response.text(), xRobotsTag };
   } catch {
-    return { status: 0, text: '' };
+    return { status: 0, text: '', xRobotsTag: '' };
   }
+}
+
+function pageFromFetch(url: string, fetched: FetchedText): PageSnapshot {
+  return { url, source: fetched.text, isHtml: true, xRobotsTag: fetched.xRobotsTag };
 }
 
 async function fetchSingleArtifact(base: string, paths: string[]): Promise<string> {
@@ -93,15 +113,33 @@ function parseSitemapUrls(sitemap: string): string[] {
     .slice(0, 4);
 }
 
+/** Rewrite a sitemap <loc> onto the target's origin: keep the path, replace scheme, host and port. */
+function resolveOnTarget(rawUrl: string, target: URL): string | undefined {
+  try {
+    const loc = new URL(rawUrl, target.href);
+    return `${target.origin}${loc.pathname}${loc.search}${loc.hash}`;
+  } catch {
+    return undefined;
+  }
+}
+
 async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
   const home = await fetchText(base);
-  if (home.text) pages.push({ url: base, source: home.text, isHtml: true });
-  const sitemapUrls = parseSitemapUrls(sitemap);
-  for (const url of sitemapUrls) {
-    if (url === base) continue;
+  if (home.text) pages.push(pageFromFetch(base, home));
+  let target: URL;
+  try {
+    target = new URL(base);
+  } catch {
+    return pages;
+  }
+  const seen = new Set<string>([target.href]);
+  for (const rawUrl of parseSitemapUrls(sitemap)) {
+    const url = resolveOnTarget(rawUrl, target);
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
     const page = await fetchText(url);
-    if (page.text) pages.push({ url, source: page.text, isHtml: true });
+    if (page.text) pages.push(pageFromFetch(url, page));
   }
   return pages;
 }
