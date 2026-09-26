@@ -16,9 +16,7 @@ describe("GET /design.md", () => {
     const response = GET();
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("content-type")).toBe(
-      "text/markdown; charset=utf-8",
-    );
+    expect(response.headers.get("content-type")).toBe("text/markdown; charset=utf-8");
     await expect(response.text()).resolves.toBe(canonical);
   });
 });

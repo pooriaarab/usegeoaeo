@@ -33,15 +33,11 @@ export function FilterChips({ chips, className }: FilterChipsProps) {
             disabled={!chip.onClick}
             className={cn(
               "inline-flex items-center h-full rounded-l-md",
-              chip.onClick
-                ? "hover:bg-accent cursor-pointer transition-colors"
-                : "cursor-default",
+              chip.onClick ? "hover:bg-accent cursor-pointer transition-colors" : "cursor-default",
             )}
           >
             <span className="px-2 text-muted-foreground">{chip.label}</span>
-            <span className="px-2 border-x text-muted-foreground">
-              {chip.condition ?? "is"}
-            </span>
+            <span className="px-2 border-x text-muted-foreground">{chip.condition ?? "is"}</span>
             <span className="px-2 font-medium">{chip.value}</span>
           </button>
           <button

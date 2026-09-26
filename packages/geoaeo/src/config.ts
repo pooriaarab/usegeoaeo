@@ -40,11 +40,10 @@ export function defineConfig(config: SiteConfig): SiteConfig {
 }
 
 export function normalizeSiteUrl(siteUrl: string): string {
-  return siteUrl.replace(/\/+$/, '');
+  return siteUrl.replace(/\/+$/, "");
 }
 
 export function absoluteUrl(siteUrl: string, pathOrUrl: string): string {
   if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
-  return new URL(pathOrUrl.replace(/^\/+/, ''), `${normalizeSiteUrl(siteUrl)}/`).toString();
+  return new URL(pathOrUrl.replace(/^\/+/, ""), `${normalizeSiteUrl(siteUrl)}/`).toString();
 }
-
