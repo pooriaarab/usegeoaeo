@@ -7,7 +7,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { GENERATED_ARTIFACTS } from '../src/commands/gen.js';
 import { JSON_LD_KINDS } from '../src/generators/jsonld.js';
-import { createMcpServer, MCP_GEN_ARTIFACTS, MCP_JSON_LD_KINDS } from '../src/mcp.js';
+import { createMcpServer, genHandler, MCP_GEN_ARTIFACTS, MCP_JSON_LD_KINDS } from '../src/mcp.js';
 
 const fixture = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../examples/static-html');
 
@@ -255,6 +255,40 @@ describe('MCP tools over an in-memory transport', () => {
       // the directory argument landed, not the summary sentence.
       const text = (result.content ?? []).map(item => item.text ?? '').join('');
       expect(text).toBe('1 files, 1 findings');
+    });
+  });
+
+  it('returns CONFIG_MISSING when the directory has no config', async () => {
+    await withFixture(async directory => {
+      const result = await withClient(client => callTool(client, 'gen', { artifact: 'llms', directory }));
+      const text = (result.content ?? []).map(item => item.text ?? '').join('');
+      expect(result.isError).toBe(true);
+      expect(text).toBe(`No geoaeo.config.ts in ${directory}. Run geoaeo init in that directory, replace the placeholder facts, then call gen again.`);
+      expect(result.structuredContent).toEqual({
+        status: 'error',
+        error: { code: 'CONFIG_MISSING', message: 'No geoaeo.config.ts' },
+      });
+    });
+  });
+
+  it('returns CONFIG_INVALID when the config file has no default export', async () => {
+    await withFixture(async directory => {
+      await writeFile(path.join(directory, 'geoaeo.config.mjs'), 'export const unused = 1;\n');
+      const result = await withClient(client => callTool(client, 'gen', { artifact: 'llms', directory }));
+      const text = (result.content ?? []).map(item => item.text ?? '').join('');
+      expect(result.isError).toBe(true);
+      expect(text).toBe(`geoaeo.config.mjs in ${directory} has no default export. Export a default config or siteConfig, then call gen again.`);
+      expect(result.structuredContent).toEqual({
+        status: 'error',
+        error: { code: 'CONFIG_INVALID', message: 'No default export' },
+      });
+    });
+  });
+
+  it('rethrows a gen failure that is not a known config state', async () => {
+    await withFixture(async directory => {
+      await writeFile(path.join(directory, 'geoaeo.config.mjs'), 'throw new Error("disk exploded");\n');
+      await expect(genHandler({ artifact: 'llms', directory })).rejects.toThrow('disk exploded');
     });
   });
 });
