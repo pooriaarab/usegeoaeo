@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   Dialog,
@@ -7,9 +7,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../primitives/dialog';
-import { Button } from '../primitives/button';
-import { Loader2 } from 'lucide-react';
+} from "../primitives/dialog";
+import { Button } from "../primitives/button";
+import { Loader2 } from "lucide-react";
 
 interface FormDialogProps {
   open: boolean;
@@ -20,7 +20,7 @@ interface FormDialogProps {
   cancelLabel?: string;
   loading?: boolean;
   disabled?: boolean;
-  variant?: 'default' | 'destructive';
+  variant?: "default" | "destructive";
   onSubmit: () => void | Promise<void>;
   children: React.ReactNode;
   className?: string;
@@ -31,11 +31,11 @@ export function FormDialog({
   onOpenChange,
   title,
   description,
-  submitLabel = 'Save',
-  cancelLabel = 'Cancel',
+  submitLabel = "Save",
+  cancelLabel = "Cancel",
   loading = false,
   disabled = false,
-  variant = 'default',
+  variant = "default",
   onSubmit,
   children,
   className,
@@ -63,11 +63,7 @@ export function FormDialog({
             >
               {cancelLabel}
             </Button>
-            <Button
-              type="submit"
-              variant={variant}
-              disabled={disabled || loading}
-            >
+            <Button type="submit" variant={variant} disabled={disabled || loading}>
               {loading && <Loader2 className="animate-spin" />}
               {submitLabel}
             </Button>

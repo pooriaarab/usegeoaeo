@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
   DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-} from '../primitives/dropdown-menu';
-import { Input } from '../primitives/input';
-import type { FilterGroup, FilterItem } from './table-filter';
+} from "../primitives/dropdown-menu";
+import { Input } from "../primitives/input";
+import type { FilterGroup, FilterItem } from "./table-filter";
 
 export function SearchField({
   searchQuery,
@@ -53,7 +53,9 @@ export function SearchField({
 
 export function FilterGroups({ groups }: { groups: FilterGroup[] }) {
   if (groups.length === 0) {
-    return <div className="px-2 py-6 text-center text-sm text-muted-foreground">No filters found</div>;
+    return (
+      <div className="px-2 py-6 text-center text-sm text-muted-foreground">No filters found</div>
+    );
   }
   return (
     <>
@@ -88,8 +90,12 @@ export function getFilteredItems(allItems: FilterItem[], showSearch: boolean, se
   return allItems.filter((item) => item.label.toLowerCase().includes(q));
 }
 
-export function getFilteredGroups(groups: FilterGroup[], filteredItems: FilterItem[], itemsLength: number) {
-  if (itemsLength > 0 || groups.length === 0) return [{ id: 'default', items: filteredItems }];
+export function getFilteredGroups(
+  groups: FilterGroup[],
+  filteredItems: FilterItem[],
+  itemsLength: number,
+) {
+  if (itemsLength > 0 || groups.length === 0) return [{ id: "default", items: filteredItems }];
   return groups
     .map((group) => ({
       ...group,
