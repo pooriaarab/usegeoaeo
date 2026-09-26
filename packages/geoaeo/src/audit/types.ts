@@ -32,6 +32,7 @@ export interface PageSignals {
   title: boolean;
   description: boolean;
   canonical: boolean;
+  canonicalHref: string;
   og: boolean;
   twitter: boolean;
   jsonLd: boolean;

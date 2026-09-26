@@ -6,6 +6,46 @@ export function headerNoindex(pages: PageSnapshot[]): boolean {
   return pages.some((page) => /noindex/i.test(page.xRobotsTag ?? ""));
 }
 
+/**
+ * Compare canonicals by the URL they resolve to, not the string as written:
+ * `https://a.com` and `https://a.com/` name the same resource, and a relative
+ * href resolves against the page that declares it. Path spelling stays
+ * significant (`/docs` and `/docs/` are different declarations), and so do
+ * scheme, query, and fragment. A directory audit has no origin to resolve
+ * relative hrefs against, so those compare as written.
+ */
+function resolvedCanonical(href: string, pageUrl: string): string {
+  try {
+    return new URL(href, pageUrl).href;
+  } catch {
+    try {
+      return new URL(href).href;
+    } catch {
+      return href;
+    }
+  }
+}
+
+/**
+ * Every inspected page canonically pointing at one URL (usually the home
+ * page) reads to a crawler as "the site is one page" and drops the rest from
+ * the index. Returns the declared shared href only when two or more pages all
+ * name it; a single page, a page with no canonical, or any differing target
+ * keeps the check legal.
+ */
+export function findSharedCanonical(
+  pages: PageSnapshot[],
+  signals: PageSignals[],
+): string | undefined {
+  if (signals.length < 2 || !signals.every((page) => page.canonicalHref.length > 0)) {
+    return undefined;
+  }
+  const resolved = signals.map((page, index) =>
+    resolvedCanonical(page.canonicalHref, pages[index]?.url ?? ""),
+  );
+  return new Set(resolved).size === 1 ? signals[0].canonicalHref : undefined;
+}
+
 export function hasOpeningAnswer(page: PageSignals): boolean {
   return page.directAnswer && page.h1;
 }
