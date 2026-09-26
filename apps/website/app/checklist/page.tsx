@@ -8,8 +8,23 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@template/ui/primitives/breadcrumb";
-import { HowToUseSection, CrawlabilitySection, SemanticHtmlSection, StructuredDataSection, LlmsTxtSection } from "./sections-foundations";
-import { MarkdownMirrorsSection, WebmcpSection, AnswerabilitySection, CitabilitySection, SitemapRobotsSection, OpenGraphSection, I18nSection, ProseSection } from "./sections-surfaces";
+import {
+  HowToUseSection,
+  CrawlabilitySection,
+  SemanticHtmlSection,
+  StructuredDataSection,
+  LlmsTxtSection,
+} from "./sections-foundations";
+import {
+  MarkdownMirrorsSection,
+  WebmcpSection,
+  AnswerabilitySection,
+  CitabilitySection,
+  SitemapRobotsSection,
+  OpenGraphSection,
+  I18nSection,
+  ProseSection,
+} from "./sections-surfaces";
 import { AuditScoreMapSection, FixLoopSection, NonGoalsSection } from "./sections-audit";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/landing/footer";
@@ -139,16 +154,12 @@ function PageHeader() {
       <p className="text-sm font-medium text-muted-foreground mb-2 tracking-wide uppercase">
         GEO / AEO
       </p>
-      <h1 className="text-fluid-xl sm:text-4xl font-bold tracking-tight mb-4">
-        GEO/AEO checklist
-      </h1>
+      <h1 className="text-fluid-xl sm:text-4xl font-bold tracking-tight mb-4">GEO/AEO checklist</h1>
       <p className="text-muted-foreground text-fluid-sm sm:text-base leading-relaxed">
-        Canonical checklist for making an app discoverable and quotable
-        by AI answer engines and agents. Use it as the target state for
-        any site.{" "}
-        <code className="font-mono text-sm text-foreground">geoaeo audit</code>{" "}
-        maps to the items marked Covered. Items marked Not covered yet
-        are product gaps, not implicit features.
+        Canonical checklist for making an app discoverable and quotable by AI answer engines and
+        agents. Use it as the target state for any site.{" "}
+        <code className="font-mono text-sm text-foreground">geoaeo audit</code> maps to the items
+        marked Covered. Items marked Not covered yet are product gaps, not implicit features.
       </p>
     </header>
   );

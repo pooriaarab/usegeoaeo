@@ -33,8 +33,8 @@ export function ProblemSection() {
             Why sites stay invisible to answer engines
           </h2>
           <p className="text-muted-foreground text-fluid-sm sm:text-base">
-            Traditional search indexes links. AI answer engines synthesize direct answers
-            from structured, machine-readable artifacts—and skip sites that lack them.
+            Traditional search indexes links. AI answer engines synthesize direct answers from
+            structured, machine-readable artifacts—and skip sites that lack them.
           </p>
         </div>
 
@@ -48,9 +48,7 @@ export function ProblemSection() {
                 <p.icon className="size-[18px] text-foreground" />
               </div>
               <h3 className="text-sm font-semibold mb-1.5">{p.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {p.description}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
             </div>
           ))}
         </div>

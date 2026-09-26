@@ -33,7 +33,10 @@ export function HarnessDocPage({ slug, name, intro, children }: HarnessDocPagePr
             Docs
           </Link>
           <span className="mx-2">/</span>
-          <Link href={`/docs/harnesses/${slug}`} className="hover:text-foreground transition-colors">
+          <Link
+            href={`/docs/harnesses/${slug}`}
+            className="hover:text-foreground transition-colors"
+          >
             Harnesses
           </Link>
           <span className="mx-2">/</span>

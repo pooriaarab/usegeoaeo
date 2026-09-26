@@ -27,9 +27,7 @@ export function LandingHeader() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color] duration-300 ${
-        scrolled
-          ? "bg-background border-b border-border"
-          : "bg-transparent"
+        scrolled ? "bg-background border-b border-border" : "bg-transparent"
       }`}
     >
       <div className="mx-auto max-w-6xl flex items-center justify-between px-5 h-14 sm:h-16">
@@ -80,7 +78,9 @@ function DesktopCta() {
   return (
     <div className="hidden md:flex items-center gap-2">
       <Button asChild variant="ghost" size="sm">
-        <a href="https://github.com/pooriaarab/usegeoaeo" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://github.com/pooriaarab/usegeoaeo" target="_blank" rel="noreferrer">
+          GitHub
+        </a>
       </Button>
       <Button asChild size="sm">
         <Link href="/docs">

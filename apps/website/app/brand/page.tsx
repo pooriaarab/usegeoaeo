@@ -56,14 +56,11 @@ function BrandHero() {
         <p className="mb-3 text-sm font-medium uppercase tracking-wide text-muted-foreground">
           Brand guide
         </p>
-        <h1 className="text-fluid-2xl mb-5 font-bold tracking-tight">
-          Clear enough to quote
-        </h1>
+        <h1 className="text-fluid-2xl mb-5 font-bold tracking-tight">Clear enough to quote</h1>
         <p className="text-fluid-base mb-4 max-w-2xl leading-relaxed text-muted-foreground">
-          geoaeo audits sites for search engine optimization (SEO), generative
-          engine optimization (GEO), and answer engine optimization (AEO). It
-          scores gaps from 0 to 100 and generates discovery artifacts. The
-          package is free, open source (MIT), and has no paid tier.
+          geoaeo audits sites for search engine optimization (SEO), generative engine optimization
+          (GEO), and answer engine optimization (AEO). It scores gaps from 0 to 100 and generates
+          discovery artifacts. The package is free, open source (MIT), and has no paid tier.
         </p>
         <p className="mb-8 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           This human guide at{" "}
@@ -112,10 +109,9 @@ function BrandFoundations() {
             <span className="font-mono text-2xl font-semibold">geoaeo</span>
           </div>
           <p className="mb-6 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Write the product name as lowercase <code className="font-mono">geoaeo</code>.
-            Render the mark as a monochrome, high-contrast square with a lowercase{" "}
-            <code className="font-mono">g</code>. Use “usegeoaeo” only for the
-            repository or domain.
+            Write the product name as lowercase <code className="font-mono">geoaeo</code>. Render
+            the mark as a monochrome, high-contrast square with a lowercase{" "}
+            <code className="font-mono">g</code>. Use “usegeoaeo” only for the repository or domain.
           </p>
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">

@@ -47,8 +47,8 @@ function CTAFooter() {
             Make your site answerable
           </h2>
           <p className="text-muted-foreground mb-8">
-            Install geoaeo and audit your first site in a minute. Free and open
-            source under the MIT license.
+            Install geoaeo and audit your first site in a minute. Free and open source under the MIT
+            license.
           </p>
           <Button asChild size="lg">
             <Link href="/docs">

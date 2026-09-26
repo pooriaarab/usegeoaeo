@@ -32,8 +32,8 @@ function PluginIntro({ harness }: { harness: PluginHarness }) {
   if (harness === "codex") {
     return (
       <p>
-        Codex uses the same marketplace as <code>/plugin marketplace add pooriaarab/usegeoaeo</code>. Run these
-        commands in your terminal:
+        Codex uses the same marketplace as <code>/plugin marketplace add pooriaarab/usegeoaeo</code>
+        . Run these commands in your terminal:
       </p>
     );
   }
@@ -47,7 +47,10 @@ function PluginIntro({ harness }: { harness: PluginHarness }) {
 function PluginFallback({ harness }: { harness: PluginHarness }) {
   if (harness === "shared") {
     return (
-      <p>Windsurf, Gemini CLI, Continue, and Copilot have no plugin dialect. Use the JSON fallback below.</p>
+      <p>
+        Windsurf, Gemini CLI, Continue, and Copilot have no plugin dialect. Use the JSON fallback
+        below.
+      </p>
     );
   }
   if (harness === "codex") {

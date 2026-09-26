@@ -14,8 +14,8 @@ export function HarnessWhatYouGet() {
           CLI bins: <code>geoaeo</code> and <code>geoaeo-mcp</code>
         </li>
         <li>
-          CLI commands: <code>audit</code>, <code>init</code>, <code>gen</code>, <code>humanize</code>,{" "}
-          <code>mcp</code>. No other commands exist.
+          CLI commands: <code>audit</code>, <code>init</code>, <code>gen</code>,{" "}
+          <code>humanize</code>, <code>mcp</code>. No other commands exist.
         </li>
         <li>
           MCP server command: <code>npx -y geoaeo mcp</code> over stdio

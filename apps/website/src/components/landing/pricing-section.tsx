@@ -49,9 +49,7 @@ function PricingCard() {
     <div className="border border-foreground bg-card p-6 sm:p-8 flex flex-col">
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-1">geoaeo</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Complete CLI, library, and MCP server.
-        </p>
+        <p className="text-sm text-muted-foreground mb-4">Complete CLI, library, and MCP server.</p>
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold">$0</span>
           <span className="text-sm text-muted-foreground">/ forever</span>
