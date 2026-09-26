@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-export const WorkspaceMemberRoleSchema = z.enum([
-  "owner",
-  "admin",
-  "member",
-]);
+export const WorkspaceMemberRoleSchema = z.enum(["owner", "admin", "member"]);
 export type WorkspaceMemberRole = z.infer<typeof WorkspaceMemberRoleSchema>;
 
 export const WorkspaceMemberStatusSchema = z.enum(["active", "pending"]);
@@ -28,9 +24,6 @@ export const WorkspaceMemberSchema = z.object({
 export type WorkspaceMember = z.infer<typeof WorkspaceMemberSchema>;
 
 /** Build the deterministic doc id used in Firestore + rule helpers. */
-export function workspaceMemberDocId(
-  workspaceId: string,
-  userId: string,
-): string {
+export function workspaceMemberDocId(workspaceId: string, userId: string): string {
   return `${workspaceId}_${userId}`;
 }

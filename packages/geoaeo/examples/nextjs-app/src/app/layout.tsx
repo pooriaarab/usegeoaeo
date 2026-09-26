@@ -1,12 +1,12 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: { template: '%s | GeoWeather', default: 'GeoWeather' },
-  description: 'Weather forecasts and climate data for every location on Earth.',
+  title: { template: "%s | GeoWeather", default: "GeoWeather" },
+  description: "Weather forecasts and climate data for every location on Earth.",
   openGraph: {
-    title: 'GeoWeather',
-    description: 'Weather forecasts and climate data for every location on Earth.',
-    siteName: 'GeoWeather',
+    title: "GeoWeather",
+    description: "Weather forecasts and climate data for every location on Earth.",
+    siteName: "GeoWeather",
   },
 };
 

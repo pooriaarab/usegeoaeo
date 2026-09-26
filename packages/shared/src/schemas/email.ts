@@ -9,11 +9,7 @@ import { z } from "zod";
  *   - a React component in `packages/email/src/templates/`,
  *   - a case in `renderEmailHtml` (`packages/email/src/render.ts`).
  */
-export const EmailTemplateNameSchema = z.enum([
-  "welcome",
-  "password_reset",
-  "billing_receipt",
-]);
+export const EmailTemplateNameSchema = z.enum(["welcome", "password_reset", "billing_receipt"]);
 export type EmailTemplateName = z.infer<typeof EmailTemplateNameSchema>;
 
 /**
@@ -69,10 +65,7 @@ export const EmailJobPayloadSchema = z.discriminatedUnion("template", [
 ]);
 export type EmailJobPayload = z.infer<typeof EmailJobPayloadSchema>;
 
-export type EmailWelcomeProps = Extract<
-  EmailJobPayload,
-  { template: "welcome" }
->["props"];
+export type EmailWelcomeProps = Extract<EmailJobPayload, { template: "welcome" }>["props"];
 export type EmailPasswordResetProps = Extract<
   EmailJobPayload,
   { template: "password_reset" }

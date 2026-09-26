@@ -1,24 +1,15 @@
 import { describe, it, expect } from "vitest";
-import {
-  EmailJobPayloadSchema,
-  EmailTemplateNameSchema,
-} from "../schemas/email";
+import { EmailJobPayloadSchema, EmailTemplateNameSchema } from "../schemas/email";
 
 describe("EmailTemplateNameSchema", () => {
   it("accepts known template names", () => {
     expect(EmailTemplateNameSchema.safeParse("welcome").success).toBe(true);
-    expect(EmailTemplateNameSchema.safeParse("password_reset").success).toBe(
-      true,
-    );
-    expect(EmailTemplateNameSchema.safeParse("billing_receipt").success).toBe(
-      true,
-    );
+    expect(EmailTemplateNameSchema.safeParse("password_reset").success).toBe(true);
+    expect(EmailTemplateNameSchema.safeParse("billing_receipt").success).toBe(true);
   });
 
   it("rejects unknown templates", () => {
-    expect(EmailTemplateNameSchema.safeParse("marketing_blast").success).toBe(
-      false,
-    );
+    expect(EmailTemplateNameSchema.safeParse("marketing_blast").success).toBe(false);
   });
 });
 

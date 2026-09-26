@@ -1,7 +1,12 @@
-import type { SiteConfig } from '../config.js';
+import type { SiteConfig } from "../config.js";
 
 function escapeXml(value: string): string {
-  return value.replace(/[<>&'\"]/g, character => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[character] ?? character);
+  return value.replace(
+    /[<>&'\"]/g,
+    (character) =>
+      ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[character] ??
+      character,
+  );
 }
 
 export function generateOgimage(config: SiteConfig): string {
