@@ -15,6 +15,19 @@ Connect the geoaeo MCP server to Muse. Use it to audit a site and generate GEO/A
 *   Muse installed (`codex` on PATH).
 *   A site directory or URL to audit.
 
+## Install the plugin
+
+Codex uses the same marketplace as `/plugin marketplace add pooriaarab/usegeoaeo`. Run these commands in your terminal:
+
+```
+codex plugin marketplace add pooriaarab/usegeoaeo
+codex plugin add geoaeo@geoaeo
+```
+
+The plugin starts `npx geoaeo mcp` over stdio. MCP tools are `audit`, `gen`, and `humanize`.
+
+The TOML paste below is the fallback if you want to wire the server by hand.
+
 ## Install geoaeo
 
 ```bash
