@@ -20,8 +20,8 @@ export function HeroSection() {
           </div>
 
           <p className="text-base sm:text-lg text-muted-foreground leading-[1.5] mb-8">
-            geoaeo audits your site 0&ndash;100 and generates the llms.txt,
-            structured data, and Markdown mirrors engines cite.
+            geoaeo audits your site 0&ndash;100 and generates the llms.txt, structured data, and
+            Markdown mirrors engines cite.
           </p>
 
           <div className="mb-8 max-w-md">
@@ -47,12 +47,7 @@ function HeroActions() {
           <ArrowRight />
         </Link>
       </Button>
-      <Button
-        asChild
-        variant="outline"
-        size="lg"
-        className="w-full sm:w-auto shadow-none"
-      >
+      <Button asChild variant="outline" size="lg" className="w-full sm:w-auto shadow-none">
         <Link href="/tools">Try the free tools</Link>
       </Button>
     </div>
