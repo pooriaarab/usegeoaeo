@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
 import { InstallThePlugin } from "@/components/docs/install-the-plugin";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo in Cursor — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Cursor with the geoaeo-mcp server. Configure .cursor/mcp.json, verify three tools, audit your site, and generate artifacts from Chat.",
+  alternates: pageAlternates("/docs/harnesses/cursor"),
 };
 
 const intro =
