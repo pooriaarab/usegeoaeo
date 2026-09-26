@@ -32,9 +32,8 @@ export function AuditScoreMapSection() {
         Audit score map (v0.1 implementation)
       </h2>
       <p className="text-sm text-muted-foreground leading-relaxed">
-        These are the live <code className="font-mono text-xs">audit</code> check
-        IDs and weights. The score is earned weight / total weight,
-        rounded 0–100. Total weight: 100.
+        These are the live <code className="font-mono text-xs">audit</code> check IDs and weights.
+        The score is earned weight / total weight, rounded 0–100. Total weight: 100.
       </p>
       <div className="rounded-xl border border-border overflow-hidden">
         <Table>
@@ -65,12 +64,9 @@ export function AuditScoreMapSection() {
 export function FixLoopSection() {
   return (
     <section id="fix-loop" className="scroll-mt-24 mb-12 space-y-4">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        Recommended fix loop
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">Recommended fix loop</h2>
       <p className="text-sm text-muted-foreground leading-relaxed">
-        Same loop through MCP: tools{" "}
-        <code className="font-mono text-xs">audit</code>,{" "}
+        Same loop through MCP: tools <code className="font-mono text-xs">audit</code>,{" "}
         <code className="font-mono text-xs">gen</code>,{" "}
         <code className="font-mono text-xs">humanize</code> on{" "}
         <code className="font-mono text-xs">npx geoaeo mcp</code>.
@@ -106,31 +102,23 @@ export function NonGoalsSection() {
       <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
         Explicit non-goals (current product)
       </h2>
-      <p className="text-sm text-muted-foreground leading-relaxed">
-        geoaeo does not today:
-      </p>
+      <p className="text-sm text-muted-foreground leading-relaxed">geoaeo does not today:</p>
       <ul className="list-disc pl-5 space-y-1.5 text-sm text-muted-foreground leading-relaxed">
-        <li>
-          Replace a full SEO crawler (JS rendering, log-file analysis,
-          backlink graphs).
-        </li>
-        <li>
-          Guarantee citations in ChatGPT, Perplexity, Gemini, or any
-          named engine.
-        </li>
+        <li>Replace a full SEO crawler (JS rendering, log-file analysis, backlink graphs).</li>
+        <li>Guarantee citations in ChatGPT, Perplexity, Gemini, or any named engine.</li>
         <li>Host your artifacts or monitor citation share over time.</li>
         <li>
-          Ship framework plugins beyond{" "}
-          <code className="font-mono text-xs">init</code>
+          Ship framework plugins beyond <code className="font-mono text-xs">init</code>
           &apos;s Next App Router vs static file split.
         </li>
       </ul>
       <p className="text-sm text-muted-foreground leading-relaxed">
-        When a checklist row is marked Not covered yet, treat it as
-        manual work or a future version, not as a hidden flag. See{" "}
-        <code className="font-mono text-xs">docs/ROADMAP.md</code> and{" "}
-        <code className="font-mono text-xs">docs/ENHANCEMENTS.md</code>.
-        Compare the three shipped targets on the{" "}
+        When a checklist row is marked Not covered yet, treat it as manual work or a future version,
+        not as a hidden flag. See <code className="font-mono text-xs">
+          docs/ROADMAP.md
+        </code> and{" "}
+        <code className="font-mono text-xs">docs/ENHANCEMENTS.md</code>. Compare the three shipped
+        targets on the{" "}
         <Link href="/examples" className="text-foreground underline underline-offset-4">
           examples page
         </Link>

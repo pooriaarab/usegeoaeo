@@ -34,29 +34,22 @@ export function HowToUseSection() {
       </h2>
       <ol className="list-decimal pl-5 space-y-2 text-sm leading-relaxed">
         <li>
-          Run{" "}
-          <code className="font-mono text-xs">{"npx geoaeo audit <url-or-dir>"}</code>{" "}
-          and read the score plus top fixes.
+          Run <code className="font-mono text-xs">{"npx geoaeo audit <url-or-dir>"}</code> and read
+          the score plus top fixes.
         </li>
         <li>
-          Close gaps with{" "}
-          <code className="font-mono text-xs">geoaeo init</code>,{" "}
-          <code className="font-mono text-xs">{"geoaeo gen <artifact>"}</code>, and
-          content edits.
+          Close gaps with <code className="font-mono text-xs">geoaeo init</code>,{" "}
+          <code className="font-mono text-xs">{"geoaeo gen <artifact>"}</code>, and content edits.
         </li>
+        <li>Re-audit until the remaining fails are intentional or tracked as product work.</li>
         <li>
-          Re-audit until the remaining fails are intentional or tracked
-          as product work.
-        </li>
-        <li>
-          Treat this checklist as the contract: if audit does not check
-          it, do not assume geoaeo enforces it.
+          Treat this checklist as the contract: if audit does not check it, do not assume geoaeo
+          enforces it.
         </li>
       </ol>
 
       <p className="text-sm text-muted-foreground">
-        Real surface today. Generators:{" "}
-        <code className="font-mono text-xs">llms</code>,{" "}
+        Real surface today. Generators: <code className="font-mono text-xs">llms</code>,{" "}
         <code className="font-mono text-xs">llms-full</code>,{" "}
         <code className="font-mono text-xs">jsonld</code> (
         <code className="font-mono text-xs">software</code> |{" "}
@@ -76,9 +69,7 @@ export function HowToUseSection() {
 export function CrawlabilitySection() {
   return (
     <section id="crawlability" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        1. Crawlability
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">1. Crawlability</h2>
       <Item
         id="public-html"
         title="1.1 Public HTML that bots and fetchers can reach"
@@ -117,9 +108,7 @@ export function CrawlabilitySection() {
 export function SemanticHtmlSection() {
   return (
     <section id="semantic-html" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        2. Semantic HTML
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">2. Semantic HTML</h2>
       <Item
         id="heading-hierarchy"
         title="2.1 One clear H1 and heading hierarchy"
@@ -170,9 +159,7 @@ export function StructuredDataSection() {
           "Audit check json-ld passes when any inspected page exposes JSON-LD / @type; the report lists detected types when parseable.",
         ]}
         gaps="No Organization, WebSite, Article, HowTo, Person, SpeakableSpecification, or validation against Google rich-result rules. Audit does not require a specific type, only that some JSON-LD exists."
-        extra={
-          <JsonLdKindsTable />
-        }
+        extra={<JsonLdKindsTable />}
       />
       <Item
         id="faq-pairs"
@@ -236,9 +223,7 @@ function SurfacesTable() {
             <TableRow key={row.face}>
               <TableCell className="font-medium">{row.face}</TableCell>
               <TableCell className="font-mono text-xs">{row.entry}</TableCell>
-              <TableCell className="text-muted-foreground">
-                {row.capabilities}
-              </TableCell>
+              <TableCell className="text-muted-foreground">{row.capabilities}</TableCell>
             </TableRow>
           ))}
         </TableBody>

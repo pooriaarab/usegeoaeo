@@ -5,9 +5,7 @@ import { Item } from "./checklist-item";
 export function MarkdownMirrorsSection() {
   return (
     <section id="markdown-mirrors" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        5. Markdown mirrors
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">5. Markdown mirrors</h2>
       <Item
         id="md-twins"
         title="5.1 .md twin of key pages"
@@ -25,9 +23,7 @@ export function MarkdownMirrorsSection() {
 export function WebmcpSection() {
   return (
     <section id="webmcp" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        6. WebMCP
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">6. WebMCP</h2>
       <Item
         id="webmcp-manifest"
         title="6.1 Tool manifest for agents"
@@ -46,9 +42,7 @@ export function WebmcpSection() {
 export function AnswerabilitySection() {
   return (
     <section id="answerability" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        7. Answerability
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">7. Answerability</h2>
       <Item
         id="answer-first"
         title="7.1 Answer-first page design"
@@ -76,9 +70,7 @@ export function AnswerabilitySection() {
 export function CitabilitySection() {
   return (
     <section id="citability" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        8. Citability
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">8. Citability</h2>
       <Item
         id="canonical"
         title="8.1 Canonical URLs"
@@ -118,9 +110,7 @@ export function CitabilitySection() {
 export function SitemapRobotsSection() {
   return (
     <section id="sitemap-robots" className="scroll-mt-24 mb-12 space-y-6">
-      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">
-        9. Sitemap and robots
-      </h2>
+      <h2 className="text-fluid-xl sm:text-2xl font-bold tracking-tight">9. Sitemap and robots</h2>
       <Item
         id="xml-sitemap"
         title="9.1 XML sitemap"

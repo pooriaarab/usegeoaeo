@@ -68,9 +68,7 @@ function FAQItem({
         style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
       >
         <div className="overflow-hidden">
-          <p className="pb-5 text-sm text-muted-foreground leading-relaxed pr-8">
-            {answer}
-          </p>
+          <p className="pb-5 text-sm text-muted-foreground leading-relaxed pr-8">{answer}</p>
         </div>
       </div>
     </div>

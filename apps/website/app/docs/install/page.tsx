@@ -17,29 +17,34 @@ const intro =
 export default function InstallPage() {
   return (
     <div className="mx-auto max-w-3xl">
-        <DocsPageHeader crumb="Install" badge="Package: geoaeo" title="Install geoaeo" intro={intro} />
+      <DocsPageHeader
+        crumb="Install"
+        badge="Package: geoaeo"
+        title="Install geoaeo"
+        intro={intro}
+      />
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
-          <Requirements />
-          <Install />
-          <OneOffWithoutInstall />
-          <VerifyBothBins />
-          <ScaffoldConfig />
-          <ConfigShape />
-          <NextSteps />
-        </div>
+      <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
+        <Requirements />
+        <Install />
+        <OneOffWithoutInstall />
+        <VerifyBothBins />
+        <ScaffoldConfig />
+        <ConfigShape />
+        <NextSteps />
+      </div>
 
-        <Card className="mt-8 border-dashed">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Quick check</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            <pre className="overflow-x-auto rounded-lg bg-muted p-3 text-xs">
-              <code>{`node --version  # >= 20
+      <Card className="mt-8 border-dashed">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Quick check</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <pre className="overflow-x-auto rounded-lg bg-muted p-3 text-xs">
+            <code>{`node --version  # >= 20
 npx geoaeo audit ./ --json | head -n 30`}</code>
-            </pre>
-          </CardContent>
-        </Card>
+          </pre>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -97,8 +102,8 @@ function VerifyBothBins() {
 npx -y --package=geoaeo geoaeo-mcp`}</code>
       </pre>
       <p>
-        <code>geoaeo</code> is the CLI. <code>geoaeo-mcp</code> is the MCP server over stdio. You do not run the
-        MCP bin by hand when an agent manages it.
+        <code>geoaeo</code> is the CLI. <code>geoaeo-mcp</code> is the MCP server over stdio. You do
+        not run the MCP bin by hand when an agent manages it.
       </p>
     </>
   );
@@ -109,16 +114,17 @@ function ScaffoldConfig() {
     <>
       <h2>Scaffold config</h2>
       <p>
-        Create <code>geoaeo.config.ts</code> from the example. The config holds site facts used by every generator.
+        Create <code>geoaeo.config.ts</code> from the example. The config holds site facts used by
+        every generator.
       </p>
       <pre>
         <code>{`npx geoaeo init ./
 cat geoaeo.config.ts`}</code>
       </pre>
       <p>
-        <code>init</code> detects Next.js, Astro, SvelteKit, Nuxt, or Remix and writes routes that emit each
-        artifact. Other directories receive static files. Existing files stay unchanged unless you pass{" "}
-        <code>--force</code>.
+        <code>init</code> detects Next.js, Astro, SvelteKit, Nuxt, or Remix and writes routes that
+        emit each artifact. Other directories receive static files. Existing files stay unchanged
+        unless you pass <code>--force</code>.
       </p>
       <pre>
         <code>npx geoaeo init ./ --force</code>
@@ -143,7 +149,8 @@ export default defineConfig({
 });`}</code>
       </pre>
       <p>
-        See <code>geoaeo.config.example.ts</code> in the repo for the full shape with tools, plans, and FAQ entries.
+        See <code>geoaeo.config.example.ts</code> in the repo for the full shape with tools, plans,
+        and FAQ entries.
       </p>
     </>
   );

@@ -1,11 +1,4 @@
-import {
-  Gauge,
-  FileText,
-  Braces,
-  Bot,
-  Sparkles,
-  Boxes,
-} from "lucide-react";
+import { Gauge, FileText, Braces, Bot, Sparkles, Boxes } from "lucide-react";
 
 const features = [
   {
@@ -59,24 +52,19 @@ export function FeaturesSection() {
             Everything an answer engine looks for
           </h2>
           <p className="text-muted-foreground text-base leading-[1.5]">
-            From the audit that finds gaps to the generators that fill them,
-            geoaeo provides tools for search and answer engine discoverability.
+            From the audit that finds gaps to the generators that fill them, geoaeo provides tools
+            for search and answer engine discoverability.
           </p>
         </div>
 
         <div className="grid gap-px bg-border border border-border sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
-            <div
-              key={f.title}
-              className="bg-background p-5 sm:p-6"
-            >
+            <div key={f.title} className="bg-background p-5 sm:p-6">
               <div className="size-9 bg-muted flex items-center justify-center mb-4">
                 <f.icon className="size-[18px] text-foreground" />
               </div>
               <h3 className="text-sm font-semibold mb-1.5">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-[1.5]">
-                {f.description}
-              </p>
+              <p className="text-sm text-muted-foreground leading-[1.5]">{f.description}</p>
             </div>
           ))}
         </div>
