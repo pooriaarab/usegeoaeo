@@ -29,6 +29,60 @@ async function callMcpTool(name: string, args: Record<string, unknown>): Promise
   }
 }
 
+type JsonSchema = {
+  type?: string;
+  properties?: Record<string, JsonSchema>;
+  required?: string[];
+  items?: JsonSchema;
+  additionalProperties?: unknown;
+};
+
+// A closed schema lets a client with a cached copy reject a response the
+// server already produced, so every object level must stay open.
+function assertOpenSchema(schema: JsonSchema, path: string): void {
+  expect(schema.additionalProperties, `${path} must stay open`).not.toBe(false);
+  for (const [name, property] of Object.entries(schema.properties ?? {})) {
+    assertOpenSchema(property, `${path}.${name}`);
+  }
+  if (schema.items !== undefined) assertOpenSchema(schema.items, `${path}[]`);
+}
+
+// Checks a callTool result against the schema listTools published, not a
+// hardcoded copy: required fields are present and declared types match.
+function assertMatchesPublishedSchema(value: unknown, schema: JsonSchema, path: string): void {
+  if (schema.type === 'array') {
+    expect(Array.isArray(value), `${path} should be an array`).toBe(true);
+    if (Array.isArray(value) && schema.items !== undefined) {
+      value.forEach((item, index) => assertMatchesPublishedSchema(item, schema.items as JsonSchema, `${path}[${index}]`));
+    }
+    return;
+  }
+  if (schema.type === 'object') {
+    expect(typeof value, `${path} should be an object`).toBe('object');
+    expect(value, `${path} should not be null`).not.toBeNull();
+    const record = value as Record<string, unknown>;
+    for (const name of schema.required ?? []) {
+      expect(name in record, `${path} is missing required field ${name}`).toBe(true);
+    }
+    for (const [name, property] of Object.entries(schema.properties ?? {})) {
+      if (name in record) assertMatchesPublishedSchema(record[name], property, `${path}.${name}`);
+    }
+    return;
+  }
+  if (schema.type === 'string') expect(typeof value, `${path} should be a string`).toBe('string');
+  if (schema.type === 'number' || schema.type === 'integer') expect(typeof value, `${path} should be a number`).toBe('number');
+  if (schema.type === 'boolean') expect(typeof value, `${path} should be a boolean`).toBe('boolean');
+}
+
+async function outputSchemaOf(client: Client, name: string): Promise<JsonSchema> {
+  const { tools } = await client.listTools();
+  const tool = tools.find(candidate => candidate.name === name);
+  expect(tool, `expected tool ${name} to be listed`).toBeDefined();
+  const schema = (tool?.outputSchema ?? {}) as JsonSchema;
+  expect(schema.type, `${name} should publish an object output schema`).toBe('object');
+  return schema;
+}
+
 describe('createMcpServer', () => {
   it('registers the audit, gen, and humanize tools without throwing', () => {
     expect(() => createMcpServer()).not.toThrow();
@@ -78,6 +132,7 @@ describe('MCP tools over an in-memory transport', () => {
   interface ToolResult {
     content?: { type: string; text?: string }[];
     structuredContent?: unknown;
+    isError?: boolean;
   }
 
   async function callTool(client: Client, name: string, args: Record<string, unknown>): Promise<ToolResult> {
@@ -153,6 +208,40 @@ describe('MCP tools over an in-memory transport', () => {
         properties?: Record<string, { description?: string }>;
       };
       expect(humanizeSchema.properties?.write?.description).toContain('in place');
+    });
+  });
+
+  it('publishes open output schemas for audit and humanize', async () => {
+    await withClient(async client => {
+      const auditSchema = await outputSchemaOf(client, 'audit');
+      const humanizeSchema = await outputSchemaOf(client, 'humanize');
+      expect(auditSchema.required).toEqual(expect.arrayContaining(['target', 'score', 'checks']));
+      expect(humanizeSchema.required).toEqual(['results']);
+      assertOpenSchema(auditSchema, 'audit');
+      assertOpenSchema(humanizeSchema, 'humanize');
+    });
+  });
+
+  it('audit structuredContent validates against its published output schema', async () => {
+    await withClient(async client => {
+      const schema = await outputSchemaOf(client, 'audit');
+      const result = await callTool(client, 'audit', { target: fixture });
+      // The SDK validates structuredContent against outputSchema server-side,
+      // so no error here already proves the declared schema accepts the report.
+      expect(result.isError).not.toBe(true);
+      assertMatchesPublishedSchema(result.structuredContent, schema, 'audit');
+    });
+  });
+
+  it('humanize structuredContent validates against its published output schema', async () => {
+    await withFixture(async directory => {
+      await writeFile(path.join(directory, 'post.md'), 'A seamless tool.\n');
+      await withClient(async client => {
+        const schema = await outputSchemaOf(client, 'humanize');
+        const result = await callTool(client, 'humanize', { glob: '*.md', directory });
+        expect(result.isError).not.toBe(true);
+        assertMatchesPublishedSchema(result.structuredContent, schema, 'humanize');
+      });
     });
   });
 

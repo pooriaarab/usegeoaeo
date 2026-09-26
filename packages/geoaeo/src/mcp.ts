@@ -2,12 +2,13 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { auditTarget } from './audit.js';
+import { auditTarget, type AuditCheck, type AuditReport } from './audit.js';
 import { formatAuditReport } from './audit/format.js';
 import { VERSION, PKG_NAME } from './constants.js';
 import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from './commands/gen.js';
 import { JSON_LD_KINDS, type JsonLdKind } from './generators/index.js';
 import { humanizeGlob } from './commands/humanize.js';
+import type { HumanizeFinding } from './humanize.js';
 
 // Built from the shared arrays so a new artifact or kind cannot land in one face only.
 const genArtifactSchema = z.enum(GENERATED_ARTIFACTS);
@@ -30,6 +31,38 @@ const MCP_INSTRUCTIONS = [
   'humanize writes a file only when write is true and the text changes.',
   'Ask the user before you set write.',
 ].join(' ');
+
+// Output schemas for the structuredContent channel. Each schema is annotated
+// with the library type it describes, so a change to AuditReport,
+// AuditCheck, or HumanizeFinding breaks this build instead of silently
+// diverging the published schema. Every object is loose: the audit report
+// grows new checks by design, and a closed schema would let a client holding
+// a cached copy reject a response the server already produced.
+const auditCheckSchema: z.ZodType<AuditCheck> = z.looseObject({
+  id: z.string().describe('Stable check id.'),
+  label: z.string().describe('Short human-readable check name.'),
+  passed: z.boolean().describe('Whether the target passed this check.'),
+  weight: z.number().describe('Points this check contributes to the 0-100 score.'),
+  details: z.string().describe('What was found, in one line.'),
+});
+const auditOutputSchema: z.ZodType<AuditReport> = z.looseObject({
+  target: z.string().describe('The audited directory or URL.'),
+  score: z.number().describe('Overall score from 0 to 100.'),
+  checks: z.array(auditCheckSchema).describe('One entry per audit check.'),
+  pages: z.array(z.string()).describe('Page URLs covered by the audit.'),
+  topFixes: z.array(z.string()).describe('Highest-impact fixes first.'),
+});
+const humanizeFindingSchema: z.ZodType<HumanizeFinding> = z.looseObject({
+  rule: z.string().describe('Rule id, e.g. ai-vocabulary.'),
+  before: z.string().describe('The matched text.'),
+  after: z.string().describe('The replacement text.'),
+});
+const humanizeOutputSchema = z.looseObject({
+  results: z.array(z.looseObject({
+    file: z.string().describe('Absolute path of the scanned file.'),
+    findings: z.array(humanizeFindingSchema).describe('Findings in this file.'),
+  })).describe('One entry per scanned file.'),
+});
 
 async function auditHandler({ target }: { target: string }) {
   const report = await auditTarget(target);
@@ -71,7 +104,7 @@ export function createMcpServer(): McpServer {
   // params below: keep the handler's destructured keys and types in sync with inputSchema by hand.
   const registerTool = server.registerTool.bind(server) as unknown as (
     name: string,
-    config: { title: string; description: string; inputSchema: Record<string, unknown>; annotations: Record<string, boolean> },
+    config: { title: string; description: string; inputSchema: Record<string, unknown>; outputSchema?: unknown; annotations: Record<string, boolean> },
     handler: (...args: never[]) => unknown,
   ) => void;
   registerTool(
@@ -80,6 +113,7 @@ export function createMcpServer(): McpServer {
       title: 'Audit a site',
       description: 'Audit a live URL or local site directory for GEO and AEO gaps. Reads the target and returns a report; it changes no files. Fetches over the network when the target is a URL.',
       inputSchema: { target: targetSchema },
+      outputSchema: auditOutputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     },
     auditHandler
@@ -100,6 +134,7 @@ export function createMcpServer(): McpServer {
       title: 'Humanize prose',
       description: 'Find AI-writing tells in prose files. Reports findings without changing files by default; with write true it rewrites matching files in place, so ask the user first.',
       inputSchema: { glob: globSchema, write: writeSchema, directory: directorySchema },
+      outputSchema: humanizeOutputSchema,
       annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
     },
     humanizeHandler
