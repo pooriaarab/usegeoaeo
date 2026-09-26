@@ -53,10 +53,10 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>You do not run geoaeo-mcp by hand when Codex manages it.</p>
+      <p>You do not run geoaeo mcp by hand when Codex manages it.</p>
     </>
   );
 }
@@ -73,7 +73,7 @@ function ConfigureMcpServer() {
       <pre>
         <code>{`[mcp_servers.geoaeo]
 command = "npx"
-args = ["-y", "geoaeo-mcp"]`}</code>
+args = ["-y", "geoaeo", "mcp"]`}</code>
       </pre>
       <p>If your Codex build reads JSON config, the equivalent JSON is:</p>
       <pre>
@@ -81,7 +81,7 @@ args = ["-y", "geoaeo-mcp"]`}</code>
   "mcp_servers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>
@@ -231,7 +231,7 @@ function Troubleshooting() {
         exactly <code>[mcp_servers.geoaeo]</code>. Restart Codex.
       </p>
       <p>
-        <strong>npx fails or hangs.</strong> Run <code>npx -y geoaeo-mcp</code> manually. It should wait on stdin.
+        <strong>npx fails or hangs.</strong> Run <code>npx -y geoaeo mcp</code> manually. It should wait on stdin.
         Press Ctrl+C. If it fails, update Node to 20+ and check npm registry access.
       </p>
       <p>
@@ -243,7 +243,7 @@ function Troubleshooting() {
       </p>
       <p>
         <strong>Tools appear but calls time out.</strong> Check that stdio is not blocked by a wrapper script. Use
-        the exact command <code>npx</code> with args <code>[&quot;-y&quot;, &quot;geoaeo-mcp&quot;]</code>.
+        the exact command <code>npx</code> with args <code>[&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
       </p>
     </>
   );

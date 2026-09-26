@@ -2,7 +2,7 @@
 
 ## What this is
 
-geoaeo is an npm package that makes a website discoverable, quotable, and usable by AI answer engines and agents. `npx geoaeo audit <url-or-dir>` scores a live site or a local directory 0-100 and lists the missing answer-engine artifacts. `npx geoaeo gen` produces them: llms.txt, sitemaps, robots rules, JSON-LD, WebMCP, and Markdown mirrors. `npx geoaeo humanize` finds AI-writing tells in prose. The same capabilities ship three ways — as a library import, as CLI commands, and as an MCP server (`npx geoaeo-mcp`) — so a person or an agent can run the full loop. The repo also holds usegeoaeo.com, the docs and marketing site, which serves the artifacts the package generates.
+geoaeo is an npm package that makes a website discoverable, quotable, and usable by AI answer engines and agents. `npx geoaeo audit <url-or-dir>` scores a live site or a local directory 0-100 and lists the missing answer-engine artifacts. `npx geoaeo gen` produces them: llms.txt, sitemaps, robots rules, JSON-LD, WebMCP, and Markdown mirrors. `npx geoaeo humanize` finds AI-writing tells in prose. The same capabilities ship three ways — as a library import, as CLI commands, and as an MCP server (`npx geoaeo mcp`) — so a person or an agent can run the full loop. The repo also holds usegeoaeo.com, the docs and marketing site, which serves the artifacts the package generates.
 
 ## Who it is for
 

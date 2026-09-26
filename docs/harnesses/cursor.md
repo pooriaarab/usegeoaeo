@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to Cursor. Use it to audit a site and generate GEO
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -25,11 +25,11 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
-Cursor starts `geoaeo-mcp` for you. You do not run it by hand.
+Cursor starts `geoaeo mcp` for you. You do not run it by hand.
 
 ## Configure the MCP server
 
@@ -42,7 +42,7 @@ Create `.cursor/mcp.json` in the repo root:
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }
@@ -140,7 +140,7 @@ Audit the repo root that contains `geoaeo.config.ts`. Cursor's working directory
 Run `npx geoaeo init ./` to create `geoaeo.config.ts`. Then retry.
 
 **Server starts then exits.**
-Run `npx -y geoaeo-mcp` in a terminal. It should wait on stdin. If it exits, update to Node >= 20 and reinstall `geoaeo`.
+Run `npx -y geoaeo mcp` in a terminal. It should wait on stdin. If it exits, update to Node >= 20 and reinstall `geoaeo`.
 
 ## Reference
 

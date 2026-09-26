@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to Gemini CLI. Use it to audit a site and generate
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -25,11 +25,11 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
-Gemini CLI starts `geoaeo-mcp` over stdio. You do not run it by hand.
+Gemini CLI starts `geoaeo mcp` over stdio. You do not run it by hand.
 
 ## Configure the MCP server
 
@@ -42,7 +42,7 @@ Add this entry to `~/.gemini/settings.json`:
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }
@@ -133,7 +133,7 @@ The `humanize` tool is also available: `{"glob": "content/**/*.md", "write": fal
 Confirm `~/.gemini/settings.json` is valid JSON. Run `cat ~/.gemini/settings.json | jq .`. Check Node >= 20 with `node --version`.
 
 **npx ENOENT or permission error.**
-Run `npx -y geoaeo-mcp` by hand. It should wait on stdin. If it fails, fix npm cache perms or install Node via nvm.
+Run `npx -y geoaeo mcp` by hand. It should wait on stdin. If it fails, fix npm cache perms or install Node via nvm.
 
 **audit returns empty or low score.**
 Ensure you audit the repo root that contains `geoaeo.config.ts` and site files. Use `{"target": "./"}` when the agent's cwd is the repo root.
@@ -142,7 +142,7 @@ Ensure you audit the repo root that contains `geoaeo.config.ts` and site files. 
 Run `npx geoaeo init ./` in the repo root, then retry.
 
 **Tools appear but calls hang.**
-Check that no wrapper overrides stdio. Use exact `command: npx` with `args: ["-y", "geoaeo-mcp"]`. Restart Gemini CLI after edits.
+Check that no wrapper overrides stdio. Use exact `command: npx` with `args: ["-y", "geoaeo", "mcp"]`. Restart Gemini CLI after edits.
 
 ## Reference
 

@@ -30,7 +30,7 @@ const features = [
     icon: Bot,
     title: "Built-in MCP server",
     description:
-      "Run geoaeo-mcp over stdio. Agents in Claude Code, Cursor, and other harnesses call the audit, gen, and humanize tools directly.",
+      "Run geoaeo mcp over stdio. Agents in Claude Code, Cursor, and other harnesses call the audit, gen, and humanize tools directly.",
   },
   {
     icon: Sparkles,

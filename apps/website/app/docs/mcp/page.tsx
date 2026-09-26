@@ -61,7 +61,7 @@ function WhatYouGet() {
           <code>mcp</code> — no other commands exist
         </li>
         <li>
-          MCP server command: <code>npx geoaeo-mcp</code> over stdio
+          MCP server command: <code>npx -y geoaeo mcp</code> over stdio
         </li>
         <li>
           MCP tools: <code>audit</code>, <code>gen</code>, <code>humanize</code>
@@ -96,10 +96,10 @@ npx geoaeo audit ./ --json
 npm install geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>You do not run geoaeo-mcp by hand when the harness manages it. The harness starts it over stdio.</p>
+      <p>You do not run geoaeo mcp by hand when the harness manages it. The harness starts it over stdio.</p>
     </>
   );
 }
@@ -110,7 +110,7 @@ function Transport() {
       <h2>Transport</h2>
       <p>
         stdio only. No SSE or HTTP transport exists. The server reads from stdin and writes to stdout. The harness
-        spawns it with <code>command: npx</code> and <code>args: [&quot;-y&quot;, &quot;geoaeo-mcp&quot;]</code>.
+        spawns it with <code>command: npx</code> and <code>args: [&quot;-y&quot;, &quot;geoaeo&quot;, &quot;mcp&quot;]</code>.
       </p>
     </>
   );
@@ -168,9 +168,9 @@ function RunDirectly() {
     <>
       <h2>Run directly</h2>
       <pre>
-        <code>{`npx geoaeo mcp
-# equivalent
-npx geoaeo-mcp`}</code>
+        <code>{`npx -y geoaeo mcp
+# equivalent: run the geoaeo-mcp bin
+npx -y --package=geoaeo geoaeo-mcp`}</code>
       </pre>
       <p>The process waits on stdin. You only run this for manual testing. Harnesses spawn it for you.</p>
     </>
@@ -187,7 +187,7 @@ function ConfigureAHarness() {
   "mcpServers": {
     "geoaeo": {
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   }
 }`}</code>
@@ -231,7 +231,7 @@ function SetupPrompt() {
       <p>Paste this prompt into your agent:</p>
       <pre>
         <code>{`Set up geoaeo in this agent. Detect the harness, then configure the
-geoaeo MCP server with command \`npx\` and args \`-y geoaeo-mcp\`.
+geoaeo MCP server with command \`npx\` and args \`-y geoaeo mcp\`.
 Run an audit on the current directory. Report the score and the
 top three fixes.`}</code>
       </pre>
@@ -253,7 +253,7 @@ function Troubleshooting() {
     <>
       <h2>Troubleshooting</h2>
       <p>
-        <strong>Server shows as disconnected.</strong> Run <code>npx -y geoaeo-mcp</code> in a terminal. It should
+        <strong>Server shows as disconnected.</strong> Run <code>npx -y geoaeo mcp</code> in a terminal. It should
         wait on stdin. Press Ctrl+C. If npx fails, check Node 20+ and npm registry access.
       </p>
       <p>

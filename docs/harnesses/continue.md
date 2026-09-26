@@ -6,7 +6,7 @@ Connect the geoaeo MCP server to Continue. Use it to audit a site and generate G
 
 *   CLI bins: `geoaeo` and `geoaeo-mcp`.
 *   CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`. No other commands exist.
-*   MCP server command: `npx geoaeo-mcp` over stdio.
+*   MCP server command: `npx -y geoaeo mcp` over stdio.
 *   MCP tools: `audit`, `gen`, `humanize`.
 
 ## Prerequisites
@@ -25,11 +25,11 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp
 ```
 
-Continue starts `geoaeo-mcp` over stdio. You do not run it by hand.
+Continue starts `geoaeo mcp` over stdio. You do not run it by hand.
 
 ## Configure the MCP server
 
@@ -43,7 +43,7 @@ Add to `~/.continue/config.yaml`:
 mcpServers:
   - name: geoaeo
     command: npx
-    args: ["-y", "geoaeo-mcp"]
+    args: ["-y", "geoaeo", "mcp"]
 ```
 
 Or with the indexed key form some builds use:
@@ -53,7 +53,7 @@ experimental:
   mcpServers:
     - name: geoaeo
       command: npx
-      args: ["-y", "geoaeo-mcp"]
+      args: ["-y", "geoaeo", "mcp"]
 ```
 
 ### Option B — config.json
@@ -66,7 +66,7 @@ Add to `~/.continue/config.json`:
     {
       "name": "geoaeo",
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   ]
 }

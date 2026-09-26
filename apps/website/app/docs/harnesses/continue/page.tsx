@@ -54,10 +54,10 @@ npx geoaeo audit ./ --json
 npm install -D geoaeo
 npx geoaeo --help
 
-# verify the MCP binary
-npx geoaeo-mcp --help`}</code>
+# verify the MCP server starts (it waits on stdin; Ctrl+C to stop)
+npx -y geoaeo mcp`}</code>
       </pre>
-      <p>Continue starts geoaeo-mcp over stdio. You do not run it by hand.</p>
+      <p>Continue starts geoaeo mcp over stdio. You do not run it by hand.</p>
     </>
   );
 }
@@ -80,7 +80,7 @@ function ConfigureMcpServer() {
         <code>{`mcpServers:
   - name: geoaeo
     command: npx
-    args: ["-y", "geoaeo-mcp"]`}</code>
+    args: ["-y", "geoaeo", "mcp"]`}</code>
       </pre>
       <p>Or with the indexed key form some builds use:</p>
       <pre>
@@ -88,7 +88,7 @@ function ConfigureMcpServer() {
   mcpServers:
     - name: geoaeo
       command: npx
-      args: ["-y", "geoaeo-mcp"]`}</code>
+      args: ["-y", "geoaeo", "mcp"]`}</code>
       </pre>
 
     </>
@@ -109,7 +109,7 @@ function ConfigureMcpServerOptionB() {
     {
       "name": "geoaeo",
       "command": "npx",
-      "args": ["-y", "geoaeo-mcp"]
+      "args": ["-y", "geoaeo", "mcp"]
     }
   ]
 }`}</code>
