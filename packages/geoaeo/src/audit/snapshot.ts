@@ -1,39 +1,45 @@
-import path from 'node:path';
-import type { PageSnapshot, TargetSnapshot } from './types.js';
-import { PAGE_EXTENSIONS } from './constants.js';
-import { findArtifact, readOptional, walkFiles } from './utils.js';
+import path from "node:path";
+import type { PageSnapshot, TargetSnapshot } from "./types.js";
+import { PAGE_EXTENSIONS } from "./constants.js";
+import { findArtifact, readOptional, walkFiles } from "./utils.js";
 
 async function collectArtifacts(files: string[]): Promise<Map<string, string>> {
-  const artifactNames = ['llms.txt', 'llms-full.txt', 'sitemap.xml', 'robots.txt', 'webmcp.json'];
+  const artifactNames = ["llms.txt", "llms-full.txt", "sitemap.xml", "robots.txt", "webmcp.json"];
   const artifacts = new Map<string, string>();
   for (const name of artifactNames) {
-    const file = name === 'webmcp.json'
-      ? findArtifact(files, name) ?? findArtifact(files, 'webmcp')
-      : findArtifact(files, name);
-    artifacts.set(name === 'webmcp.json' ? 'webmcp' : name, await readOptional(file));
+    const file =
+      name === "webmcp.json"
+        ? (findArtifact(files, name) ?? findArtifact(files, "webmcp"))
+        : findArtifact(files, name);
+    artifacts.set(name === "webmcp.json" ? "webmcp" : name, await readOptional(file));
   }
   const wellKnown: Array<[string, RegExp]> = [
-    ['mcp-card', /well-known\/mcp\/server-card\.json|well-known\/mcp\.json/i],
-    ['agent-card', /well-known\/agent-card\.json|well-known\/ai-plugin\.json/i],
-    ['agent-skills', /well-known\/agent-skills(\/index)?\.json/i],
-    ['api-catalog', /well-known\/api-catalog/i],
+    ["mcp-card", /well-known\/mcp\/server-card\.json|well-known\/mcp\.json/i],
+    ["agent-card", /well-known\/agent-card\.json|well-known\/ai-plugin\.json/i],
+    ["agent-skills", /well-known\/agent-skills(\/index)?\.json/i],
+    ["api-catalog", /well-known\/api-catalog/i],
   ];
   for (const [key, pattern] of wellKnown) {
-    const file = files.find(candidate => pattern.test(candidate.replaceAll('\\', '/')));
+    const file = files.find((candidate) => pattern.test(candidate.replaceAll("\\", "/")));
     artifacts.set(key, await readOptional(file));
   }
   return artifacts;
 }
 
 function collectMirrors(files: string[]): string[] {
-  return files.filter(file => /\.md$|\.md\/route\.ts$/.test(file) && !/README|BUILD_BRIEF/i.test(file));
+  return files.filter(
+    (file) => /\.md$|\.md\/route\.ts$/.test(file) && !/README|BUILD_BRIEF/i.test(file),
+  );
 }
 
 async function collectPages(files: string[]): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
-  const pageFiles = files.filter(file => {
+  const pageFiles = files.filter((file) => {
     if (/\.html?$/.test(file)) return true;
-    return PAGE_EXTENSIONS.has(path.extname(file)) && /(?:^|\/)(?:page|layout)\.(?:tsx|jsx|mdx)$/.test(file);
+    return (
+      PAGE_EXTENSIONS.has(path.extname(file)) &&
+      /(?:^|\/)(?:page|layout)\.(?:tsx|jsx|mdx)$/.test(file)
+    );
   });
   for (const file of pageFiles) {
     const source = await readOptional(file);
@@ -66,12 +72,12 @@ async function fetchText(url: string): Promise<FetchedText> {
     // response.url (e.g. a stubbed Response in tests) skips this check rather
     // than throwing on new URL('').
     if (response.url && new URL(response.url).host !== new URL(url).host) {
-      return { status: 0, text: '', xRobotsTag: '' };
+      return { status: 0, text: "", xRobotsTag: "" };
     }
-    const xRobotsTag = response.headers.get('x-robots-tag') ?? '';
+    const xRobotsTag = response.headers.get("x-robots-tag") ?? "";
     return { status: response.status, text: await response.text(), xRobotsTag };
   } catch {
-    return { status: 0, text: '', xRobotsTag: '' };
+    return { status: 0, text: "", xRobotsTag: "" };
   }
 }
 
@@ -84,20 +90,20 @@ async function fetchSingleArtifact(base: string, paths: string[]): Promise<strin
     const result = await fetchText(`${base}${artifactPath}`);
     if (result.status >= 200 && result.status < 400 && result.text) return result.text;
   }
-  return '';
+  return "";
 }
 
 async function fetchArtifacts(base: string): Promise<Map<string, string>> {
   const artifactPaths: Array<[string, string[]]> = [
-    ['llms.txt', ['/llms.txt']],
-    ['llms-full.txt', ['/llms-full.txt']],
-    ['sitemap.xml', ['/sitemap.xml']],
-    ['robots.txt', ['/robots.txt']],
-    ['webmcp', ['/webmcp', '/webmcp.json']],
-    ['mcp-card', ['/.well-known/mcp/server-card.json', '/.well-known/mcp.json']],
-    ['agent-card', ['/.well-known/agent-card.json', '/.well-known/ai-plugin.json']],
-    ['agent-skills', ['/.well-known/agent-skills/index.json', '/.well-known/agent-skills.json']],
-    ['api-catalog', ['/.well-known/api-catalog']],
+    ["llms.txt", ["/llms.txt"]],
+    ["llms-full.txt", ["/llms-full.txt"]],
+    ["sitemap.xml", ["/sitemap.xml"]],
+    ["robots.txt", ["/robots.txt"]],
+    ["webmcp", ["/webmcp", "/webmcp.json"]],
+    ["mcp-card", ["/.well-known/mcp/server-card.json", "/.well-known/mcp.json"]],
+    ["agent-card", ["/.well-known/agent-card.json", "/.well-known/ai-plugin.json"]],
+    ["agent-skills", ["/.well-known/agent-skills/index.json", "/.well-known/agent-skills.json"]],
+    ["api-catalog", ["/.well-known/api-catalog"]],
   ];
   const artifacts = new Map<string, string>();
   for (const [name, paths] of artifactPaths) {
@@ -108,7 +114,7 @@ async function fetchArtifacts(base: string): Promise<Map<string, string>> {
 
 function parseSitemapUrls(sitemap: string): string[] {
   return [...sitemap.matchAll(/<loc>\s*([^<]+)\s*<\/loc>/gi)]
-    .map(match => match[1])
+    .map((match) => match[1])
     .filter(Boolean)
     .slice(0, 4);
 }
@@ -147,16 +153,16 @@ async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSna
 async function fetchMirrors(pages: PageSnapshot[]): Promise<string[]> {
   const mirrors: string[] = [];
   for (const page of pages.slice(0, 4)) {
-    const mirror = await fetchText(`${page.url.replace(/\/$/, '')}.md`);
+    const mirror = await fetchText(`${page.url.replace(/\/$/, "")}.md`);
     if (mirror.status >= 200 && mirror.status < 400 && mirror.text) mirrors.push(`${page.url}.md`);
   }
   return mirrors;
 }
 
 export async function snapshotUrl(siteUrl: string): Promise<TargetSnapshot> {
-  const base = siteUrl.replace(/\/+$/, '');
+  const base = siteUrl.replace(/\/+$/, "");
   const artifacts = await fetchArtifacts(base);
-  const sitemap = artifacts.get('sitemap.xml') ?? '';
+  const sitemap = artifacts.get("sitemap.xml") ?? "";
   const pages = await fetchSitemapPages(base, sitemap);
   const mirrors = await fetchMirrors(pages);
   return { artifacts, pages, mirrors };
