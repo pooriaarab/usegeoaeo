@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import type { MentionCategory } from './mention-textarea';
+import { useState, useRef } from "react";
+import type { MentionCategory } from "./mention-textarea";
 
 export function useMentionState(initialValue: string) {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [mentionFilter, setMentionFilter] = useState('');
+  const [mentionFilter, setMentionFilter] = useState("");
   const [mentionCategory, setMentionCategory] = useState<MentionCategory | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isEmpty, setIsEmpty] = useState(!initialValue);

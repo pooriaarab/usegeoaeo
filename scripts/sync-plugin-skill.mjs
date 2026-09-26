@@ -3,14 +3,7 @@
 // must hold real files. The canonical skill is .claude/skills/geoaeo.
 // This script copies with dereference. `--check` fails the build on drift.
 
-import {
-  cpSync,
-  existsSync,
-  lstatSync,
-  readFileSync,
-  readdirSync,
-  rmSync,
-} from "node:fs";
+import { cpSync, existsSync, lstatSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 

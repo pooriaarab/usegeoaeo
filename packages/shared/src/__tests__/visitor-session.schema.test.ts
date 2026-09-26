@@ -29,21 +29,13 @@ describe("VisitorSessionSchema", () => {
   });
 
   it("rejects missing agentId or workspaceId", () => {
-    expect(
-      VisitorSessionSchema.safeParse({ ...base, agentId: "" }).success,
-    ).toBe(false);
-    expect(
-      VisitorSessionSchema.safeParse({ ...base, workspaceId: "" }).success,
-    ).toBe(false);
+    expect(VisitorSessionSchema.safeParse({ ...base, agentId: "" }).success).toBe(false);
+    expect(VisitorSessionSchema.safeParse({ ...base, workspaceId: "" }).success).toBe(false);
   });
 
   it("rejects negative counters", () => {
-    expect(
-      VisitorSessionSchema.safeParse({ ...base, messageCount: -1 }).success,
-    ).toBe(false);
-    expect(
-      VisitorSessionSchema.safeParse({ ...base, tokenUsage: -1 }).success,
-    ).toBe(false);
+    expect(VisitorSessionSchema.safeParse({ ...base, messageCount: -1 }).success).toBe(false);
+    expect(VisitorSessionSchema.safeParse({ ...base, tokenUsage: -1 }).success).toBe(false);
   });
 
   it("exposes hard-ceiling constants", () => {
