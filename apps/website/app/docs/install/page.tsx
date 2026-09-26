@@ -14,8 +14,7 @@ const intro =
 
 export default function InstallPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
+    <div className="mx-auto max-w-3xl">
         <DocsPageHeader crumb="Install" badge="Package: geoaeo" title="Install geoaeo" intro={intro} />
 
         <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
@@ -39,7 +38,6 @@ npx geoaeo audit ./ --json | head -n 30`}</code>
             </pre>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

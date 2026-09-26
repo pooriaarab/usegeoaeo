@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@template/ui/primitives/card";
-import { Alert, AlertDescription, AlertTitle } from "@template/ui/primitives/alert";
+import { Alert, AlertDescription } from "@template/ui/primitives/alert";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -167,7 +167,10 @@ function PageIntro() {
 function SourceAuditCaveat() {
   return (
     <Alert className="mb-10 sm:mb-14 max-w-3xl">
-      <AlertTitle>Source-directory audits understate framework apps</AlertTitle>
+      {/* Same look as AlertTitle, but a paragraph so we do not skip h2–h4. */}
+      <p className="mb-1 font-medium leading-none tracking-tight">
+        Source-directory audits understate framework apps
+      </p>
       <AlertDescription>
         <p>
           Framework apps understate when audited as a source directory
@@ -277,7 +280,7 @@ function ExampleCard({ example }: { example: (typeof examples)[number] }) {
           {example.command}
         </pre>
         <div>
-          <h3 className="text-sm font-semibold mb-3">What ships</h3>
+          <h2 className="text-sm font-semibold mb-3">What ships</h2>
           <ul className="space-y-2">
             {example.files.map((item) => (
               <li
