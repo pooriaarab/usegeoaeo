@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Filter } from 'lucide-react';
-import { Button } from '../primitives/button';
+import * as React from "react";
+import { Filter } from "lucide-react";
+import { Button } from "../primitives/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from '../primitives/dropdown-menu';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
+} from "../primitives/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../primitives/tooltip";
 import {
   FilterGroups,
   SearchField,
@@ -16,7 +16,7 @@ import {
   getFilteredGroups,
   getFilteredItems,
   resolveOpen,
-} from './table-filter-content';
+} from "./table-filter-content";
 
 export interface FilterItem {
   id: string;
@@ -80,7 +80,10 @@ function useTableFilterState(opts: {
   internalOpen: boolean;
 }) {
   const isOpen = resolveOpen(opts.open, opts.internalOpen);
-  const allItems = React.useMemo(() => getAllItems(opts.items, opts.groups), [opts.items, opts.groups]);
+  const allItems = React.useMemo(
+    () => getAllItems(opts.items, opts.groups),
+    [opts.items, opts.groups],
+  );
   const filteredItems = React.useMemo(
     () => getFilteredItems(allItems, opts.showSearch, opts.searchQuery),
     [allItems, opts.searchQuery, opts.showSearch],
@@ -122,49 +125,65 @@ function FilterDropdownContent(opts: {
   );
 }
 
+function useTableFilterMenu(opts: {
+  items: FilterItem[];
+  groups: FilterGroup[];
+  showSearch: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const { isOpen, filteredGroups } = useTableFilterState({
+    items: opts.items,
+    groups: opts.groups,
+    showSearch: opts.showSearch,
+    searchQuery,
+    open: opts.open,
+    internalOpen,
+  });
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      const handler = opts.onOpenChange ?? setInternalOpen;
+      handler(newOpen);
+      if (!newOpen) setSearchQuery("");
+    },
+    [opts.onOpenChange],
+  );
+  React.useEffect(() => {
+    if (isOpen && opts.showSearch) setTimeout(() => searchInputRef.current?.focus(), 0);
+  }, [isOpen, opts.showSearch]);
+  return { isOpen, filteredGroups, searchQuery, setSearchQuery, searchInputRef, handleOpenChange };
+}
+
 export function TableFilter({
   items = EMPTY_ITEMS,
   groups = EMPTY_GROUPS,
   trigger,
   showSearch = false,
-  searchPlaceholder = 'Filter by…',
+  searchPlaceholder = "Filter by…",
   searchKeyboardShortcut,
   showHeader = true,
-  headerTitle = 'Filter',
+  headerTitle = "Filter",
   open,
   onOpenChange,
 }: TableFilterProps) {
-  const [internalOpen, setInternalOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const searchInputRef = React.useRef<HTMLInputElement>(null);
-  const { isOpen, filteredGroups } = useTableFilterState({
-    items, groups, showSearch, searchQuery, open, internalOpen,
-  });
-  const handleOpenChange = React.useCallback(
-    (newOpen: boolean) => {
-      const handler = onOpenChange ?? setInternalOpen;
-      handler(newOpen);
-      if (!newOpen) setSearchQuery('');
-    },
-    [onOpenChange],
-  );
-  React.useEffect(() => {
-    if (isOpen && showSearch) setTimeout(() => searchInputRef.current?.focus(), 0);
-  }, [isOpen, showSearch]);
+  const menu = useTableFilterMenu({ items, groups, showSearch, open, onOpenChange });
   return (
-    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
+    <DropdownMenu open={menu.isOpen} onOpenChange={menu.handleOpenChange}>
       <DropdownMenuTrigger asChild>{trigger ?? <DefaultTrigger />}</DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="start" className="w-52 p-0">
         <FilterDropdownContent
           showHeader={showHeader}
           headerTitle={headerTitle}
           showSearch={showSearch}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+          searchQuery={menu.searchQuery}
+          setSearchQuery={menu.setSearchQuery}
           searchPlaceholder={searchPlaceholder}
           searchKeyboardShortcut={searchKeyboardShortcut}
-          searchInputRef={searchInputRef}
-          filteredGroups={filteredGroups}
+          searchInputRef={menu.searchInputRef}
+          filteredGroups={menu.filteredGroups}
         />
       </DropdownMenuContent>
     </DropdownMenu>
