@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import pkg from "../../../../../packages/geoaeo/package.json";
 
 export const dynamic = "force-static";
 
@@ -11,7 +12,8 @@ const agentCard = {
     organization: "geoaeo",
     url: "https://usegeoaeo.com",
   },
-  version: "0.5.0",
+  // The package file is the only copy of this number.
+  version: pkg.version,
   capabilities: {
     audit: true,
     generation: true,

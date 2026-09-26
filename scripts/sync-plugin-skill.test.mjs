@@ -2,14 +2,17 @@ import assert from "node:assert/strict";
 import { lstatSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, test } from "node:test";
 
 import {
   TARGET_DIR,
+  checkAgentCard,
   checkPluginSkill,
+  checkVersions,
   syncPluginSkill,
+  syncVersions,
 } from "./sync-plugin-skill.mjs";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
@@ -70,6 +73,87 @@ test("check fails when the generated copy is a symlink", () => {
   mkdirSync(target);
   symlinkSync(join(source, "SKILL.md"), join(target, "SKILL.md"));
   assert.throws(() => checkPluginSkill(source, target), /symlink/);
+});
+
+const SINK_FIXTURES = [
+  ["plugins/geoaeo/.claude-plugin/plugin.json", (version) => `{\n  "version": "${version}"\n}\n`],
+  ["plugins/geoaeo/.cursor-plugin/plugin.json", (version) => `{\n  "version": "${version}"\n}\n`],
+  ["plugins/geoaeo/.codex-plugin/plugin.json", (version) => `{\n  "version": "${version}"\n}\n`],
+  [
+    "plugins/geoaeo/mcp.json",
+    (version) =>
+      `{\n  "mcpServers": {\n    "geoaeo": {\n      "args": ["-y", "geoaeo@${version}", "mcp"]\n    }\n  }\n}\n`,
+  ],
+  [
+    "server.json",
+    (version) => `{\n  "version": "${version}",\n  "packages": [{ "version": "${version}" }]\n}\n`,
+  ],
+  ["README.md", (version) => `<img alt="npm geoaeo ${version}"/>\n`],
+];
+
+function writeSinks(root, version) {
+  for (const [rel, render] of SINK_FIXTURES) {
+    const path = join(root, rel);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, render(version));
+  }
+}
+
+test("committed versions match packages/geoaeo/package.json", () => {
+  checkVersions();
+  checkAgentCard();
+});
+
+test("check fails when a generated version drifts", () => {
+  const root = tempDir();
+  writeSinks(root, "9.9.9");
+  assert.throws(() => checkVersions(root, { name: "geoaeo", version: "0.5.0" }), /drifted/);
+});
+
+test("check fails when package.json is ahead of the copies", () => {
+  const root = tempDir();
+  writeSinks(root, "0.5.0");
+  assert.throws(() => checkVersions(root, { name: "geoaeo", version: "0.6.0" }), /drifted/);
+});
+
+test("sync rewrites drifted versions and the JSON still parses", () => {
+  const root = tempDir();
+  writeSinks(root, "9.9.9");
+  const identity = { name: "geoaeo", version: "0.5.0" };
+  syncVersions(root, identity);
+  checkVersions(root, identity);
+  for (const [rel] of SINK_FIXTURES) {
+    if (!rel.endsWith(".json")) continue;
+    const parsed = JSON.parse(readFileSync(join(root, rel), "utf8"));
+    assert.equal(typeof parsed, "object");
+  }
+  const server = JSON.parse(readFileSync(join(root, "server.json"), "utf8"));
+  assert.equal(server.version, "0.5.0");
+  assert.equal(server.packages[0].version, "0.5.0");
+});
+
+test("sync keeps file bytes when the version already matches", () => {
+  const root = tempDir();
+  writeSinks(root, "0.5.0");
+  const rel = "plugins/geoaeo/.claude-plugin/plugin.json";
+  const before = readFileSync(join(root, rel), "utf8");
+  syncVersions(root, { name: "geoaeo", version: "0.5.0" });
+  assert.equal(readFileSync(join(root, rel), "utf8"), before);
+});
+
+test("check fails when the agent card hard-codes a version", () => {
+  const root = tempDir();
+  const dir = join(root, "apps/website/app/.well-known/agent-card.json");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(
+    join(dir, "route.ts"),
+    [
+      'import pkg from "../../../../../packages/geoaeo/package.json";',
+      'const agentCard = { version: "9.9.9" };',
+      "",
+    ].join("\n"),
+  );
+  assert.throws(() => checkAgentCard(root), /hand-written/);
 });
 
 test("sync writes a real file even when asked to copy a symlink", () => {
