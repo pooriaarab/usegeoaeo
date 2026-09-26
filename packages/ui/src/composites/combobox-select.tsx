@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Check, ChevronsUpDown } from 'lucide-react';
-import { cn } from '../utils';
-import { Button } from '../primitives/button';
-import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../primitives/command';
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "../utils";
+import { Button } from "../primitives/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../primitives/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../primitives/command";
 
 export interface ComboboxOption {
   value: string;
@@ -24,7 +31,13 @@ interface ComboboxSelectProps {
   disabled?: boolean;
 }
 
-function SelectedLabel({ selected, placeholder }: { selected?: ComboboxOption; placeholder: string }) {
+function SelectedLabel({
+  selected,
+  placeholder,
+}: {
+  selected?: ComboboxOption;
+  placeholder: string;
+}) {
   if (selected) {
     return (
       <span className="flex items-center gap-1.5 min-w-0">
@@ -46,8 +59,15 @@ function OptionRow({
   onSelect: (v: string) => void;
 }) {
   return (
-    <CommandItem key={option.value} value={option.label} onSelect={() => onSelect(option.value)} className="text-sm">
-      <Check className={cn('mr-1.5 h-3.5 w-3.5', value === option.value ? 'opacity-100' : 'opacity-0')} />
+    <CommandItem
+      key={option.value}
+      value={option.label}
+      onSelect={() => onSelect(option.value)}
+      className="text-sm"
+    >
+      <Check
+        className={cn("mr-1.5 h-3.5 w-3.5", value === option.value ? "opacity-100" : "opacity-0")}
+      />
       {option.icon && <span className="mr-1.5">{option.icon}</span>}
       {option.label}
     </CommandItem>
@@ -72,7 +92,10 @@ function ComboboxList({
   return (
     <Command>
       <CommandInput placeholder={searchPlaceholder} className="h-9 text-sm" />
-      <CommandList id={listboxId} className="max-h-[260px] [&>div]:max-h-[inherit] [&>div]:overflow-y-auto">
+      <CommandList
+        id={listboxId}
+        className="max-h-[260px] [&>div]:max-h-[inherit] [&>div]:overflow-y-auto"
+      >
         <CommandEmpty>{emptyText}</CommandEmpty>
         <CommandGroup>
           {options.map((option) => (
@@ -106,7 +129,7 @@ function ComboboxTrigger({
       aria-expanded={open}
       aria-controls={listboxId}
       disabled={disabled}
-      className={cn('justify-between h-9 text-sm font-normal', className)}
+      className={cn("justify-between h-9 text-sm font-normal", className)}
     >
       <SelectedLabel selected={selected} placeholder={placeholder} />
       <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
@@ -114,7 +137,11 @@ function ComboboxTrigger({
   );
 }
 
-function useComboboxState(value: string, options: ComboboxOption[], onValueChange: (v: string) => void) {
+function useComboboxState(
+  value: string,
+  options: ComboboxOption[],
+  onValueChange: (v: string) => void,
+) {
   const [open, setOpen] = React.useState(false);
   const listboxId = React.useId();
   const selected = options.find((o) => o.value === value);
@@ -132,13 +159,17 @@ export function ComboboxSelect({
   value,
   onValueChange,
   options,
-  placeholder = 'Select…',
-  searchPlaceholder = 'Search…',
-  emptyText = 'No results.',
+  placeholder = "Select…",
+  searchPlaceholder = "Search…",
+  emptyText = "No results.",
   className,
   disabled,
 }: ComboboxSelectProps) {
-  const { open, setOpen, listboxId, selected, handleSelect } = useComboboxState(value, options, onValueChange);
+  const { open, setOpen, listboxId, selected, handleSelect } = useComboboxState(
+    value,
+    options,
+    onValueChange,
+  );
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
