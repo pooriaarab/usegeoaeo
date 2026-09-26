@@ -57,7 +57,7 @@ export function Item({
       <CardContent className="space-y-4">
         {covers.length > 0 ? (
           <div>
-            <h4 className="text-sm font-semibold mb-2">How geoaeo covers it</h4>
+            <h3 className="text-sm font-semibold mb-2">How geoaeo covers it</h3>
             <ul className="list-disc pl-5 space-y-1.5 text-sm text-muted-foreground leading-relaxed">
               {covers.map((line) => (
                 <li key={line}>{line}</li>
@@ -67,7 +67,7 @@ export function Item({
         ) : null}
         {extra}
         <div>
-          <h4 className="text-sm font-semibold mb-2">Not covered yet</h4>
+          <h3 className="text-sm font-semibold mb-2">Not covered yet</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">{gaps}</p>
         </div>
       </CardContent>
