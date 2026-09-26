@@ -4,9 +4,9 @@
  * Lives in primitives/ — imports only from lib/ utilities.
  */
 
-'use client';
+"use client";
 
-import { cn } from '../utils';
+import { cn } from "../utils";
 
 interface LevelRingProps {
   /** Agent level (1-10) */
@@ -20,10 +20,10 @@ interface LevelRingProps {
 }
 
 function getRingStyle(level: number) {
-  if (level <= 3) return { width: 2, colorClass: 'stroke-muted-foreground/50' };
-  if (level <= 6) return { width: 2.5, colorClass: 'stroke-info' };
-  if (level <= 8) return { width: 3, colorClass: 'stroke-warning' };
-  return { width: 3.5, colorClass: 'stroke-chart-1' };
+  if (level <= 3) return { width: 2, colorClass: "stroke-muted-foreground/50" };
+  if (level <= 6) return { width: 2.5, colorClass: "stroke-info" };
+  if (level <= 8) return { width: 3, colorClass: "stroke-warning" };
+  return { width: 3.5, colorClass: "stroke-chart-1" };
 }
 
 function getRingMetrics(level: number, xpProgress: number, size: number) {
@@ -38,8 +38,25 @@ function getRingMetrics(level: number, xpProgress: number, size: number) {
   return { ring, outerSize, center, radius, circumference, progressOffset };
 }
 
-function RingBackground({ center, radius, width }: { center: number; radius: number; width: number }) {
-  return <circle cx={center} cy={center} r={radius} fill="none" strokeWidth={width} className="stroke-muted/50" />;
+function RingBackground({
+  center,
+  radius,
+  width,
+}: {
+  center: number;
+  radius: number;
+  width: number;
+}) {
+  return (
+    <circle
+      cx={center}
+      cy={center}
+      r={radius}
+      fill="none"
+      strokeWidth={width}
+      className="stroke-muted/50"
+    />
+  );
 }
 
 function RingProgress({
@@ -68,7 +85,7 @@ function RingProgress({
       strokeDasharray={circumference}
       strokeDashoffset={offset}
       strokeLinecap="round"
-      style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+      style={{ transition: "stroke-dashoffset 0.5s ease-out" }}
     />
   );
 }
@@ -91,7 +108,7 @@ function RingShimmer({
       width={outerSize}
       height={outerSize}
       className="absolute inset-0 animate-level-shimmer"
-      style={{ transform: 'rotate(-90deg)' }}
+      style={{ transform: "rotate(-90deg)" }}
     >
       <circle
         cx={center}
@@ -108,13 +125,22 @@ function RingShimmer({
 }
 
 export function LevelRing({ level, xpProgress, size, children, className }: LevelRingProps) {
-  const { ring, outerSize, center, radius, circumference, progressOffset } = getRingMetrics(level, xpProgress, size);
+  const { ring, outerSize, center, radius, circumference, progressOffset } = getRingMetrics(
+    level,
+    xpProgress,
+    size,
+  );
   return (
     <div
-      className={cn('relative inline-flex items-center justify-center', className)}
+      className={cn("relative inline-flex items-center justify-center", className)}
       style={{ width: outerSize, height: outerSize }}
     >
-      <svg width={outerSize} height={outerSize} className="absolute inset-0" style={{ transform: 'rotate(-90deg)' }}>
+      <svg
+        width={outerSize}
+        height={outerSize}
+        className="absolute inset-0"
+        style={{ transform: "rotate(-90deg)" }}
+      >
         <RingBackground center={center} radius={radius} width={ring.width} />
         <RingProgress
           center={center}
