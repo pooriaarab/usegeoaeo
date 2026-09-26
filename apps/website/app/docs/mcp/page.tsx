@@ -3,11 +3,13 @@ import { DocsPageHeader } from "@/components/docs/docs-page-header";
 import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@template/ui/primitives/card";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo MCP Server — stdio tools for audit, gen, humanize",
   description:
     "Run geoaeo as an MCP server with the geoaeo-mcp bin. Expose audit, gen, and humanize over stdio to Claude Code, Cursor, and every supported harness.",
+  alternates: pageAlternates("/docs/mcp"),
 };
 
 const intro =

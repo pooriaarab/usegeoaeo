@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { DocsPageHeader } from "@/components/docs/docs-page-header";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@template/ui/primitives/card";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "Install geoaeo — npm install for SEO, GEO, and AEO toolkit",
   description:
     "Add geoaeo to any project with npm install geoaeo. Use npx for one-offs, verify both bins, and scaffold a config for your framework in seconds.",
+  alternates: pageAlternates("/docs/install"),
 };
 
 const intro =

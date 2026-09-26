@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
 import { InstallThePlugin } from "@/components/docs/install-the-plugin";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo in Claude Code — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Claude Code via the geoaeo-mcp server. Configure .mcp.json, verify three tools, audit your site, and generate artifacts without leaving the agent.",
+  alternates: pageAlternates("/docs/harnesses/claude-code"),
 };
 
 const intro =

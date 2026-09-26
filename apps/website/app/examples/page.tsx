@@ -21,11 +21,13 @@ import {
 } from "@template/ui/primitives/breadcrumb";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/landing/footer";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "Examples — geoaeo",
   description:
     "Three geoaeo example sites and their source-directory audit scores: static HTML 80/100, Next.js 48/100, Astro 46/100. Framework apps understate when audited as a source directory because artifacts are generated at runtime.",
+  alternates: pageAlternates("/examples"),
 };
 
 const examples = [

@@ -29,7 +29,6 @@ export const metadata: Metadata = {
   description,
   authors: [{ name: "Pooria Arab", url: "https://github.com/pooriaarab" }],
   creator: "Pooria Arab",
-  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "https://usegeoaeo.com",
