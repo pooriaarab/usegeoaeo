@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { ChevronRightIcon } from 'lucide-react';
-import { cn } from '../utils';
-import type { FileTreeItem } from './file-tree';
+import { ChevronRightIcon } from "lucide-react";
+import { cn } from "../utils";
+import type { FileTreeItem } from "./file-tree";
 
 function ExpandIcon({ isExpanded, isDirectory }: { isExpanded: boolean; isDirectory: boolean }) {
   if (!isDirectory) return <span className="h-3.5 w-3.5 shrink-0" />;
   return (
     <ChevronRightIcon
       className={cn(
-        'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150',
-        isExpanded && 'rotate-90',
+        "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform duration-150",
+        isExpanded && "rotate-90",
       )}
     />
   );
@@ -45,11 +45,11 @@ export function FileTreeNodeButton({
       data-focused={isFocused || undefined}
       data-selected={isSelected || undefined}
       className={cn(
-        'flex w-full items-center gap-1.5 rounded-md px-2 py-1',
-        'text-left text-sm transition-colors',
-        'hover:bg-accent/50',
-        'outline-none data-[focused]:ring-1 data-[focused]:ring-ring',
-        isSelected ? 'bg-accent text-accent-foreground font-medium' : 'text-foreground/80',
+        "flex w-full items-center gap-1.5 rounded-md px-2 py-1",
+        "text-left text-sm transition-colors",
+        "hover:bg-accent/50",
+        "outline-none data-[focused]:ring-1 data-[focused]:ring-ring",
+        isSelected ? "bg-accent text-accent-foreground font-medium" : "text-foreground/80",
       )}
       style={{ paddingLeft: `${depth * 16 + 8}px` }}
     >
