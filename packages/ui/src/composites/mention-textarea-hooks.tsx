@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { extractRawText } from './mention-helpers';
-import { doDetectTrigger, doInsertMention, handleDropdownNav, handleBrInsert } from './mention-actions';
-import type { MentionEntity } from './mention-textarea';
+import { useCallback } from "react";
+import { extractRawText } from "./mention-helpers";
+import {
+  doDetectTrigger,
+  doInsertMention,
+  handleDropdownNav,
+  handleBrInsert,
+} from "./mention-actions";
+import type { MentionEntity } from "./mention-textarea";
 
 function useDetectTrigger(opts: {
   setShowDropdown: (v: boolean) => void;
-  setMentionCategory: (v: MentionEntity['category'] | null) => void;
+  setMentionCategory: (v: MentionEntity["category"] | null) => void;
   setMentionFilter: (v: string) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   mentionTriggerNode: React.MutableRefObject<Text | null>;
@@ -42,7 +47,7 @@ function useInsertMention(opts: {
   setIsEmpty: (v: boolean) => void;
   onChange: (v: string) => void;
   setShowDropdown: (v: boolean) => void;
-  setMentionCategory: (v: MentionEntity['category'] | null) => void;
+  setMentionCategory: (v: MentionEntity["category"] | null) => void;
   setMentionFilter: (v: string) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
@@ -101,7 +106,14 @@ function useHandleInput(opts: {
     opts.setIsEmpty(!rawText);
     opts.onChange(rawText);
     opts.detect();
-  }, [opts.editorRef, opts.isComposing, opts.lastExtractedValue, opts.setIsEmpty, opts.onChange, opts.detect]);
+  }, [
+    opts.editorRef,
+    opts.isComposing,
+    opts.lastExtractedValue,
+    opts.setIsEmpty,
+    opts.onChange,
+    opts.detect,
+  ]);
 }
 
 function useHandleKeyDown(opts: {
@@ -148,7 +160,7 @@ function useHandlePaste(handleInput: () => void) {
   return useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       e.preventDefault();
-      const text = e.clipboardData.getData('text/plain');
+      const text = e.clipboardData.getData("text/plain");
       const sel = window.getSelection();
       if (!sel || sel.rangeCount === 0) return;
       const range = sel.getRangeAt(0);
@@ -172,7 +184,7 @@ function useMentionCore(opts: {
   setIsEmpty: (v: boolean) => void;
   onChange: (v: string) => void;
   setShowDropdown: (v: boolean) => void;
-  setMentionCategory: (v: MentionEntity['category'] | null) => void;
+  setMentionCategory: (v: MentionEntity["category"] | null) => void;
   setMentionFilter: (v: string) => void;
   setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
   mentionTriggerNode: React.MutableRefObject<Text | null>;
@@ -235,8 +247,12 @@ function useMentionInteractions(opts: {
     externalKeyDown: opts.externalKeyDown,
   });
   const handlePaste = useHandlePaste(opts.handleInput);
-  const handleClick = useCallback(() => { opts.detectMentionTrigger(); }, [opts.detectMentionTrigger]);
-  const handleBlur = useCallback(() => { setTimeout(() => opts.setShowDropdown(false), 150); }, [opts.setShowDropdown]);
+  const handleClick = useCallback(() => {
+    opts.detectMentionTrigger();
+  }, [opts.detectMentionTrigger]);
+  const handleBlur = useCallback(() => {
+    setTimeout(() => opts.setShowDropdown(false), 150);
+  }, [opts.setShowDropdown]);
   return { handleKeyDown, handlePaste, handleClick, handleBlur };
 }
 
@@ -255,7 +271,7 @@ export function useMentionCallbacks(opts: {
   renderEntityIconDOM?: (e: MentionEntity) => HTMLElement | null;
   mentionTriggerNode: React.MutableRefObject<Text | null>;
   mentionTriggerOffset: React.MutableRefObject<number>;
-  setMentionCategory: (v: MentionEntity['category'] | null) => void;
+  setMentionCategory: (v: MentionEntity["category"] | null) => void;
   setMentionFilter: (v: string) => void;
   externalKeyDown?: (e: React.KeyboardEvent<HTMLElement>) => void;
 }) {
