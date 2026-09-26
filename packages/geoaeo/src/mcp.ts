@@ -4,11 +4,8 @@ import { fileURLToPath } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import {
-  assertAllowedPath,
-  PathOutsideAllowedRootsError,
-  readAllowedRoots,
-} from "./allowed-roots.js";
+import { readAllowedRoots } from "./allowed-roots.js";
+import { pathBoundError } from "./mcp-path-gate.js";
 import { auditTarget, type AuditCheck, type AuditReport } from "./audit.js";
 import { formatAuditReport } from "./audit/format.js";
 import { VERSION, PKG_NAME, CONFIG_FILENAME } from "./constants.js";
@@ -100,31 +97,6 @@ const humanizeOutputSchema = z.looseObject({
     )
     .describe("One entry per scanned file."),
 });
-
-function pathToolError(error: PathOutsideAllowedRootsError) {
-  return {
-    isError: true,
-    content: [{ type: "text" as const, text: error.message }],
-    structuredContent: {
-      status: "error",
-      error: { code: error.code, message: error.message },
-    },
-  };
-}
-
-async function pathBoundError(
-  input: string,
-  roots: readonly string[] | undefined,
-  allowHttpUrl = false,
-) {
-  try {
-    await assertAllowedPath(input, roots, allowHttpUrl);
-    return undefined;
-  } catch (error) {
-    if (error instanceof PathOutsideAllowedRootsError) return pathToolError(error);
-    throw error;
-  }
-}
 
 async function auditHandler(
   { target }: { target: string },
