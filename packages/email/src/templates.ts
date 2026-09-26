@@ -32,7 +32,11 @@ export function welcomeSubject(props: EmailWelcomeProps): string {
   return `Welcome to ${props.workspaceName}`;
 }
 
-export function renderWelcome(props: EmailWelcomeProps): { subject: string; html: string; text: string } {
+export function renderWelcome(props: EmailWelcomeProps): {
+  subject: string;
+  html: string;
+  text: string;
+} {
   const name = props.ownerName?.trim() || "there";
   const subject = welcomeSubject(props);
   const text = `Hi ${name},\n\nYour workspace "${props.workspaceName}" is ready.\n\n— Team`;
@@ -49,9 +53,11 @@ export function passwordResetSubject(_props: EmailPasswordResetProps): string {
   return "Reset your password";
 }
 
-export function renderPasswordReset(
-  props: EmailPasswordResetProps,
-): { subject: string; html: string; text: string } {
+export function renderPasswordReset(props: EmailPasswordResetProps): {
+  subject: string;
+  html: string;
+  text: string;
+} {
   const subject = passwordResetSubject(props);
   const text = `Reset your password:\n${props.resetUrl}\n\nIf you did not request this, ignore this email.`;
   const html = layout(
@@ -68,9 +74,11 @@ export function billingReceiptSubject(props: EmailBillingReceiptProps): string {
   return `Receipt for ${props.workspaceName}`;
 }
 
-export function renderBillingReceipt(
-  props: EmailBillingReceiptProps,
-): { subject: string; html: string; text: string } {
+export function renderBillingReceipt(props: EmailBillingReceiptProps): {
+  subject: string;
+  html: string;
+  text: string;
+} {
   const amount = (props.amountCents / 100).toFixed(2);
   const subject = billingReceiptSubject(props);
   const text = `Payment received for ${props.workspaceName}: $${amount}. Invoice: ${props.invoiceUrl}`;
