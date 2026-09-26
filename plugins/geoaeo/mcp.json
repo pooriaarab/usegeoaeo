@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "geoaeo": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "geoaeo@0.4.0",
+        "mcp"
+      ]
+    }
+  }
+}
