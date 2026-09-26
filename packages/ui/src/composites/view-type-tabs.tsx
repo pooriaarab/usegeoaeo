@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Table2, LayoutGrid, Network, Calendar, GitBranch } from 'lucide-react';
-import { Button } from '../primitives/button';
-import type { DisplaySettings, ViewType } from './display-popover';
+import { Table2, LayoutGrid, Network, Calendar, GitBranch } from "lucide-react";
+import { Button } from "../primitives/button";
+import type { DisplaySettings, ViewType } from "./display-popover";
 
 function ViewTabButton({
   active,
@@ -15,7 +15,7 @@ function ViewTabButton({
 }) {
   return (
     <Button
-      variant={active ? 'secondary' : 'ghost'}
+      variant={active ? "secondary" : "ghost"}
       size="sm"
       className="h-7 gap-1.5 text-xs"
       onClick={onClick}
@@ -36,29 +36,26 @@ export function ViewTypeTabs({
 }) {
   return (
     <div className="flex items-center gap-1 border-b p-3">
-      <ViewTabButton active={view === 'list'} onClick={() => update({ view: 'list' })}>
+      <ViewTabButton active={view === "list"} onClick={() => update({ view: "list" })}>
         <Table2 className="h-3.5 w-3.5" /> List
       </ViewTabButton>
       {flags.board && (
-        <ViewTabButton active={view === 'board'} onClick={() => update({ view: 'board' })}>
+        <ViewTabButton active={view === "board"} onClick={() => update({ view: "board" })}>
           <LayoutGrid className="h-3.5 w-3.5" /> Board
         </ViewTabButton>
       )}
       {flags.graph && (
-        <ViewTabButton active={view === 'graph'} onClick={() => update({ view: 'graph' })}>
+        <ViewTabButton active={view === "graph"} onClick={() => update({ view: "graph" })}>
           <Network className="h-3.5 w-3.5" /> Graph
         </ViewTabButton>
       )}
       {flags.calendar && (
-        <ViewTabButton
-          active={view === 'calendar'}
-          onClick={() => update({ view: 'calendar' })}
-        >
+        <ViewTabButton active={view === "calendar"} onClick={() => update({ view: "calendar" })}>
           <Calendar className="h-3.5 w-3.5" /> Calendar
         </ViewTabButton>
       )}
       {flags.org && (
-        <ViewTabButton active={view === 'org'} onClick={() => update({ view: 'org' })}>
+        <ViewTabButton active={view === "org"} onClick={() => update({ view: "org" })}>
           <GitBranch className="h-3.5 w-3.5" /> Org
         </ViewTabButton>
       )}

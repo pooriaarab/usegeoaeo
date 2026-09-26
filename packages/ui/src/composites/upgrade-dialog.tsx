@@ -21,10 +21,10 @@
  * ```
  */
 
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '../primitives/button';
+import { useState } from "react";
+import { Button } from "../primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -32,7 +32,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../primitives/dialog';
+} from "../primitives/dialog";
 
 export interface UpgradePlanOption {
   id: string;
@@ -60,14 +60,19 @@ function PlanCard({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div key={plan.id} className="flex items-center justify-between rounded-md border border-border p-4">
+    <div
+      key={plan.id}
+      className="flex items-center justify-between rounded-md border border-border p-4"
+    >
       <div className="flex flex-col">
         <span className="font-medium">{plan.name}</span>
         <span className="text-sm text-muted-foreground">{plan.price}</span>
-        {plan.description ? <span className="mt-1 text-xs text-muted-foreground">{plan.description}</span> : null}
+        {plan.description ? (
+          <span className="mt-1 text-xs text-muted-foreground">{plan.description}</span>
+        ) : null}
       </div>
       <Button onClick={() => onSelect(plan.id)} disabled={pendingId !== null}>
-        {pendingId === plan.id ? 'Redirecting...' : 'Choose'}
+        {pendingId === plan.id ? "Redirecting..." : "Choose"}
       </Button>
     </div>
   );
@@ -76,8 +81,8 @@ function PlanCard({
 export function UpgradeDialog({
   open,
   onOpenChange,
-  title = 'Upgrade your plan',
-  description = 'Pick a plan to unlock more capacity and features.',
+  title = "Upgrade your plan",
+  description = "Pick a plan to unlock more capacity and features.",
   plans,
   onSelectPlan,
 }: UpgradeDialogProps) {

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { ArrowUpDown, Layers } from 'lucide-react';
-import { cn } from '../utils';
-import { Button } from '../primitives/button';
-import { ComboboxSelect, type ComboboxOption } from './combobox-select';
-import type { DisplaySettings } from './display-popover';
+import { ArrowUpDown, Layers } from "lucide-react";
+import { cn } from "../utils";
+import { Button } from "../primitives/button";
+import { ComboboxSelect, type ComboboxOption } from "./combobox-select";
+import type { DisplaySettings } from "./display-popover";
 
 function LabeledCombobox({
   label,
@@ -58,15 +58,15 @@ function OrderingRow({
         className="h-8 w-8 shrink-0"
         onClick={() =>
           update({
-            orderDirection: settings.orderDirection === 'asc' ? 'desc' : 'asc',
+            orderDirection: settings.orderDirection === "asc" ? "desc" : "asc",
           })
         }
         aria-label="Toggle sort direction"
       >
         <ArrowUpDown
           className={cn(
-            'h-3.5 w-3.5 transition-transform',
-            settings.orderDirection === 'desc' && 'rotate-180',
+            "h-3.5 w-3.5 transition-transform",
+            settings.orderDirection === "desc" && "rotate-180",
           )}
         />
       </Button>
@@ -99,11 +99,7 @@ export function GroupingOrderingSection({
         onValueChange={(v) => update({ subGrouping: v })}
         options={groupingOptions}
       />
-      <OrderingRow
-        settings={settings}
-        update={update}
-        orderingOptions={orderingOptions}
-      />
+      <OrderingRow settings={settings} update={update} orderingOptions={orderingOptions} />
     </div>
   );
 }
