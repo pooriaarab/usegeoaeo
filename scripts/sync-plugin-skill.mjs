@@ -5,7 +5,7 @@
 //
 // The same run stamps packages/geoaeo/package.json onto the plugin manifests,
 // both server.json version fields, and the README badge alt text. The agent
-// card imports that package.json, so it has no second copy of the number.
+// card reads the generated server card, so it has no second copy of the number.
 
 import {
   cpSync,
@@ -34,7 +34,7 @@ const VERSION_SINKS = [
 ];
 
 const AGENT_CARD_REL = "apps/website/app/.well-known/agent-card.json/route.ts";
-const AGENT_CARD_IMPORT = 'from "../../../../../packages/geoaeo/package.json"';
+const AGENT_CARD_IMPORT = 'from "../../../src/generated/server-card.generated"';
 
 function listRelativeFiles(dir) {
   return readdirSync(dir, { recursive: true })
@@ -224,10 +224,10 @@ export function checkAgentCard(root = repoRoot) {
     throw new Error(`${AGENT_CARD_REL} has a hand-written version string`);
   }
   const importsPackage = text.includes(AGENT_CARD_IMPORT);
-  const usesPackageVersion = /version:\s*pkg\.version\b/.test(text);
+  const usesPackageVersion = /JSON\.parse\(serverCardJson\)/.test(text);
   if (!importsPackage || !usesPackageVersion) {
     throw new Error(
-      `${AGENT_CARD_REL} must import packages/geoaeo/package.json and set version to pkg.version`,
+      `${AGENT_CARD_REL} must read its version from the generated server card`,
     );
   }
 }

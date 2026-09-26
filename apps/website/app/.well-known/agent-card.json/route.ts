@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
-import pkg from "../../../../../packages/geoaeo/package.json";
+import { serverCardJson } from "../../../src/generated/server-card.generated";
 
 export const dynamic = "force-static";
+
+// server.json is stamped from packages/geoaeo/package.json and checked for
+// drift, so its generated copy carries the package version into the bundle.
+const { version } = JSON.parse(serverCardJson) as { version: string };
 
 const agentCard = {
   name: "geoaeo",
@@ -12,8 +16,7 @@ const agentCard = {
     organization: "geoaeo",
     url: "https://usegeoaeo.com",
   },
-  // The package file is the only copy of this number.
-  version: pkg.version,
+  version,
   capabilities: {
     audit: true,
     generation: true,

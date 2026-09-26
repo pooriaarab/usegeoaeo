@@ -148,7 +148,7 @@ test("check fails when the agent card hard-codes a version", () => {
   writeFileSync(
     join(dir, "route.ts"),
     [
-      'import pkg from "../../../../../packages/geoaeo/package.json";',
+      'import { serverCardJson } from "../../../src/generated/server-card.generated";',
       'const agentCard = { version: "9.9.9" };',
       "",
     ].join("\n"),
