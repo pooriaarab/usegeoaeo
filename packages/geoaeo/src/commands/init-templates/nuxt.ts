@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { PKG_NAME } from '../../constants.js';
-import { configImport } from './helpers.js';
+import path from "node:path";
+import { PKG_NAME } from "../../constants.js";
+import { configImport } from "./helpers.js";
 
 function nuxtLlmsRoute(llmsImport: string): string {
   return `import { generateLlms } from '${PKG_NAME}';
@@ -96,20 +96,20 @@ Read more: \${siteConfig.siteUrl}/\${page}
 }
 
 export function nuxtTemplates(root: string): Map<string, string> {
-  const llmsImport = configImport(root, path.join(root, 'server/routes/llms.txt.get.ts'));
-  const llmsFullImport = configImport(root, path.join(root, 'server/routes/llms-full.txt.get.ts'));
-  const webmcpImport = configImport(root, path.join(root, 'server/routes/webmcp.json.get.ts'));
-  const sitemapImport = configImport(root, path.join(root, 'server/routes/sitemap.xml.get.ts'));
-  const robotsImport = configImport(root, path.join(root, 'server/routes/robots.txt.get.ts'));
-  const jsonLdImport = configImport(root, path.join(root, 'components/SeoJsonLd.vue'));
-  const mirrorImport = configImport(root, path.join(root, 'server/routes/[page].md.get.ts'));
+  const llmsImport = configImport(root, path.join(root, "server/routes/llms.txt.get.ts"));
+  const llmsFullImport = configImport(root, path.join(root, "server/routes/llms-full.txt.get.ts"));
+  const webmcpImport = configImport(root, path.join(root, "server/routes/webmcp.json.get.ts"));
+  const sitemapImport = configImport(root, path.join(root, "server/routes/sitemap.xml.get.ts"));
+  const robotsImport = configImport(root, path.join(root, "server/routes/robots.txt.get.ts"));
+  const jsonLdImport = configImport(root, path.join(root, "components/SeoJsonLd.vue"));
+  const mirrorImport = configImport(root, path.join(root, "server/routes/[page].md.get.ts"));
   return new Map([
-    ['server/routes/llms.txt.get.ts', nuxtLlmsRoute(llmsImport)],
-    ['server/routes/llms-full.txt.get.ts', nuxtLlmsFullRoute(llmsFullImport)],
-    ['server/routes/webmcp.json.get.ts', nuxtWebmcpRoute(webmcpImport)],
-    ['server/routes/sitemap.xml.get.ts', nuxtSitemapRoute(sitemapImport)],
-    ['server/routes/robots.txt.get.ts', nuxtRobotsRoute(robotsImport)],
-    ['components/SeoJsonLd.vue', nuxtJsonLdComponent(jsonLdImport)],
-    ['server/routes/[page].md.get.ts', nuxtMirrorRoute(mirrorImport)],
+    ["server/routes/llms.txt.get.ts", nuxtLlmsRoute(llmsImport)],
+    ["server/routes/llms-full.txt.get.ts", nuxtLlmsFullRoute(llmsFullImport)],
+    ["server/routes/webmcp.json.get.ts", nuxtWebmcpRoute(webmcpImport)],
+    ["server/routes/sitemap.xml.get.ts", nuxtSitemapRoute(sitemapImport)],
+    ["server/routes/robots.txt.get.ts", nuxtRobotsRoute(robotsImport)],
+    ["components/SeoJsonLd.vue", nuxtJsonLdComponent(jsonLdImport)],
+    ["server/routes/[page].md.get.ts", nuxtMirrorRoute(mirrorImport)],
   ]);
 }
