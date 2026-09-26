@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { Command, X } from 'lucide-react';
-import { cn } from '../utils';
+import * as React from "react";
+import { Command, X } from "lucide-react";
+import { cn } from "../utils";
 
-const transformOriginStyle = { transformOrigin: 'bottom center' } as const;
+const transformOriginStyle = { transformOrigin: "bottom center" } as const;
 
 export interface BottomBulkActionsBarProps {
   count: number;
@@ -54,8 +54,8 @@ function BarContent({
   count,
   onClear,
   onActionsClick,
-  itemNameSingular = 'item',
-  itemNamePlural = 'items',
+  itemNameSingular = "item",
+  itemNamePlural = "items",
 }: BottomBulkActionsBarProps) {
   return (
     <div className="inline-flex items-center gap-0 bg-background rounded-lg border border-border shadow-lg w-full max-w-[400px] sm:w-auto sm:max-w-none">
@@ -97,8 +97,8 @@ export function BottomBulkActionsBar({
   count,
   onClear,
   onActionsClick,
-  itemNameSingular = 'item',
-  itemNamePlural = 'items',
+  itemNameSingular = "item",
+  itemNamePlural = "items",
   className,
 }: BottomBulkActionsBarProps) {
   const isVisible = useDelayedVisible(count);
@@ -106,8 +106,8 @@ export function BottomBulkActionsBar({
   return (
     <div
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-center pb-6 px-4 transition-[transform,opacity] duration-200 ease-in-out md:pb-4',
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
+        "fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-center pb-6 px-4 transition-[transform,opacity] duration-200 ease-in-out md:pb-4",
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none",
         className,
       )}
       style={transformOriginStyle}
