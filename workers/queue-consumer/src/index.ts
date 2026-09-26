@@ -20,23 +20,15 @@ interface Env {
   RESEND_API_KEY?: string;
 }
 
-type Handler = (
-  message: QueueJobMessage,
-  env: Env
-) => Promise<void>;
+type Handler = (message: QueueJobMessage, env: Env) => Promise<void>;
 
-async function handleDemo(
-  message: Extract<QueueJobMessage, { type: "job.demo" }>
-): Promise<void> {
-  console.log(
-    "[queue-consumer] DEMO JOB SUCCESS! Payload:",
-    JSON.stringify(message.payload)
-  );
+async function handleDemo(message: Extract<QueueJobMessage, { type: "job.demo" }>): Promise<void> {
+  console.log("[queue-consumer] DEMO JOB SUCCESS! Payload:", JSON.stringify(message.payload));
 }
 
 async function handleEmailSend(
   message: Extract<QueueJobMessage, { type: "email.send" }>,
-  env: Env
+  env: Env,
 ): Promise<void> {
   const { to, subject, html, text, from } = message.payload;
   const fromAddr = from || env.EMAIL_FROM || "onboarding@localhost";
@@ -69,28 +61,19 @@ async function handleOutboxDrain(): Promise<void> {
 }
 
 const handlers: Record<QueueJobMessage["type"], Handler> = {
-  "job.demo": (msg, _env) =>
-    handleDemo(msg as Extract<QueueJobMessage, { type: "job.demo" }>),
+  "job.demo": (msg, _env) => handleDemo(msg as Extract<QueueJobMessage, { type: "job.demo" }>),
   "email.send": (msg, env) =>
-    handleEmailSend(
-      msg as Extract<QueueJobMessage, { type: "email.send" }>,
-      env
-    ),
+    handleEmailSend(msg as Extract<QueueJobMessage, { type: "email.send" }>, env),
   "outbox.drain": () => handleOutboxDrain(),
 };
 
-async function processMessage(
-  msg: Message<QueueJobMessage>,
-  env: Env
-): Promise<void> {
+async function processMessage(msg: Message<QueueJobMessage>, env: Env): Promise<void> {
   const message = msg.body;
   const id = message.id;
   const idempotencyKey = `job_run:${id}`;
   const alreadyRun = await env.FLAGS.get(idempotencyKey);
   if (alreadyRun) {
-    console.warn(
-      `[queue-consumer] Duplicate message skipped: ${id} (${message.type})`
-    );
+    console.warn(`[queue-consumer] Duplicate message skipped: ${id} (${message.type})`);
     msg.ack();
     return;
   }
@@ -116,11 +99,9 @@ export default {
   async queue(
     batch: MessageBatch<QueueJobMessage>,
     env: Env,
-    _ctx: ExecutionContext
+    _ctx: ExecutionContext,
   ): Promise<void> {
-    console.log(
-      `[queue-consumer] Processing batch of ${batch.messages.length} messages`
-    );
+    console.log(`[queue-consumer] Processing batch of ${batch.messages.length} messages`);
     for (const msg of batch.messages) {
       await processMessage(msg, env);
     }
