@@ -15,6 +15,19 @@ Connect the geoaeo MCP server to Claude Code. Use it to audit a site and generat
 *   Claude Code >= 1.0.60.
 *   A site directory or a live URL to audit.
 
+## Install the plugin
+
+Run these two commands in Claude Code:
+
+```
+/plugin marketplace add pooriaarab/usegeoaeo
+/plugin install geoaeo@geoaeo
+```
+
+The plugin starts `npx geoaeo mcp` over stdio. MCP tools are `audit`, `gen`, and `humanize`.
+
+JSON paste below is the fallback if you want to wire the server by hand.
+
 ## Install geoaeo
 
 Use npx for zero install, or add it to the project:

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DocsPageHeader } from "@/components/docs/docs-page-header";
+import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@template/ui/primitives/card";
 
@@ -21,6 +22,7 @@ export default function McpPage() {
         <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
           <WhatYouGet />
           <Prerequisites />
+          <InstallThePlugin harness="shared" />
           <Install />
           <Transport />
           <Tools />
@@ -181,7 +183,10 @@ function ConfigureAHarness() {
   return (
     <>
       <h2>Configure a harness</h2>
-      <p>Minimal MCP config. The harness starts the server for you:</p>
+      <p>
+        JSON paste is the fallback for Windsurf, Gemini CLI, Continue, and Copilot. The harness starts the server
+        for you:
+      </p>
       <pre>
         <code>{`{
   "mcpServers": {
@@ -228,7 +233,10 @@ function SetupPrompt() {
   return (
     <>
       <h2>Set up in your agent</h2>
-      <p>Paste this prompt into your agent:</p>
+      <p>
+        Claude Code, Cursor, and Codex install the plugin above. Windsurf, Gemini CLI, Continue, and Copilot have
+        no plugin dialect. Paste this prompt instead:
+      </p>
       <pre>
         <code>{`Set up geoaeo in this agent. Detect the harness, then configure the
 geoaeo MCP server with command \`npx\` and args \`-y geoaeo mcp\`.

@@ -15,6 +15,19 @@ Connect the geoaeo MCP server to Cursor. Use it to audit a site and generate GEO
 *   Cursor (latest).
 *   A site directory or URL to audit.
 
+## Install the plugin
+
+Run these two commands in Cursor:
+
+```
+/plugin marketplace add pooriaarab/usegeoaeo
+/plugin install geoaeo@geoaeo
+```
+
+The plugin starts `npx geoaeo mcp` over stdio. MCP tools are `audit`, `gen`, and `humanize`.
+
+JSON paste below is the fallback if you want to wire the server by hand.
+
 ## Install geoaeo
 
 ```bash

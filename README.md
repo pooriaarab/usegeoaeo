@@ -50,22 +50,27 @@ npx geoaeo audit https://example.com
 
 3. Add it to a project, and call it from a build script or CI. See [Install](#install).
 
-4. Drive it from your agent over MCP:
+4. Drive it from your agent over MCP. In Claude Code, Cursor, or Codex:
 
-```json
-{
-  "mcpServers": {
-    "geoaeo": {
-      "command": "npx",
-      "args": ["-y", "geoaeo", "mcp"]
-    }
-  }
-}
 ```
+/plugin marketplace add pooriaarab/usegeoaeo
+/plugin install geoaeo@geoaeo
+```
+
+Windsurf, Gemini CLI, Continue, and Copilot use the JSON fallback in [Set up in your agent](#set-up-in-your-agent).
 
 ## Set up in your agent
 
-Paste this prompt into your agent:
+In Claude Code, Cursor, or Codex, install the plugin:
+
+```
+/plugin marketplace add pooriaarab/usegeoaeo
+/plugin install geoaeo@geoaeo
+```
+
+The plugin starts `npx geoaeo mcp` over stdio. The tools are `audit`, `gen`, and `humanize`.
+
+Windsurf, Gemini CLI, Continue, and Copilot have no plugin dialect. Paste this prompt instead:
 
 ```
 Set up geoaeo in this agent. Detect the harness, then configure the

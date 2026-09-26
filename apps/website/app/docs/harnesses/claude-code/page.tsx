@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
+import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 
 export const metadata: Metadata = {
   title: "geoaeo in Claude Code — MCP setup, audit, and gen guide",
@@ -16,6 +17,7 @@ export default function ClaudeCodeHarnessPage() {
     <HarnessDocPage slug="claude-code" name="Claude Code" intro={intro}>
       <HarnessWhatYouGet />
       <Prerequisites />
+      <InstallThePlugin harness="claude-code" />
       <InstallGeoaeo />
       <ConfigureMcpServer />
       <VerifyConnection />

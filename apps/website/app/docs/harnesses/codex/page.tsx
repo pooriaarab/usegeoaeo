@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
+import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 
 export const metadata: Metadata = {
   title: "geoaeo in Muse — MCP setup, audit, and gen guide",
@@ -16,6 +17,7 @@ export default function CodexHarnessPage() {
     <HarnessDocPage slug="codex" name="Muse" intro={intro}>
       <HarnessWhatYouGet />
       <Prerequisites />
+      <InstallThePlugin harness="codex" />
       <InstallGeoaeo />
       <ConfigureMcpServer />
       <VerifyConnection />
