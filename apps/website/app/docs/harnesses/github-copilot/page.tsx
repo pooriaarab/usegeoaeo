@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "geoaeo in GitHub Copilot — MCP setup, audit and gen guide",
   description:
     "Connect geoaeo to GitHub Copilot in VS Code with the geoaeo-mcp server. Configure .vscode/mcp.json, verify tools in Agent mode, audit, and generate.",
+  alternates: pageAlternates("/docs/harnesses/github-copilot"),
 };
 
 const intro =

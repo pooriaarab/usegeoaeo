@@ -13,11 +13,13 @@ import { MarkdownMirrorsSection, WebmcpSection, AnswerabilitySection, Citability
 import { AuditScoreMapSection, FixLoopSection, NonGoalsSection } from "./sections-audit";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/landing/footer";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata: Metadata = {
   title: "GEO/AEO checklist — geoaeo",
   description:
     "Canonical GEO/AEO checklist for making an app discoverable and quotable by AI answer engines. geoaeo audit maps to the items marked Covered.",
+  alternates: pageAlternates("/checklist"),
 };
 
 const toc = [
