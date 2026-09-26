@@ -27,8 +27,7 @@ const examples = [
     score: 46,
     badge: "Source dir understates",
     badgeVariant: "warning" as const,
-    summary:
-      "Compiles titles, meta tags, and JSON-LD into HTML at build time before deployment.",
+    summary: "Compiles titles, meta tags, and JSON-LD into HTML at build time before deployment.",
   },
 ];
 
@@ -81,13 +80,9 @@ function ProofCards() {
               <span className="text-4xl font-bold tracking-tight tabular-nums font-mono">
                 {item.score}
               </span>
-              <span className="text-base font-medium text-muted-foreground font-mono">
-                /100
-              </span>
+              <span className="text-base font-medium text-muted-foreground font-mono">/100</span>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {item.summary}
-            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{item.summary}</p>
           </div>
         </Link>
       ))}
@@ -99,9 +94,9 @@ function ProofNote() {
   return (
     <div className="p-4 sm:p-5 rounded-xl border border-border bg-muted/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <p className="text-sm text-muted-foreground leading-relaxed">
-        <strong className="font-semibold text-foreground">Note:</strong> Framework apps
-        understate when audited as a source directory because artifacts are generated
-        at runtime. Audit the deployed URL for the live score.
+        <strong className="font-semibold text-foreground">Note:</strong> Framework apps understate
+        when audited as a source directory because artifacts are generated at runtime. Audit the
+        deployed URL for the live score.
       </p>
       <Link
         href="/examples"
