@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
+import { serverCardJson } from "../../../src/generated/server-card.generated";
 
 export const dynamic = "force-static";
+
+// server.json is stamped from packages/geoaeo/package.json and checked for
+// drift, so its generated copy carries the package version into the bundle.
+const { version } = JSON.parse(serverCardJson) as { version: string };
 
 const agentCard = {
   name: "geoaeo",
@@ -11,7 +16,7 @@ const agentCard = {
     organization: "geoaeo",
     url: "https://usegeoaeo.com",
   },
-  version: "0.5.0",
+  version,
   capabilities: {
     audit: true,
     generation: true,
