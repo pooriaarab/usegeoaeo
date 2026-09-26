@@ -1,4 +1,4 @@
-import pkg from '../package.json';
+import pkg from "../package.json";
 
 export const PKG_NAME = pkg.name;
 export const VERSION = pkg.version;

@@ -21,7 +21,7 @@ export interface CloudflareEnv {
 export async function getFlag<T = boolean>(
   kv: KVNamespace,
   name: string,
-  defaultValue: T
+  defaultValue: T,
 ): Promise<T> {
   const key = `flag:${name}`;
   const value = await kv.get(key);
@@ -35,11 +35,7 @@ export async function getFlag<T = boolean>(
   }
 }
 
-export async function setFlag<T = boolean>(
-  kv: KVNamespace,
-  name: string,
-  value: T
-): Promise<void> {
+export async function setFlag<T = boolean>(kv: KVNamespace, name: string, value: T): Promise<void> {
   const key = `flag:${name}`;
   const valueStr = typeof value === "string" ? value : JSON.stringify(value);
   await kv.put(key, valueStr);
