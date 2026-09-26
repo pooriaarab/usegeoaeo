@@ -75,7 +75,10 @@ function AuditCommand() {
       <h2>
         <code>geoaeo audit &lt;target&gt;</code>
       </h2>
-      <p>Audit a live URL or a local directory. Scores 0–100 across 25 weighted checks including answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.</p>
+      <p>
+        Audit a live URL or a local directory. Scores 0–100 across 25 weighted checks including
+        answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.
+      </p>
       <pre>
         <code>{`npx geoaeo audit https://example.com
 npx geoaeo audit https://example.com --json
@@ -90,13 +93,16 @@ npx geoaeo audit ./apps/website`}</code>
           <code>--ci</code> — exit non-zero when the score is below <code>--min-score</code>
         </li>
         <li>
-          <code>--min-score &lt;n&gt;</code> — minimum passing score for <code>--ci</code> (default <code>90</code>)
+          <code>--min-score &lt;n&gt;</code> — minimum passing score for <code>--ci</code> (default{" "}
+          <code>90</code>)
         </li>
       </ul>
       <pre>
         <code>npx geoaeo audit https://example.com --ci --min-score 85</code>
       </pre>
-      <p>The command exits non-zero when the score is below the threshold. Use it to gate a build.</p>
+      <p>
+        The command exits non-zero when the score is below the threshold. Use it to gate a build.
+      </p>
     </>
   );
 }
@@ -107,7 +113,10 @@ function InitCommand() {
       <h2>
         <code>geoaeo init [directory]</code>
       </h2>
-      <p>Scaffold GEO and AEO artifacts into a site. Detects Next.js, Astro, SvelteKit, Nuxt, or Remix.</p>
+      <p>
+        Scaffold GEO and AEO artifacts into a site. Detects Next.js, Astro, SvelteKit, Nuxt, or
+        Remix.
+      </p>
       <pre>
         <code>{`npx geoaeo init ./
 npx geoaeo init ./apps/website --force`}</code>
@@ -129,7 +138,10 @@ function GenCommand() {
       <h2>
         <code>geoaeo gen &lt;artifact&gt;</code>
       </h2>
-      <p>Generate one artifact from the local <code>geoaeo.config.ts</code>. Prints to stdout or writes to a file.</p>
+      <p>
+        Generate one artifact from the local <code>geoaeo.config.ts</code>. Prints to stdout or
+        writes to a file.
+      </p>
       <pre>
         <code>{`npx geoaeo gen llms
 npx geoaeo gen llms-full --output public/llms-full.txt
@@ -148,13 +160,16 @@ npx geoaeo gen mdmirror`}</code>
           <code>-o, --output &lt;file&gt;</code> — write to a file instead of stdout
         </li>
         <li>
-          <code>--type &lt;kind&gt;</code> — JSON-LD kind: <code>software</code>, <code>product</code>,{" "}
-          <code>faq</code>, <code>breadcrumb</code>, <code>organization</code>, <code>website</code>,{" "}
-          <code>article</code>, <code>howto</code>, <code>person</code>, or <code>review</code> (default{" "}
-          <code>software</code>)
+          <code>--type &lt;kind&gt;</code> — JSON-LD kind: <code>software</code>,{" "}
+          <code>product</code>, <code>faq</code>, <code>breadcrumb</code>, <code>organization</code>
+          , <code>website</code>, <code>article</code>, <code>howto</code>, <code>person</code>, or{" "}
+          <code>review</code> (default <code>software</code>)
         </li>
       </ul>
-      <p>Available artifacts: llms, llms-full, jsonld, webmcp, sitemap, robots, ogimage, rss, hreflang, mdmirror.</p>
+      <p>
+        Available artifacts: llms, llms-full, jsonld, webmcp, sitemap, robots, ogimage, rss,
+        hreflang, mdmirror.
+      </p>
     </>
   );
 }
@@ -165,7 +180,10 @@ function HumanizeCommand() {
       <h2>
         <code>geoaeo humanize &lt;glob&gt;</code>
       </h2>
-      <p>Find AI-writing tells in Markdown and JSX files. Checks for em dashes, AI vocabulary, filler, hype, fake-depth tails, and title-case headings.</p>
+      <p>
+        Find AI-writing tells in Markdown and JSX files. Checks for em dashes, AI vocabulary,
+        filler, hype, fake-depth tails, and title-case headings.
+      </p>
       <pre>
         <code>{`npx geoaeo humanize 'content/**/*.md' --check
 npx geoaeo humanize 'src/**/*.tsx' --write`}</code>
@@ -175,8 +193,8 @@ npx geoaeo humanize 'src/**/*.tsx' --write`}</code>
           <code>--check</code> — report only. Exits non-zero when tells are found
         </li>
         <li>
-          <code>--write</code> — rewrite files in place. Keeps YAML frontmatter, code fences, JSX tags, imports,
-          class names, and expressions
+          <code>--write</code> — rewrite files in place. Keeps YAML frontmatter, code fences, JSX
+          tags, imports, class names, and expressions
         </li>
       </ul>
     </>
@@ -189,15 +207,18 @@ function McpCommand() {
       <h2>
         <code>geoaeo mcp</code>
       </h2>
-      <p>Run the MCP server over stdio. The binary is also available as <code>geoaeo-mcp</code>.</p>
+      <p>
+        Run the MCP server over stdio. The binary is also available as <code>geoaeo-mcp</code>.
+      </p>
       <pre>
         <code>{`npx -y geoaeo mcp
 # equivalent: run the geoaeo-mcp bin
 npx -y --package=geoaeo geoaeo-mcp`}</code>
       </pre>
       <p>
-        The server exposes three tools: <code>audit</code>, <code>gen</code>, and <code>humanize</code>. See the{" "}
-        <Link href="/docs/mcp">MCP page</Link> for wiring it into agents.
+        The server exposes three tools: <code>audit</code>, <code>gen</code>, and{" "}
+        <code>humanize</code>. See the <Link href="/docs/mcp">MCP page</Link> for wiring it into
+        agents.
       </p>
     </>
   );
