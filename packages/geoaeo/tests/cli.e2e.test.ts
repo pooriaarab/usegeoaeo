@@ -7,8 +7,22 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cli = path.join(root, 'dist', 'cli.js');
 
-function run(args: string[], cwd = root): string {
-  return execFileSync('node', [cli, ...args], { encoding: 'utf8', cwd });
+function run(args: string[], cwd = root, extraEnv?: Record<string, string>): string {
+  return execFileSync('node', [cli, ...args], {
+    encoding: 'utf8',
+    cwd,
+    env: extraEnv === undefined ? process.env : { ...process.env, ...extraEnv },
+  });
+}
+
+function runFailure(args: string[], extraEnv: Record<string, string>, cwd = root): { status: number | null; stderr: string } {
+  try {
+    run(args, cwd, extraEnv);
+  } catch (error) {
+    const failed = error as { status?: number | null; stderr?: string };
+    return { status: failed.status ?? null, stderr: failed.stderr ?? '' };
+  }
+  throw new Error(`expected failure: ${args.join(' ')}`);
 }
 
 describe('geoaeo CLI end-to-end', () => {
@@ -36,5 +50,26 @@ describe('geoaeo CLI end-to-end', () => {
 
   it('exits non-zero for --ci below the threshold', () => {
     expect(() => run(['audit', 'examples/static-html', '--ci', '--min-score', '200'])).toThrow();
+  });
+
+  it('allows audit, gen, and humanize inside GEOAEO_ALLOWED_ROOTS', () => {
+    const allowed = path.join(root, 'examples', 'static-html');
+    const env = { GEOAEO_ALLOWED_ROOTS: allowed };
+    const report = JSON.parse(run(['audit', allowed, '--json'], root, env));
+    expect(report.score).toBeGreaterThan(0);
+    expect(report.target).toBe(allowed);
+    expect(run(['gen', 'llms'], allowed, env).length).toBeGreaterThan(0);
+    expect(run(['humanize', 'no-such-*.md', '--check'], allowed, env)).toBe('');
+  });
+
+  it('refuses audit, gen, and humanize outside GEOAEO_ALLOWED_ROOTS', () => {
+    const allowed = path.join(root, 'examples', 'static-html');
+    const env = { GEOAEO_ALLOWED_ROOTS: allowed };
+    const message = `${root} is outside GEOAEO_ALLOWED_ROOTS`;
+    for (const args of [['audit', root, '--json'], ['gen', 'llms'], ['humanize', '*.md', '--check']]) {
+      const failed = runFailure(args, env, root);
+      expect(failed.status).toBe(1);
+      expect(failed.stderr).toContain(message);
+    }
   });
 });

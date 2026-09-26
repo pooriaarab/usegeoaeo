@@ -104,6 +104,14 @@ Use the stdio server in an MCP client such as Claude Code or Cursor:
 
 The server exposes `audit`, `gen`, and `humanize` tools.
 
+Set `GEOAEO_ALLOWED_ROOTS` when you start the CLI or the MCP server.
+Separate directories with your platform path delimiter (`:` on macOS and Linux, `;` on Windows).
+`audit`, `gen`, and `humanize` then accept a local directory only when it resolves inside one of those directories.
+For the CLI, that directory is the `audit` target, or the working directory of `gen` and `humanize`.
+`audit` still accepts an absolute `http` or `https` URL.
+When the variable is unset or empty, local paths stay unbounded.
+A path outside the list returns an error that names the path you passed.
+
 You can also run it through the CLI:
 
 ```bash

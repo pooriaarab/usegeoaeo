@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
+import { assertAllowedPath, PathOutsideAllowedRootsError, readAllowedRoots } from './allowed-roots.js';
 import { auditTarget, type AuditCheck, type AuditReport } from './audit.js';
 import { formatAuditReport } from './audit/format.js';
 import { VERSION, PKG_NAME, CONFIG_FILENAME } from './constants.js';
@@ -16,8 +17,8 @@ import type { HumanizeFinding } from './humanize.js';
 // Built from the shared arrays so a new artifact or kind cannot land in one face only.
 const genArtifactSchema = z.enum(GENERATED_ARTIFACTS);
 const genTypeSchema = z.enum(JSON_LD_KINDS);
-const directorySchema = z.string().optional().describe('Absolute path to the site root. Defaults to the MCP server\'s working directory, which is usually not the project you mean — pass it explicitly.');
-const targetSchema = z.string().describe('A local directory or an absolute http(s) URL.');
+const directorySchema = z.string().optional().describe('Absolute path to the site root. Defaults to the MCP server\'s working directory, which is usually not the project you mean — pass it explicitly. When GEOAEO_ALLOWED_ROOTS is set, the path must resolve inside one root.');
+const targetSchema = z.string().describe('A local directory or an absolute http(s) URL. When GEOAEO_ALLOWED_ROOTS is set, a local directory must resolve inside one root. An http(s) URL stays allowed.');
 const globSchema = z.string().describe('Glob pattern matching the prose files to scan. Reads the matches; changes nothing unless write is true.');
 const writeSchema = z.boolean().optional().describe('Default false. true rewrites matching files in place. Set true only after the user asked to change files.');
 const artifactSchema = genArtifactSchema.describe('Which GEO or AEO artifact to generate. It is returned as text; no file is written.');
@@ -33,6 +34,9 @@ const MCP_INSTRUCTIONS = [
   'It writes no file.',
   'humanize writes a file only when write is true and the text changes.',
   'Ask the user before you set write.',
+  'When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root.',
+  'An http(s) audit URL stays allowed.',
+  'A path outside the roots is an error.',
 ].join(' ');
 
 // Output schemas for the structuredContent channel. Each schema is annotated
@@ -67,7 +71,27 @@ const humanizeOutputSchema = z.looseObject({
   })).describe('One entry per scanned file.'),
 });
 
-async function auditHandler({ target }: { target: string }) {
+function pathToolError(error: PathOutsideAllowedRootsError) {
+  return {
+    isError: true,
+    content: [{ type: 'text' as const, text: error.message }],
+    structuredContent: { status: 'error', error: { code: error.code, message: error.message } },
+  };
+}
+
+async function pathBoundError(input: string, roots: readonly string[] | undefined, allowHttpUrl = false) {
+  try {
+    await assertAllowedPath(input, roots, allowHttpUrl);
+    return undefined;
+  } catch (error) {
+    if (error instanceof PathOutsideAllowedRootsError) return pathToolError(error);
+    throw error;
+  }
+}
+
+async function auditHandler({ target }: { target: string }, allowedRoots: readonly string[] | undefined) {
+  const rejected = await pathBoundError(target, allowedRoots, true);
+  if (rejected) return rejected;
   const report = await auditTarget(target);
   // Text is the same report the CLI prints. structuredContent is the object
   // an agent can read without parsing a JSON blob.
@@ -77,7 +101,9 @@ async function auditHandler({ target }: { target: string }) {
   };
 }
 
-async function humanizeHandler({ glob, write, directory }: { glob: string; write?: boolean; directory?: string }) {
+async function humanizeHandler({ glob, write, directory }: { glob: string; write?: boolean; directory?: string }, allowedRoots: readonly string[] | undefined) {
+  const rejected = await pathBoundError(directory ?? process.cwd(), allowedRoots);
+  if (rejected) return rejected;
   const results = await humanizeGlob(glob, { write, directory });
   const summary = [...results.entries()].map(([file, result]) => ({ file, findings: result.findings }));
   const findingCount = summary.reduce((count, item) => count + item.findings.length, 0);
@@ -104,12 +130,15 @@ function configToolError(error: ConfigLoadError, directory: string | undefined) 
   };
 }
 
-// Known config states return a tool result. Every other failure stays a throw.
+// A path outside the bound, and the known config states, return a tool result.
+// Every other failure stays a throw.
 export async function genHandler({ artifact, type, directory }: {
   artifact: GeneratedArtifact;
   type?: JsonLdKind;
   directory?: string;
-}) {
+}, allowedRoots: readonly string[] | undefined = readAllowedRoots()) {
+  const rejected = await pathBoundError(directory ?? process.cwd(), allowedRoots);
+  if (rejected) return rejected;
   try {
     const text = await generateArtifact(artifact, directory, type ?? 'software');
     return { content: [{ type: 'text', text }] };
@@ -119,7 +148,7 @@ export async function genHandler({ artifact, type, directory }: {
   }
 }
 
-export function createMcpServer(): McpServer {
+export function createMcpServer(allowedRoots: readonly string[] | undefined = readAllowedRoots()): McpServer {
   const server = new McpServer({ name: PKG_NAME, version: VERSION }, {
     capabilities: { tools: { listChanged: false } },
     instructions: MCP_INSTRUCTIONS,
@@ -142,7 +171,7 @@ export function createMcpServer(): McpServer {
       outputSchema: auditOutputSchema,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     },
-    auditHandler
+    (input: { target: string }) => auditHandler(input, allowedRoots)
   );
   registerTool(
     'gen',
@@ -152,7 +181,7 @@ export function createMcpServer(): McpServer {
       inputSchema: { artifact: artifactSchema, type: artifactTypeSchema, directory: directorySchema },
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     },
-    genHandler
+    (input: { artifact: GeneratedArtifact; type?: JsonLdKind; directory?: string }) => genHandler(input, allowedRoots)
   );
   registerTool(
     'humanize',
@@ -163,7 +192,7 @@ export function createMcpServer(): McpServer {
       outputSchema: humanizeOutputSchema,
       annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
     },
-    humanizeHandler
+    (input: { glob: string; write?: boolean; directory?: string }) => humanizeHandler(input, allowedRoots)
   );
   // registerTool merges tools.listChanged back to true. These three tools never change.
   server.server.registerCapabilities({ tools: { listChanged: false } });
