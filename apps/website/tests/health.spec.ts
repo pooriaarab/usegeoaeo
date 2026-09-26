@@ -9,7 +9,9 @@ test("health API is up", async ({ request }) => {
 
 test("landing renders", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("body")).toContainText(/platform for modern teams|Master Template|Get started/i);
+  await expect(page.locator("body")).toContainText(
+    /platform for modern teams|Master Template|Get started/i,
+  );
 });
 
 test("login page renders", async ({ page }) => {

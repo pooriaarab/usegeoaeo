@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  WorkspaceMemberSchema,
-  workspaceMemberDocId,
-} from "../schemas/workspace-member";
+import { WorkspaceMemberSchema, workspaceMemberDocId } from "../schemas/workspace-member";
 
 const validBase = {
   id: "ws_1_user_1",

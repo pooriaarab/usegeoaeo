@@ -1,5 +1,5 @@
-import { generateJsonLd, type JsonLdKind } from 'geoaeo';
-import { siteConfig } from '../../geoaeo.config';
+import { generateJsonLd, type JsonLdKind } from "geoaeo";
+import { siteConfig } from "../../geoaeo.config";
 
 function JsonLd({ kind }: { kind: JsonLdKind }) {
   return (

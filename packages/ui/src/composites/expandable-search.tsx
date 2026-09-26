@@ -37,7 +37,10 @@ function ExpandedInput({
         expandedWidth,
       )}
     >
-      <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 transform text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
+      <Search
+        className="absolute top-1/2 left-3 size-4 -translate-y-1/2 transform text-muted-foreground pointer-events-none z-10"
+        aria-hidden="true"
+      />
       <Input
         ref={inputRef}
         className="h-9 pl-9 pr-3 text-base border-0 bg-transparent shadow-none focus-visible:ring-1 focus-visible:ring-ring"
