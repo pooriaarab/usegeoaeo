@@ -32,7 +32,7 @@ export type QueueJobMessage = EmailSendJob | JobDemoJob | OutboxDrainJob;
  */
 export async function sendJob(
   queue: Queue<QueueJobMessage>,
-  message: QueueJobMessage
+  message: QueueJobMessage,
 ): Promise<void> {
   if (!message.id) {
     throw new Error("Idempotency key 'id' is required for all queue messages.");

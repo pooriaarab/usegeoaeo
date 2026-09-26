@@ -39,12 +39,7 @@ export const ThreadSchema = z.object({
 });
 export type Thread = z.infer<typeof ThreadSchema>;
 
-export const MessageRoleSchema = z.enum([
-  "user",
-  "assistant",
-  "tool",
-  "system",
-]);
+export const MessageRoleSchema = z.enum(["user", "assistant", "tool", "system"]);
 export type MessageRole = z.infer<typeof MessageRoleSchema>;
 
 export const MessageUsageSchema = z.object({

@@ -13,9 +13,9 @@
  * ```
  */
 
-import { Loader2 } from 'lucide-react';
-import { Button } from '../primitives/button';
-import type { ComponentProps } from 'react';
+import { Loader2 } from "lucide-react";
+import { Button } from "../primitives/button";
+import type { ComponentProps } from "react";
 
 type ButtonProps = ComponentProps<typeof Button>;
 

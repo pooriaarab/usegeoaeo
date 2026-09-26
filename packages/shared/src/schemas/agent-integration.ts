@@ -25,5 +25,4 @@ export const AgentIntegrationSchema = z.object({
 });
 
 export type AgentIntegration = z.infer<typeof AgentIntegrationSchema>;
-export type AgentIntegrationProvider =
-  (typeof AgentIntegrationProviders)[number];
+export type AgentIntegrationProvider = (typeof AgentIntegrationProviders)[number];
