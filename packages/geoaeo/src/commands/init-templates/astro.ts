@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { PKG_NAME } from '../../constants.js';
-import { configImport } from './helpers.js';
+import path from "node:path";
+import { PKG_NAME } from "../../constants.js";
+import { configImport } from "./helpers.js";
 
 function astroLlmsRoute(llmsImport: string): string {
   return `import { generateLlms } from '${PKG_NAME}';
@@ -101,20 +101,20 @@ Read more: \${siteConfig.siteUrl}/\${params.page}
 }
 
 export function astroTemplates(root: string): Map<string, string> {
-  const llmsImport = configImport(root, path.join(root, 'src/pages/llms.txt.ts'));
-  const llmsFullImport = configImport(root, path.join(root, 'src/pages/llms-full.txt.ts'));
-  const webmcpImport = configImport(root, path.join(root, 'src/pages/webmcp.json.ts'));
-  const sitemapImport = configImport(root, path.join(root, 'src/pages/sitemap.xml.ts'));
-  const robotsImport = configImport(root, path.join(root, 'src/pages/robots.txt.ts'));
-  const jsonLdImport = configImport(root, path.join(root, 'src/components/seo/JsonLd.astro'));
-  const mirrorImport = configImport(root, path.join(root, 'src/pages/[page].md.ts'));
+  const llmsImport = configImport(root, path.join(root, "src/pages/llms.txt.ts"));
+  const llmsFullImport = configImport(root, path.join(root, "src/pages/llms-full.txt.ts"));
+  const webmcpImport = configImport(root, path.join(root, "src/pages/webmcp.json.ts"));
+  const sitemapImport = configImport(root, path.join(root, "src/pages/sitemap.xml.ts"));
+  const robotsImport = configImport(root, path.join(root, "src/pages/robots.txt.ts"));
+  const jsonLdImport = configImport(root, path.join(root, "src/components/seo/JsonLd.astro"));
+  const mirrorImport = configImport(root, path.join(root, "src/pages/[page].md.ts"));
   return new Map([
-    ['src/pages/llms.txt.ts', astroLlmsRoute(llmsImport)],
-    ['src/pages/llms-full.txt.ts', astroLlmsFullRoute(llmsFullImport)],
-    ['src/pages/webmcp.json.ts', astroWebmcpRoute(webmcpImport)],
-    ['src/pages/sitemap.xml.ts', astroSitemapRoute(sitemapImport)],
-    ['src/pages/robots.txt.ts', astroRobotsRoute(robotsImport)],
-    ['src/components/seo/JsonLd.astro', astroJsonLdComponent(jsonLdImport)],
-    ['src/pages/[page].md.ts', astroMirrorRoute(mirrorImport)],
+    ["src/pages/llms.txt.ts", astroLlmsRoute(llmsImport)],
+    ["src/pages/llms-full.txt.ts", astroLlmsFullRoute(llmsFullImport)],
+    ["src/pages/webmcp.json.ts", astroWebmcpRoute(webmcpImport)],
+    ["src/pages/sitemap.xml.ts", astroSitemapRoute(sitemapImport)],
+    ["src/pages/robots.txt.ts", astroRobotsRoute(robotsImport)],
+    ["src/components/seo/JsonLd.astro", astroJsonLdComponent(jsonLdImport)],
+    ["src/pages/[page].md.ts", astroMirrorRoute(mirrorImport)],
   ]);
 }

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { cn } from '../utils';
-import { CATEGORY_LABELS } from './mention-helpers';
-import type { MentionCategory, MentionEntity } from './mention-textarea';
+import { cn } from "../utils";
+import { CATEGORY_LABELS } from "./mention-helpers";
+import type { MentionCategory, MentionEntity } from "./mention-textarea";
 
-function DefaultEntityIcon({ entity, size }: { entity: MentionEntity; size: 'sm' | 'md' }) {
-  const px = size === 'sm' ? 14 : 18;
+function DefaultEntityIcon({ entity, size }: { entity: MentionEntity; size: "sm" | "md" }) {
+  const px = size === "sm" ? 14 : 18;
   if (entity.avatarUrl)
     return (
       <img
@@ -18,13 +18,13 @@ function DefaultEntityIcon({ entity, size }: { entity: MentionEntity; size: 'sm'
       />
     );
   if (entity.emoji) return <span className="shrink-0 leading-none">{entity.emoji}</span>;
-  const initial = entity.displayName?.charAt(0).toUpperCase() ?? '?';
+  const initial = entity.displayName?.charAt(0).toUpperCase() ?? "?";
   return (
     <span
       className={cn(
-        'shrink-0 rounded-full flex items-center justify-center',
-        'text-white font-medium',
-        entity.avatarColor || 'bg-muted-foreground/50',
+        "shrink-0 rounded-full flex items-center justify-center",
+        "text-white font-medium",
+        entity.avatarColor || "bg-muted-foreground/50",
       )}
       style={{ width: px, height: px, fontSize: px * 0.55 }}
     >
@@ -44,7 +44,7 @@ function MentionOption({
   idx: number;
   selectedIndex: number;
   onSelect: (e: MentionEntity) => void;
-  renderEntityIcon?: (entity: MentionEntity, size: 'sm' | 'md') => React.ReactNode;
+  renderEntityIcon?: (entity: MentionEntity, size: "sm" | "md") => React.ReactNode;
 }) {
   const optionId = `mention-option-${entity.category}-${entity.id}`;
   const isSelected = idx === selectedIndex;
@@ -57,9 +57,9 @@ function MentionOption({
       aria-selected={isSelected}
       data-selected={isSelected}
       className={cn(
-        'flex items-center gap-2 w-full px-3 py-2',
-        'text-sm text-left hover:bg-muted/50 transition-colors',
-        isSelected && 'bg-muted',
+        "flex items-center gap-2 w-full px-3 py-2",
+        "text-sm text-left hover:bg-muted/50 transition-colors",
+        isSelected && "bg-muted",
       )}
       onMouseDown={(ev) => {
         ev.preventDefault();
@@ -67,7 +67,7 @@ function MentionOption({
       }}
     >
       {renderEntityIcon ? (
-        renderEntityIcon(entity, 'md')
+        renderEntityIcon(entity, "md")
       ) : (
         <DefaultEntityIcon entity={entity} size="md" />
       )}
@@ -88,7 +88,7 @@ function MentionGroup({
   startIndex: number;
   selectedIndex: number;
   onSelect: (e: MentionEntity) => void;
-  renderEntityIcon?: (entity: MentionEntity, size: 'sm' | 'md') => React.ReactNode;
+  renderEntityIcon?: (entity: MentionEntity, size: "sm" | "md") => React.ReactNode;
 }) {
   return (
     <div key={group.category}>
@@ -119,7 +119,7 @@ export function MentionDropdown({
   grouped: { category: MentionCategory; items: MentionEntity[] }[];
   selectedIndex: number;
   onSelect: (e: MentionEntity) => void;
-  renderEntityIcon?: (entity: MentionEntity, size: 'sm' | 'md') => React.ReactNode;
+  renderEntityIcon?: (entity: MentionEntity, size: "sm" | "md") => React.ReactNode;
   dropdownRef: React.RefObject<HTMLDivElement | null>;
 }) {
   let flatIndex = 0;

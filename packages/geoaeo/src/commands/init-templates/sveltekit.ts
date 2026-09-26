@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { PKG_NAME } from '../../constants.js';
-import { configImport } from './helpers.js';
+import path from "node:path";
+import { PKG_NAME } from "../../constants.js";
+import { configImport } from "./helpers.js";
 
 function svelteKitLlmsRoute(llmsImport: string): string {
   return `import { generateLlms } from '${PKG_NAME}';
@@ -95,20 +95,20 @@ Read more: \${siteConfig.siteUrl}/\${params.page}
 }
 
 export function svelteKitTemplates(root: string): Map<string, string> {
-  const llmsImport = configImport(root, path.join(root, 'src/routes/llms.txt/+server.ts'));
-  const llmsFullImport = configImport(root, path.join(root, 'src/routes/llms-full.txt/+server.ts'));
-  const webmcpImport = configImport(root, path.join(root, 'src/routes/webmcp.json/+server.ts'));
-  const sitemapImport = configImport(root, path.join(root, 'src/routes/sitemap.xml/+server.ts'));
-  const robotsImport = configImport(root, path.join(root, 'src/routes/robots.txt/+server.ts'));
-  const jsonLdImport = configImport(root, path.join(root, 'src/lib/components/JsonLd.svelte'));
-  const mirrorImport = configImport(root, path.join(root, 'src/routes/[page].md/+server.ts'));
+  const llmsImport = configImport(root, path.join(root, "src/routes/llms.txt/+server.ts"));
+  const llmsFullImport = configImport(root, path.join(root, "src/routes/llms-full.txt/+server.ts"));
+  const webmcpImport = configImport(root, path.join(root, "src/routes/webmcp.json/+server.ts"));
+  const sitemapImport = configImport(root, path.join(root, "src/routes/sitemap.xml/+server.ts"));
+  const robotsImport = configImport(root, path.join(root, "src/routes/robots.txt/+server.ts"));
+  const jsonLdImport = configImport(root, path.join(root, "src/lib/components/JsonLd.svelte"));
+  const mirrorImport = configImport(root, path.join(root, "src/routes/[page].md/+server.ts"));
   return new Map([
-    ['src/routes/llms.txt/+server.ts', svelteKitLlmsRoute(llmsImport)],
-    ['src/routes/llms-full.txt/+server.ts', svelteKitLlmsFullRoute(llmsFullImport)],
-    ['src/routes/webmcp.json/+server.ts', svelteKitWebmcpRoute(webmcpImport)],
-    ['src/routes/sitemap.xml/+server.ts', svelteKitSitemapRoute(sitemapImport)],
-    ['src/routes/robots.txt/+server.ts', svelteKitRobotsRoute(robotsImport)],
-    ['src/lib/components/JsonLd.svelte', svelteKitJsonLdComponent(jsonLdImport)],
-    ['src/routes/[page].md/+server.ts', svelteKitMirrorRoute(mirrorImport)],
+    ["src/routes/llms.txt/+server.ts", svelteKitLlmsRoute(llmsImport)],
+    ["src/routes/llms-full.txt/+server.ts", svelteKitLlmsFullRoute(llmsFullImport)],
+    ["src/routes/webmcp.json/+server.ts", svelteKitWebmcpRoute(webmcpImport)],
+    ["src/routes/sitemap.xml/+server.ts", svelteKitSitemapRoute(sitemapImport)],
+    ["src/routes/robots.txt/+server.ts", svelteKitRobotsRoute(robotsImport)],
+    ["src/lib/components/JsonLd.svelte", svelteKitJsonLdComponent(jsonLdImport)],
+    ["src/routes/[page].md/+server.ts", svelteKitMirrorRoute(mirrorImport)],
   ]);
 }
