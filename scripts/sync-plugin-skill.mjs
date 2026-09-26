@@ -160,10 +160,7 @@ function writeJsonVersions(text, version) {
 function writeNpmPin(text, name, version) {
   const parsed = JSON.parse(text);
   if (pinVersion(parsed, name) === version) return text;
-  const next = text.replace(
-    new RegExp(`"${escapeRegExp(name)}@[^"]*"`),
-    `"${name}@${version}"`,
-  );
+  const next = text.replace(new RegExp(`"${escapeRegExp(name)}@[^"]*"`), `"${name}@${version}"`);
   if (pinVersion(JSON.parse(next), name) !== version) {
     throw new Error("mcp.json pin update did not apply");
   }
@@ -200,9 +197,7 @@ export function checkVersions(root = repoRoot, identity = readPackageIdentity())
       const text = readFileSync(join(root, sink.rel), "utf8");
       for (const found of versionsIn(sink, text, identity.name)) {
         if (found !== identity.version) {
-          throw new Error(
-            `version drifted: found ${found}, package.json is ${identity.version}`,
-          );
+          throw new Error(`version drifted: found ${found}, package.json is ${identity.version}`);
         }
       }
     });
@@ -226,9 +221,7 @@ export function checkAgentCard(root = repoRoot) {
   const importsPackage = text.includes(AGENT_CARD_IMPORT);
   const usesPackageVersion = /JSON\.parse\(serverCardJson\)/.test(text);
   if (!importsPackage || !usesPackageVersion) {
-    throw new Error(
-      `${AGENT_CARD_REL} must read its version from the generated server card`,
-    );
+    throw new Error(`${AGENT_CARD_REL} must read its version from the generated server card`);
   }
 }
 
@@ -249,7 +242,9 @@ function main() {
   syncPluginSkill();
   syncVersions();
   process.stdout.write("Synced .claude/skills/geoaeo into plugins/geoaeo/skills/geoaeo\n");
-  process.stdout.write("Synced package version into the plugin, server.json, and the README badge\n");
+  process.stdout.write(
+    "Synced package version into the plugin, server.json, and the README badge\n",
+  );
 }
 
 if (isMain()) {
