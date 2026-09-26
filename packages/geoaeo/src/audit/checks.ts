@@ -4,7 +4,7 @@ import { analyzePage } from "./analyze-page.js";
 import { blockedAgents } from "./robots-policy.js";
 import type { CheckContext, CheckDef } from "./check-types.js";
 import { getCheckDefinitions } from "./check-definitions.js";
-import { answerabilityDetails, headerNoindex } from "./check-predicates.js";
+import { answerabilityDetails, findSharedCanonical, headerNoindex } from "./check-predicates.js";
 
 function buildContext(snapshot: TargetSnapshot): CheckContext {
   const llms = snapshot.artifacts.get("llms.txt") ?? "";
@@ -34,11 +34,13 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
   const jsonTypes = [...new Set(pageSignals.flatMap((page) => page.jsonLdTypes))];
   const has = (value: string) => value.trim().length > 0;
   const blockedAiAgents = blockedAgents(robots, AI_AGENTS);
+  const sharedCanonical = findSharedCanonical(snapshot.pages, pageSignals);
   return {
     artifacts,
     mirrors: snapshot.mirrors,
     pages: snapshot.pages,
     blockedAiAgents,
+    sharedCanonical,
     pageSignals,
     jsonTypes,
     has,
@@ -59,30 +61,36 @@ function noindexReasons(header: boolean, meta: boolean): string {
   return reasons.filter((reason) => reason.length > 0).join("; ");
 }
 
-function detailFor(check: CheckDef, ctx: CheckContext): string {
-  if (check.id === "markdown")
-    return ctx.mirrors.length
+const detailFns: Record<string, (ctx: CheckContext, check: CheckDef) => string> = {
+  markdown: (ctx) =>
+    ctx.mirrors.length
       ? `${ctx.mirrors.length} mirror file(s) found.`
-      : "No page markdown mirrors were found.";
-  if (check.id === "json-ld")
-    return ctx.jsonTypes.length
+      : "No page markdown mirrors were found.",
+  "json-ld": (ctx) =>
+    ctx.jsonTypes.length
       ? `Types: ${ctx.jsonTypes.join(", ")}.`
-      : "No schema.org JSON-LD was found.";
-  if (check.id === "meta-robots") {
-    const reasons = noindexReasons(headerNoindex(ctx.pages), metaTagNoindex(ctx.pageSignals));
-    return reasons || check.details;
-  }
-  if (check.id === "ai-crawlers" && ctx.blockedAiAgents.length)
-    return `Blocked: ${ctx.blockedAiAgents.join(", ")}.`;
-  if (check.id === "answerability") return answerabilityDetails(ctx);
-  return check.details;
+      : "No schema.org JSON-LD was found.",
+  "meta-robots": (ctx, check) =>
+    noindexReasons(headerNoindex(ctx.pages), metaTagNoindex(ctx.pageSignals)) || check.details,
+  canonical: (ctx, check) =>
+    ctx.sharedCanonical
+      ? `All inspected pages declare the same canonical URL: ${ctx.sharedCanonical}.`
+      : check.details,
+  "ai-crawlers": (ctx, check) =>
+    ctx.blockedAiAgents.length ? `Blocked: ${ctx.blockedAiAgents.join(", ")}.` : check.details,
+  answerability: (ctx) => answerabilityDetails(ctx),
+};
+
+function detailFor(check: CheckDef, ctx: CheckContext): string {
+  return detailFns[check.id]?.(ctx, check) ?? check.details;
 }
 
-function applyFailurePrefix(check: AuditCheck): AuditCheck {
+function applyFailurePrefix(check: AuditCheck, ctx: CheckContext): AuditCheck {
   if (
     check.passed ||
     check.id === "ai-crawlers" ||
     check.id === "answerability" ||
+    (check.id === "canonical" && ctx.sharedCanonical !== undefined) ||
     check.details.startsWith("noindex set by ")
   )
     return check;
@@ -99,5 +107,5 @@ export function buildChecks(snapshot: TargetSnapshot): AuditCheck[] {
     weight: def.weight,
     details: detailFor(def, ctx),
   }));
-  return checks.map(applyFailurePrefix);
+  return checks.map((check) => applyFailurePrefix(check, ctx));
 }

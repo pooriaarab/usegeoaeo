@@ -6,6 +6,7 @@ export interface CheckContext {
   mirrors: string[];
   pages: PageSnapshot[];
   blockedAiAgents: string[];
+  sharedCanonical: string | undefined;
   pageSignals: ReturnType<typeof analyzePage>[];
   jsonTypes: string[];
   has: (value: string) => boolean;

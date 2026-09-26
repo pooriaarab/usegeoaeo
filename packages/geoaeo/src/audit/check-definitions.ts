@@ -34,7 +34,7 @@ function pageMetaChecks(): CheckDef[] {
     { id: 'api-catalog', label: 'API catalog', weight: 2, details: 'An API catalog is published at /.well-known/api-catalog.', passed: ctx => ctx.has(ctx.artifacts.get('__apiCatalog') ?? '') },
     { id: 'title', label: 'Page titles', weight: 4, details: 'Every inspected page has a title.', passed: ctx => ctx.allPage(page => page.title) },
     { id: 'description', label: 'Meta descriptions', weight: 4, details: 'Every inspected page has a meta description.', passed: ctx => ctx.allPage(page => page.description) },
-    { id: 'canonical', label: 'Canonical links', weight: 3, details: 'Every inspected page has a canonical URL.', passed: ctx => ctx.allPage(page => page.canonical) },
+    { id: 'canonical', label: 'Canonical links', weight: 3, details: 'Every inspected page has a canonical URL.', passed: ctx => ctx.allPage(page => page.canonical) && ctx.sharedCanonical === undefined },
     { id: 'open-graph', label: 'Open Graph tags', weight: 3, details: 'Open Graph tags are present.', passed: ctx => ctx.anyPage(page => page.og) },
   ];
 }

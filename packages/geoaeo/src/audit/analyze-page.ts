@@ -72,6 +72,7 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     title: () => ctx.$('title').text().trim().length > 0,
     description: () => !!ctx.$('meta[name="description"]').attr('content')?.trim().length,
     canonical: () => !!ctx.$('link[rel="canonical"]').attr('href')?.trim().length,
+    canonicalHref: () => ctx.$('link[rel="canonical"]').attr('href')?.trim() ?? '',
     og: () => ctx.$('meta[property^="og:"]').length >= 2,
     twitter: () => ctx.$('meta[name^="twitter:"]').length >= 1,
     jsonLd: () => ctx.jsonLdTypes.length > 0,
@@ -112,7 +113,7 @@ function checkHtmlImageAlt(ctx: HtmlContext): boolean {
 function analyzeHtml(source: string): PageSignals {
   const ctx = buildHtmlContext(source);
   const keys: Array<keyof PageSignals> = [
-    'title', 'description', 'canonical', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
+    'title', 'description', 'canonical', 'canonicalHref', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
     'h1', 'earlyFaq', 'directAnswer', 'wordCount', 'questionHeadings', 'freshness', 'author',
     'headingOrder', 'imageAlt', 'metaRobotsOk', 'hreflang',
   ];
@@ -121,11 +122,25 @@ function analyzeHtml(source: string): PageSignals {
   return result;
 }
 
+function extractSourceCanonicalHref(source: string): string {
+  const patterns = [
+    /rel\s*=\s*["']canonical["'][^>]*?href\s*=\s*["']([^"']+)["']/i,
+    /href\s*=\s*["']([^"']+)["'][^>]*?rel\s*=\s*["']canonical["']/i,
+    /\bcanonical\s*:\s*["']([^"']+)["']/i,
+  ];
+  for (const pattern of patterns) {
+    const href = pattern.exec(source)?.[1]?.trim();
+    if (href) return href;
+  }
+  return '';
+}
+
 function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[keyof PageSignals] {
   const table: Record<string, () => unknown> = {
     title: () => sourceHas(source, [/<title[\s>]/i, /metadata\s*=|title\s*:/i]),
     description: () => sourceHas(source, [/name=["']description["']/i, /description\s*:/i]),
     canonical: () => sourceHas(source, [/rel=["']canonical["']/i, /canonical\s*:/i]),
+    canonicalHref: () => extractSourceCanonicalHref(source),
     og: () => sourceHas(source, [/og:title/i, /og:description/i]),
     twitter: () => sourceHas(source, [/twitter:card/i, /twitter:title/i]),
     jsonLd: () => sourceHas(source, [/application\/ld\+json/i, /['"]@type['"]\s*:/i]),
@@ -152,7 +167,7 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
 
 function analyzeSource(source: string): PageSignals {
   const keys: Array<keyof PageSignals> = [
-    'title', 'description', 'canonical', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
+    'title', 'description', 'canonical', 'canonicalHref', 'og', 'twitter', 'jsonLd', 'jsonLdTypes',
     'h1', 'earlyFaq', 'directAnswer', 'wordCount', 'questionHeadings', 'freshness', 'author',
     'headingOrder', 'imageAlt', 'metaRobotsOk', 'hreflang',
   ];
