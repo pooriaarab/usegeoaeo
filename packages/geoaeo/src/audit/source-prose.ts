@@ -19,20 +19,26 @@ export function extractSourceProse(source: string): string {
 /** Line-level `import ...` and `export { ... }` / `export * from`. Leaves `export default function` bodies intact. */
 function stripImportExportStatements(source: string): string {
   return source
-    .replaceAll(/^[ \t]*import(?:\s+type)?\s*(?:[\s\S]*?\sfrom\s*)?['"][^'"]+['"]\s*;?[ \t]*$/gm, ' ')
-    .replaceAll(/^[ \t]*export\s+(?:\*(?:\s+as\s+\w+)?\s+from\s+['"][^'"]+['"]|\{[^}]*\}\s*(?:from\s+['"][^'"]+['"])?)\s*;?[ \t]*$/gm, ' ');
+    .replaceAll(
+      /^[ \t]*import(?:\s+type)?\s*(?:[\s\S]*?\sfrom\s*)?['"][^'"]+['"]\s*;?[ \t]*$/gm,
+      " ",
+    )
+    .replaceAll(
+      /^[ \t]*export\s+(?:\*(?:\s+as\s+\w+)?\s+from\s+['"][^'"]+['"]|\{[^}]*\}\s*(?:from\s+['"][^'"]+['"])?)\s*;?[ \t]*$/gm,
+      " ",
+    );
 }
 
 /** `className="..."`, `href='...'`, and other quoted JSX attribute values. */
 function stripQuotedAttributeValues(source: string): string {
-  return source.replaceAll(/(\s+[A-Za-z_:][\w:-]*\s*=\s*)(?:"[^"]*"|'[^']*'|`[^`]*`)/g, '$1');
+  return source.replaceAll(/(\s+[A-Za-z_:][\w:-]*\s*=\s*)(?:"[^"]*"|'[^']*'|`[^`]*`)/g, "$1");
 }
 
 function skipQuoted(source: string, start: number): number {
   const quote = source[start];
   let index = start + 1;
   while (index < source.length) {
-    if (source[index] === '\\') {
+    if (source[index] === "\\") {
       index += 2;
       continue;
     }
@@ -47,12 +53,12 @@ function findMatchingBrace(source: string, openIndex: number): number {
   let index = openIndex;
   while (index < source.length) {
     const char = source[index];
-    if (char === '"' || char === "'" || char === '`') {
+    if (char === '"' || char === "'" || char === "`") {
       index = skipQuoted(source, index);
       continue;
     }
-    if (char === '{') depth += 1;
-    if (char === '}') {
+    if (char === "{") depth += 1;
+    if (char === "}") {
       depth -= 1;
       if (depth === 0) return index;
     }
@@ -64,12 +70,12 @@ function findMatchingBrace(source: string, openIndex: number): number {
 /** `className={...}`, `href={...}`, `onClick={...}` — only values that follow `attr=`. */
 function stripAttributeBraceValues(source: string): string {
   const attrEquals = /\s+[A-Za-z_:][\w:-]*\s*=\s*/g;
-  let result = '';
+  let result = "";
   let last = 0;
   let match = attrEquals.exec(source);
   while (match) {
     const valueIndex = match.index + match[0].length;
-    if (source[valueIndex] !== '{') {
+    if (source[valueIndex] !== "{") {
       attrEquals.lastIndex = valueIndex;
       match = attrEquals.exec(source);
       continue;
@@ -86,5 +92,5 @@ function stripAttributeBraceValues(source: string): string {
 
 /** Opening, closing, and self-closing JSX/HTML tags, including leftover empty attributes. */
 function stripJsxTags(source: string): string {
-  return source.replaceAll(/<\/?[A-Za-z][\w.-]*[^>]*>/g, ' ');
+  return source.replaceAll(/<\/?[A-Za-z][\w.-]*[^>]*>/g, " ");
 }

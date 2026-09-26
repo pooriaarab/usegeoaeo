@@ -1,8 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo } from 'react';
-import { parseSegments, renderSegmentsToDOM, filterEntities, groupEntities } from './mention-helpers';
-import type { MentionEntity } from './mention-textarea';
+import { useEffect, useMemo } from "react";
+import {
+  parseSegments,
+  renderSegmentsToDOM,
+  filterEntities,
+  groupEntities,
+} from "./mention-helpers";
+import type { MentionEntity } from "./mention-textarea";
 
 export function useSyncEditor(opts: {
   value: string;
@@ -54,11 +59,15 @@ export function useDropdownScroll(
 ) {
   useEffect(() => {
     if (!showDropdown || !ref.current) return;
-    ref.current.querySelector('[data-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+    ref.current.querySelector('[data-selected="true"]')?.scrollIntoView({ block: "nearest" });
   }, [showDropdown, selectedIndex, ref]);
 }
 
-export function getActiveId(showDropdown: boolean, filtered: MentionEntity[], idx: number): string | undefined {
+export function getActiveId(
+  showDropdown: boolean,
+  filtered: MentionEntity[],
+  idx: number,
+): string | undefined {
   if (!showDropdown || filtered.length === 0 || idx >= filtered.length) return undefined;
   const e = filtered[idx];
   return `mention-option-${e.category}-${e.id}`;
@@ -67,12 +76,13 @@ export function getActiveId(showDropdown: boolean, filtered: MentionEntity[], id
 export function useMentionDerived(opts: {
   showDropdown: boolean;
   mentionFilter: string;
-  mentionCategory: MentionEntity['category'] | null;
+  mentionCategory: MentionEntity["category"] | null;
   entities: MentionEntity[];
   selectedIndex: number;
 }) {
   const filteredEntities = useMemo(
-    () => filterEntities(opts.showDropdown, opts.mentionFilter, opts.mentionCategory, opts.entities),
+    () =>
+      filterEntities(opts.showDropdown, opts.mentionFilter, opts.mentionCategory, opts.entities),
     [opts.showDropdown, opts.mentionFilter, opts.mentionCategory, opts.entities],
   );
   const groupedEntities = useMemo(() => groupEntities(filteredEntities), [filteredEntities]);
