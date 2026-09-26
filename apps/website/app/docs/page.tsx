@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@template/ui/primitives/card";
 import { Badge } from "@template/ui/primitives/badge";
 import { Separator } from "@template/ui/primitives/separator";
+import { DocsBreadcrumb } from "@/components/docs/docs-breadcrumb";
 
 export const metadata: Metadata = {
   title: "geoaeo Docs — CLI, MCP, and harnesses for AI discoverability",
@@ -43,8 +44,7 @@ const harnesses = [
 
 export default function DocsIndexPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:py-14">
+    <div className="mx-auto max-w-6xl">
         <DocsHeader />
 
         <SectionCards />
@@ -54,7 +54,6 @@ export default function DocsIndexPage() {
         <QuickStart />
 
         <RelatedLinks />
-      </div>
     </div>
   );
 }
@@ -63,13 +62,7 @@ export default function DocsIndexPage() {
 function DocsHeader() {
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
-          Home
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">Docs</span>
-      </nav>
+      <DocsBreadcrumb crumbs={[{ label: "Home", href: "/" }, { label: "Docs" }]} />
 
       <div className="max-w-3xl">
         <Badge variant="secondary" className="mb-3">
