@@ -1,10 +1,10 @@
-import { cn } from '../utils';
-import { type LucideIcon, BarChart3, AlertCircle, Inbox, TrendingUp } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '../primitives/button';
+import { cn } from "../utils";
+import { type LucideIcon, BarChart3, AlertCircle, Inbox, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { Button } from "../primitives/button";
 
-type EmptyStateVariant = 'default' | 'error' | 'info';
-type EmptyStateSize = 'default' | 'sm';
+type EmptyStateVariant = "default" | "error" | "info";
+type EmptyStateSize = "default" | "sm";
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -21,17 +21,17 @@ interface EmptyStateProps {
 }
 
 const variantDefaults: Record<EmptyStateVariant, { icon: LucideIcon; iconClass: string }> = {
-  default: { icon: BarChart3, iconClass: 'text-muted-foreground/50' },
-  error: { icon: AlertCircle, iconClass: 'text-error' },
-  info: { icon: Inbox, iconClass: 'text-info' },
+  default: { icon: BarChart3, iconClass: "text-muted-foreground/50" },
+  error: { icon: AlertCircle, iconClass: "text-error" },
+  info: { icon: Inbox, iconClass: "text-info" },
 };
 
 function getIconClass(sm: boolean, iconClass: string) {
-  if (sm) return 'text-muted-foreground/40';
+  if (sm) return "text-muted-foreground/40";
   return iconClass;
 }
 
-function getActionButton(action: EmptyStateProps['action']) {
+function getActionButton(action: EmptyStateProps["action"]) {
   if (!action) return null;
   if (action.href && !action.onClick) {
     const href = action.href;
@@ -52,22 +52,37 @@ export function EmptyState({
   icon,
   title,
   description,
-  variant = 'default',
-  size = 'default',
+  variant = "default",
+  size = "default",
   action,
   className,
 }: EmptyStateProps) {
   const defaults = variantDefaults[variant];
   const Icon = icon ?? defaults.icon;
-  const sm = size === 'sm';
+  const sm = size === "sm";
   return (
-    <div className={cn('flex flex-col items-center justify-center text-center', sm ? 'py-10' : 'p-12', className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center text-center",
+        sm ? "py-10" : "p-12",
+        className,
+      )}
+    >
       <Icon
-        className={cn(sm ? 'h-5 w-5 mb-2' : 'h-12 w-12 mb-4', getIconClass(sm, defaults.iconClass))}
+        className={cn(sm ? "h-5 w-5 mb-2" : "h-12 w-12 mb-4", getIconClass(sm, defaults.iconClass))}
         aria-hidden="true"
       />
-      <h3 className={cn(sm ? 'text-sm font-medium text-muted-foreground' : 'text-lg font-semibold')}>{title}</h3>
-      <p className={cn('text-muted-foreground max-w-md', sm ? 'text-xs mt-1 opacity-70' : 'text-sm mt-2')}>
+      <h3
+        className={cn(sm ? "text-sm font-medium text-muted-foreground" : "text-lg font-semibold")}
+      >
+        {title}
+      </h3>
+      <p
+        className={cn(
+          "text-muted-foreground max-w-md",
+          sm ? "text-xs mt-1 opacity-70" : "text-sm mt-2",
+        )}
+      >
         {description}
       </p>
       {getActionButton(action)}
@@ -80,18 +95,24 @@ export function NoDataEmptyState({ onRefresh }: { onRefresh?: () => void }) {
     <EmptyState
       title="No data available"
       description="No data for the selected time range. Try adjusting filters or date range."
-      action={onRefresh ? { label: 'Refresh', onClick: onRefresh } : undefined}
+      action={onRefresh ? { label: "Refresh", onClick: onRefresh } : undefined}
     />
   );
 }
 
-export function ErrorEmptyState({ errorMessage, onRetry }: { errorMessage: string; onRetry?: () => void }) {
+export function ErrorEmptyState({
+  errorMessage,
+  onRetry,
+}: {
+  errorMessage: string;
+  onRetry?: () => void;
+}) {
   return (
     <EmptyState
       title="Failed to load data"
       description={`Error loading this chart: ${errorMessage}`}
       variant="error"
-      action={onRetry ? { label: 'Try Again', onClick: onRetry } : undefined}
+      action={onRetry ? { label: "Try Again", onClick: onRetry } : undefined}
     />
   );
 }
