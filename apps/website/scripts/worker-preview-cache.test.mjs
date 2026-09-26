@@ -5,7 +5,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, test } from "node:test";
 
-import { cacheTitle, cleanupCache, listAll, prepareCache, renderRuntimeConfig, validateAccess, validatePreviewName } from "./worker-preview-cache.mjs";
+import {
+  cacheTitle,
+  cleanupCache,
+  listAll,
+  prepareCache,
+  renderRuntimeConfig,
+  validateAccess,
+  validatePreviewName,
+} from "./worker-preview-cache.mjs";
 
 const originalFetch = globalThis.fetch;
 const originalEnv = { ...process.env };
@@ -50,7 +58,8 @@ test("keeps Preview names exact and hashes only long KV titles", () => {
 
 test("accepts only pinned fail-closed Access identities", () => {
   assert.doesNotThrow(() => validateAccess(access()));
-  for (const key of ["workerId", "workerAppId", "hostnameAppId", "clientId", "serviceTokenId"]) assert.throws(() => validateAccess(access({ expected: { ...expected, [key]: "wrong" } })));
+  for (const key of ["workerId", "workerAppId", "hostnameAppId", "clientId", "serviceTokenId"])
+    assert.throws(() => validateAccess(access({ expected: { ...expected, [key]: "wrong" } })));
   const unsafe = access();
   unsafe.apps[0].service_auth_401_redirect = false;
   assert.throws(() => validateAccess(unsafe), /fail-closed/);
@@ -128,10 +137,15 @@ test("renders one structurally exact isolated KV binding", () => {
     vars: { ENVIRONMENT: "preview", WORKER_PREVIEW: "true" },
     kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
   });
-  assert.deepEqual(JSON.parse(renderRuntimeConfig(source, id)).kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id }]);
+  assert.deepEqual(JSON.parse(renderRuntimeConfig(source, id)).kv_namespaces, [
+    { binding: "NEXT_INC_CACHE_KV", id },
+  ]);
   for (const unsafe of [
     "{}",
-    JSON.stringify({ vars: { ENVIRONMENT: "production", WORKER_PREVIEW: "true" }, kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }] }),
+    JSON.stringify({
+      vars: { ENVIRONMENT: "production", WORKER_PREVIEW: "true" },
+      kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
+    }),
     JSON.stringify({
       kv_namespaces: [{ binding: "OTHER", id: "__PREVIEW_KV_ID__" }],
     }),
@@ -139,7 +153,10 @@ test("renders one structurally exact isolated KV binding", () => {
       kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
       r2_buckets: [],
     }),
-    JSON.stringify({ kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }], send_email: [] }),
+    JSON.stringify({
+      kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
+      send_email: [],
+    }),
     JSON.stringify({
       kv_namespaces: [{ binding: "NEXT_INC_CACHE_KV", id: "__PREVIEW_KV_ID__" }],
       env: { production: { kv_namespaces: [] } },
@@ -152,7 +169,10 @@ test("renders one structurally exact isolated KV binding", () => {
 const response = (result, resultInfo) => new Response(JSON.stringify({ success: true, result, result_info: resultInfo }));
 
 test("validates every Cloudflare list page", async () => {
-  const pages = [response([{ id: "one" }], { page: 1, total_count: 2 }), response([{ id: "two" }], { page: 2, total_count: 2 })];
+  const pages = [
+    response([{ id: "one" }], { page: 1, total_count: 2 }),
+    response([{ id: "two" }], { page: 2, total_count: 2 }),
+  ];
   globalThis.fetch = async () => pages.shift();
   assert.deepEqual(await listAll("/items", "token"), [{ id: "one" }, { id: "two" }]);
   globalThis.fetch = async () => response({}, { page: 1, total_count: 0 });
@@ -171,15 +191,19 @@ test("cleanup uses recorded ID and title, tolerates only true absence", async ()
   const deleted = [];
   globalThis.fetch = async (url, options = {}) => {
     if (options.method === "DELETE") deleted.push(new URL(url).pathname);
-    return options.method === "DELETE" ? response({}) : response([record], { page: 1, total_count: 1 });
+    return options.method === "DELETE"
+      ? response({})
+      : response([record], { page: 1, total_count: 1 });
   };
   await cleanupCache(previewName, state);
   assert.equal(deleted[0].endsWith(record.id), true);
   globalThis.fetch = async () => response([], { page: 1, total_count: 0 });
   await cleanupCache(previewName, state);
-  globalThis.fetch = async () => response([{ ...record, title: "different" }], { page: 1, total_count: 1 });
+  globalThis.fetch = async () =>
+    response([{ ...record, title: "different" }], { page: 1, total_count: 1 });
   await assert.rejects(cleanupCache(previewName, state), AggregateError);
-  globalThis.fetch = async () => response([{ ...record, id: "b".repeat(32) }], { page: 1, total_count: 1 });
+  globalThis.fetch = async () =>
+    response([{ ...record, id: "b".repeat(32) }], { page: 1, total_count: 1 });
   await assert.rejects(cleanupCache(previewName, state), AggregateError);
 });
 
@@ -199,6 +223,10 @@ test("prepareCache rollback deletes only its namespace when a duplicate exists",
 
 test("imports safely without an argv script path", () => {
   const moduleUrl = new URL("./worker-preview-cache.mjs", import.meta.url).href;
-  const result = spawnSync(process.execPath, ["--input-type=module", "-e", `process.argv.splice(1); await import(${JSON.stringify(moduleUrl)})`]);
+  const result = spawnSync(process.execPath, [
+    "--input-type=module",
+    "-e",
+    `process.argv.splice(1); await import(${JSON.stringify(moduleUrl)})`,
+  ]);
   assert.equal(result.status, 0, result.stderr.toString());
 });
