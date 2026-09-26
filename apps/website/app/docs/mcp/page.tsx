@@ -15,8 +15,7 @@ const intro =
 
 export default function McpPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
+    <div className="mx-auto max-w-3xl">
         <DocsPageHeader crumb="MCP" badge="Bin: geoaeo-mcp" title="MCP server" intro={intro} />
 
         <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
@@ -45,7 +44,6 @@ export default function McpPage() {
             for flags.
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

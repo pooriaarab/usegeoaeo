@@ -22,8 +22,7 @@ const intro =
 
 export default function CliPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
+    <div className="mx-auto max-w-3xl">
         <DocsPageHeader crumb="CLI" badge="Bin: geoaeo" title="CLI reference" intro={intro} />
 
         <div className="overflow-x-auto rounded-lg border">
@@ -64,7 +63,6 @@ export default function CliPage() {
             </Link>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

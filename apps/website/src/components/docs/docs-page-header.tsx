@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { Badge } from "@template/ui/primitives/badge";
 import { Separator } from "@template/ui/primitives/separator";
+import { DocsBreadcrumb } from "@/components/docs/docs-breadcrumb";
 
 type DocsPageHeaderProps = {
   /** Last breadcrumb crumb, e.g. "CLI". */
@@ -21,17 +21,13 @@ type DocsPageHeaderProps = {
 export function DocsPageHeader({ crumb, badge, title, intro }: DocsPageHeaderProps) {
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-foreground transition-colors">
-          Home
-        </Link>
-        <span className="mx-2">/</span>
-        <Link href="/docs" className="hover:text-foreground transition-colors">
-          Docs
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">{crumb}</span>
-      </nav>
+      <DocsBreadcrumb
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Docs", href: "/docs" },
+          { label: crumb },
+        ]}
+      />
 
       <Badge variant="secondary" className="mb-3">
         {badge}
