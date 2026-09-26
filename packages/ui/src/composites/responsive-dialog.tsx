@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
   Dialog,
   DialogClose,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../primitives/dialog';
+} from "../primitives/dialog";
 import {
   Sheet,
   SheetClose,
@@ -20,7 +20,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '../primitives/sheet';
+} from "../primitives/sheet";
 
 const MOBILE_BREAKPOINT = 768;
 
@@ -30,8 +30,8 @@ function useIsMobile() {
   React.useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
   return isMobile;
@@ -57,17 +57,27 @@ function ResponsiveDialog({ children, ...props }: React.ComponentProps<typeof Di
   );
 }
 
-function ResponsiveDialogTrigger({ children, ...props }: React.ComponentProps<typeof DialogTrigger>) {
+function ResponsiveDialogTrigger({
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogTrigger>) {
   const { isMobile } = React.useContext(ResponsiveDialogContext);
   if (isMobile) return <SheetTrigger {...props}>{children}</SheetTrigger>;
   return <DialogTrigger {...props}>{children}</DialogTrigger>;
 }
 
-function ResponsiveDialogContent({ children, className, ...props }: React.ComponentProps<typeof DialogContent>) {
+function ResponsiveDialogContent({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogContent>) {
   const { isMobile } = React.useContext(ResponsiveDialogContext);
   if (isMobile) {
     return (
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto overscroll-contain rounded-t-xl">
+      <SheetContent
+        side="bottom"
+        className="max-h-[85vh] overflow-y-auto overscroll-contain rounded-t-xl"
+      >
         {children}
       </SheetContent>
     );
@@ -97,7 +107,10 @@ function ResponsiveDialogTitle({ children, ...props }: React.ComponentProps<type
   return <DialogTitle {...props}>{children}</DialogTitle>;
 }
 
-function ResponsiveDialogDescription({ children, ...props }: React.ComponentProps<typeof DialogDescription>) {
+function ResponsiveDialogDescription({
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogDescription>) {
   const { isMobile } = React.useContext(ResponsiveDialogContext);
   if (isMobile) return <SheetDescription {...props}>{children}</SheetDescription>;
   return <DialogDescription {...props}>{children}</DialogDescription>;
