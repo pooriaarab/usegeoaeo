@@ -58,10 +58,7 @@ const skillDirs = await readdir(skillsDirectory).catch(() => [] as string[]);
 const loadedSkills = await Promise.all(
   skillDirs.map(async (entry) => ({
     entry,
-    markdown: await readFile(
-      resolve(skillsDirectory, entry, "SKILL.md"),
-      "utf8",
-    ).catch(() => ""),
+    markdown: await readFile(resolve(skillsDirectory, entry, "SKILL.md"), "utf8").catch(() => ""),
   })),
 );
 for (const { entry, markdown } of loadedSkills) {
@@ -70,8 +67,7 @@ for (const { entry, markdown } of loadedSkills) {
   skills.push({
     id: entry,
     name: frontmatter.match(/^name:\s*(.+)$/m)?.[1]?.trim() ?? entry,
-    description:
-      frontmatter.match(/^description:\s*(.+)$/m)?.[1]?.trim() ?? "",
+    description: frontmatter.match(/^description:\s*(.+)$/m)?.[1]?.trim() ?? "",
     url: `${SITE_URL}/.well-known/agent-skills/${entry}/SKILL.md`,
     source: `${REPO_URL}/blob/main/.claude/skills/${entry}/SKILL.md`,
   });

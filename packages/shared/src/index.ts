@@ -219,9 +219,7 @@ export function clamp(value: number, min: number, max: number): number {
  * Remove undefined and null values from an object (shallow).
  * Useful for building API payloads where missing fields should be omitted.
  */
-export function compactObject<T extends Record<string, unknown>>(
-  obj: T,
-): Partial<T> {
+export function compactObject<T extends Record<string, unknown>>(obj: T): Partial<T> {
   const result: Partial<T> = {};
   for (const [key, value] of Object.entries(obj)) {
     if (value !== undefined && value !== null) {
@@ -234,8 +232,6 @@ export function compactObject<T extends Record<string, unknown>>(
 /**
  * Type-safe Object.keys that returns the correct key type.
  */
-export function typedKeys<T extends Record<string, unknown>>(
-  obj: T,
-): Array<keyof T & string> {
+export function typedKeys<T extends Record<string, unknown>>(obj: T): Array<keyof T & string> {
   return Object.keys(obj) as Array<keyof T & string>;
 }

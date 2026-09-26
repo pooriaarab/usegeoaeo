@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Input } from '../primitives/input';
-import { Button } from '../primitives/button';
+import { Input } from "../primitives/input";
+import { Button } from "../primitives/button";
 export interface AiAssistPreset {
   label: string;
   value: string;
@@ -51,7 +51,7 @@ export function CustomInputRow({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+          if (e.key === "Enter") {
             e.preventDefault();
             onSubmit();
           }

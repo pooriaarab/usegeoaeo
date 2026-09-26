@@ -6,11 +6,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, test } from "node:test";
 
-import {
-  TARGET_DIR,
-  checkPluginSkill,
-  syncPluginSkill,
-} from "./sync-plugin-skill.mjs";
+import { TARGET_DIR, checkPluginSkill, syncPluginSkill } from "./sync-plugin-skill.mjs";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const PLUGIN_MANIFESTS = [

@@ -1,10 +1,6 @@
 import type { EmailJobPayload } from "@template/shared";
 
-import {
-  renderBillingReceipt,
-  renderPasswordReset,
-  renderWelcome,
-} from "./templates";
+import { renderBillingReceipt, renderPasswordReset, renderWelcome } from "./templates";
 
 export interface RenderedEmail {
   subject: string;
