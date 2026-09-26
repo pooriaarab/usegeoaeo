@@ -11,11 +11,13 @@ import { Footer } from "@/components/landing/footer";
 import { Button } from "@template/ui/primitives/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { pageAlternates } from "@/utils/page-alternates";
 
 export const metadata = {
   title: "geoaeo | Make any site quotable by AI answer engines",
   description:
     "geoaeo audits any site for SEO, GEO, and AEO, scores it 0 to 100, and generates llms.txt, sitemap, robots, JSON-LD, WebMCP, and Markdown mirrors. CLI, MCP server, and library. Free and open source under the MIT license.",
+  alternates: pageAlternates("/"),
 };
 
 /**
