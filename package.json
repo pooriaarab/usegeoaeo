@@ -9,7 +9,9 @@
     "workers/*"
   ],
   "scripts": {
-    "ci:local": "bun run lint && bun run typecheck && bun run test",
+    "ci:local": "bun run lint && bun run typecheck && bun run test && bun run check:plugin-skill",
+    "sync:plugin-skill": "node scripts/sync-plugin-skill.mjs",
+    "check:plugin-skill": "node scripts/sync-plugin-skill.mjs --check && bun test scripts/sync-plugin-skill.test.mjs",
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",

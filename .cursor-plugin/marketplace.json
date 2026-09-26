@@ -1,0 +1,16 @@
+{
+  "name": "geoaeo",
+  "owner": {
+    "name": "Pooria Arab"
+  },
+  "metadata": {
+    "description": "Official geoaeo plugin marketplace."
+  },
+  "plugins": [
+    {
+      "name": "geoaeo",
+      "source": "./plugins/geoaeo",
+      "description": "Audit a site for GEO and AEO, score it 0-100, and generate the artifacts that close the gaps. MCP tools are audit, gen, and humanize."
+    }
+  ]
+}

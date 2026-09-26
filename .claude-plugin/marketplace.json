@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "geoaeo",
+  "description": "Official geoaeo plugin marketplace.",
+  "owner": {
+    "name": "Pooria Arab",
+    "url": "https://github.com/pooriaarab"
+  },
+  "plugins": [
+    {
+      "name": "geoaeo",
+      "source": "./plugins/geoaeo",
+      "description": "Audit a site for GEO and AEO, score it 0-100, and generate the artifacts that close the gaps. MCP tools are audit, gen, and humanize."
+    }
+  ]
+}
