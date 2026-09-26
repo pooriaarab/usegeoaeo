@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { PKG_NAME } from '../../constants.js';
-import { configImport } from './helpers.js';
+import path from "node:path";
+import { PKG_NAME } from "../../constants.js";
+import { configImport } from "./helpers.js";
 
 function remixLlmsRoute(llmsImport: string): string {
   return `import { generateLlms } from '${PKG_NAME}';
@@ -104,20 +104,20 @@ Read more: \${siteConfig.siteUrl}/\${page}
 }
 
 export function remixTemplates(root: string): Map<string, string> {
-  const llmsImport = configImport(root, path.join(root, 'app/routes/llms.txt.tsx'));
-  const llmsFullImport = configImport(root, path.join(root, 'app/routes/llms-full.txt.tsx'));
-  const webmcpImport = configImport(root, path.join(root, 'app/routes/webmcp[.]json.tsx'));
-  const sitemapImport = configImport(root, path.join(root, 'app/routes/sitemap[.]xml.tsx'));
-  const robotsImport = configImport(root, path.join(root, 'app/routes/robots[.]txt.tsx'));
-  const jsonLdImport = configImport(root, path.join(root, 'app/components/seo/json-ld.tsx'));
-  const mirrorImport = configImport(root, path.join(root, 'app/routes/$page[.]md.tsx'));
+  const llmsImport = configImport(root, path.join(root, "app/routes/llms.txt.tsx"));
+  const llmsFullImport = configImport(root, path.join(root, "app/routes/llms-full.txt.tsx"));
+  const webmcpImport = configImport(root, path.join(root, "app/routes/webmcp[.]json.tsx"));
+  const sitemapImport = configImport(root, path.join(root, "app/routes/sitemap[.]xml.tsx"));
+  const robotsImport = configImport(root, path.join(root, "app/routes/robots[.]txt.tsx"));
+  const jsonLdImport = configImport(root, path.join(root, "app/components/seo/json-ld.tsx"));
+  const mirrorImport = configImport(root, path.join(root, "app/routes/$page[.]md.tsx"));
   return new Map([
-    ['app/routes/llms.txt.tsx', remixLlmsRoute(llmsImport)],
-    ['app/routes/llms-full.txt.tsx', remixLlmsFullRoute(llmsFullImport)],
-    ['app/routes/webmcp[.]json.tsx', remixWebmcpRoute(webmcpImport)],
-    ['app/routes/sitemap[.]xml.tsx', remixSitemapRoute(sitemapImport)],
-    ['app/routes/robots[.]txt.tsx', remixRobotsRoute(robotsImport)],
-    ['app/components/seo/json-ld.tsx', remixJsonLdComponent(jsonLdImport)],
-    ['app/routes/$page[.]md.tsx', remixMirrorRoute(mirrorImport)],
+    ["app/routes/llms.txt.tsx", remixLlmsRoute(llmsImport)],
+    ["app/routes/llms-full.txt.tsx", remixLlmsFullRoute(llmsFullImport)],
+    ["app/routes/webmcp[.]json.tsx", remixWebmcpRoute(webmcpImport)],
+    ["app/routes/sitemap[.]xml.tsx", remixSitemapRoute(sitemapImport)],
+    ["app/routes/robots[.]txt.tsx", remixRobotsRoute(robotsImport)],
+    ["app/components/seo/json-ld.tsx", remixJsonLdComponent(jsonLdImport)],
+    ["app/routes/$page[.]md.tsx", remixMirrorRoute(mirrorImport)],
   ]);
 }
