@@ -49,7 +49,7 @@ const plainCopy = "<h1>Hi</h1><p>Plain copy.</p>";
 const faqCopy = "<h1>Hi</h1><h2>Frequently asked questions</h2>";
 const sizedImg = `<img src="/a.png" alt="a" width="4" height="4">`;
 const bareImg = `<img src="/a.png" alt="a">`;
-const faqSrc = `"@type": "FAQPage", acceptedAnswer: {},` + ` frequently asked questions`;
+const faqSrc = `"<h2>Frequently asked questions</h2>", "@type": "FAQPage",` + ` acceptedAnswer: {}`;
 
 // [name, head, check id, passed]
 const stdCases: Array<[string, string, string, boolean]> = [
@@ -68,6 +68,7 @@ const stdCases: Array<[string, string, string, boolean]> = [
   ["no blocks", "", "schema-valid", true],
   ["no FAQ copy", org, "faq-schema", true],
   ["incidental FAQ mention", org, "faq-schema", true],
+  ["quoted phrase in prose", org, "faq-schema", true],
   ["bare FAQ heading without schema", org, "faq-schema", false],
   ["bare FAQ heading with schema", faqOk, "faq-schema", true],
   ["Organization counts as author", org, "author", true],
@@ -77,6 +78,7 @@ const stdBodies: Record<string, string> = {
   "sized image": sizedImg,
   "unsized image": bareImg,
   "incidental FAQ mention": "<p>Configure pages: ['pricing', 'faq'].</p>",
+  "quoted phrase in prose": `<p>Audit looks for an early "FAQ" / "frequently asked questions" signal.</p>`,
   "bare FAQ heading without schema": "<h2>FAQ</h2><p>Q and A below.</p>",
   "bare FAQ heading with schema": "<h2>FAQ</h2><p>Q and A below.</p>",
 };
