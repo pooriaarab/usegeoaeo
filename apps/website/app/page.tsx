@@ -7,6 +7,7 @@ import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { ProofSection } from "@/components/landing/proof-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { FAQSection } from "@/components/landing/faq-section";
+import { faqs } from "@/components/landing/faq-data";
 import { Footer } from "@/components/landing/footer";
 import { Button } from "@template/ui/primitives/button";
 import { ArrowRight } from "lucide-react";
@@ -64,6 +65,16 @@ function CTAFooter() {
   );
 }
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 export default function Page() {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
@@ -81,6 +92,10 @@ export default function Page() {
         <CTAFooter />
       </main>
       <Footer />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     </div>
   );
 }
