@@ -59,6 +59,7 @@ export async function snapshotDirectory(directory: string): Promise<TargetSnapsh
 interface FetchedText {
   status: number;
   text: string;
+  contentType: string;
   xRobotsTag: string;
 }
 
@@ -72,17 +73,29 @@ async function fetchText(url: string): Promise<FetchedText> {
     // response.url (e.g. a stubbed Response in tests) skips this check rather
     // than throwing on new URL('').
     if (response.url && new URL(response.url).host !== new URL(url).host) {
-      return { status: 0, text: "", xRobotsTag: "" };
+      return { status: 0, text: "", contentType: "", xRobotsTag: "" };
     }
     const xRobotsTag = response.headers.get("x-robots-tag") ?? "";
-    return { status: response.status, text: await response.text(), xRobotsTag };
+    return {
+      status: response.status,
+      text: await response.text(),
+      contentType: response.headers.get("content-type") ?? "",
+      xRobotsTag,
+    };
   } catch {
-    return { status: 0, text: "", xRobotsTag: "" };
+    return { status: 0, text: "", contentType: "", xRobotsTag: "" };
   }
 }
 
 function pageFromFetch(url: string, fetched: FetchedText): PageSnapshot {
-  return { url, source: fetched.text, isHtml: true, xRobotsTag: fetched.xRobotsTag };
+  // Some fetch implementations (including existing test stubs) omit content-type.
+  // Treat that as HTML only when the body looks like HTML; explicit non-HTML wins.
+  const contentType = fetched.contentType.toLowerCase();
+  const isHtml =
+    !contentType ||
+    /(?:^|;)\s*(?:text\/html|application\/xhtml\+xml)\b/i.test(contentType) ||
+    /(?:^|;)\s*text\/plain\b/i.test(contentType);
+  return { url, source: fetched.text, isHtml, xRobotsTag: fetched.xRobotsTag };
 }
 
 async function fetchSingleArtifact(base: string, paths: string[]): Promise<string> {
@@ -115,8 +128,25 @@ async function fetchArtifacts(base: string): Promise<Map<string, string>> {
 function parseSitemapUrls(sitemap: string): string[] {
   return [...sitemap.matchAll(/<loc>\s*([^<]+)\s*<\/loc>/gi)]
     .map((match) => match[1])
-    .filter(Boolean)
-    .slice(0, 4);
+    .filter(Boolean);
+}
+
+function isSitemapIndex(sitemap: string): boolean {
+  return /<sitemapindex\b/i.test(sitemap);
+}
+
+function markdownAlternate(source: string, pageUrl: string): string | undefined {
+  const match = source.match(/<link\b[^>]*>/gi)?.find((tag) =>
+    /\brel\s*=\s*["']?alternate\b/i.test(tag) &&
+    /\btype\s*=\s*["']?text\/markdown\b/i.test(tag),
+  );
+  const href = match?.match(/\bhref\s*=\s*["']([^"']+)["']/i)?.[1];
+  if (!href) return undefined;
+  try {
+    return new URL(href, pageUrl).href;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Rewrite a sitemap <loc> onto the target's origin: keep the path, replace scheme, host and port. */
@@ -132,7 +162,7 @@ function resolveOnTarget(rawUrl: string, target: URL): string | undefined {
 async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
   const home = await fetchText(base);
-  if (home.text) pages.push(pageFromFetch(base, home));
+  if (home.text && pageFromFetch(base, home).isHtml) pages.push(pageFromFetch(base, home));
   let target: URL;
   try {
     target = new URL(base);
@@ -140,12 +170,22 @@ async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSna
     return pages;
   }
   const seen = new Set<string>([target.href]);
-  for (const rawUrl of parseSitemapUrls(sitemap)) {
+  const sitemapUrls = parseSitemapUrls(sitemap);
+  const pageUrls = isSitemapIndex(sitemap)
+    ? (await Promise.all(
+        sitemapUrls.slice(0, 4).map(async (rawUrl) => {
+          const url = resolveOnTarget(rawUrl, target);
+          if (!url) return [];
+          return parseSitemapUrls((await fetchText(url)).text);
+        }),
+      )).flat().slice(0, 4)
+    : sitemapUrls.slice(0, 4);
+  for (const rawUrl of pageUrls) {
     const url = resolveOnTarget(rawUrl, target);
     if (!url || seen.has(url)) continue;
     seen.add(url);
     const page = await fetchText(url);
-    if (page.text) pages.push(pageFromFetch(url, page));
+    if (page.text && pageFromFetch(url, page).isHtml) pages.push(pageFromFetch(url, page));
   }
   return pages;
 }
@@ -153,8 +193,16 @@ async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSna
 async function fetchMirrors(pages: PageSnapshot[]): Promise<string[]> {
   const mirrors: string[] = [];
   for (const page of pages.slice(0, 4)) {
-    const mirror = await fetchText(`${page.url.replace(/\/$/, "")}.md`);
-    if (mirror.status >= 200 && mirror.status < 400 && mirror.text) mirrors.push(`${page.url}.md`);
+    const alternate = markdownAlternate(page.source, page.url);
+    const fallbacks = [alternate, `${page.url.replace(/\/$/, "")}.md`];
+    if (new URL(page.url).pathname === "/") fallbacks.push(`${page.url.replace(/\/$/, "")}/index.md`);
+    for (const mirrorUrl of fallbacks.filter((url): url is string => Boolean(url))) {
+      const mirror = await fetchText(mirrorUrl);
+      if (mirror.status >= 200 && mirror.status < 400 && mirror.text) {
+        mirrors.push(mirrorUrl);
+        break;
+      }
+    }
   }
   return mirrors;
 }
