@@ -32,6 +32,9 @@ All notable changes to geoaeo are recorded here. The format follows
   questions" phrase or a heading that reads exactly FAQ), not on the
   bare word. A page that only mentions FAQ as a config field or a
   file purpose no longer fails for missing FAQPage schema.
+- `faq-schema` names a section by its heading. Body prose that quotes
+  the phrase no longer counts, so docs about the check itself stop
+  failing it.
 
 ## [0.5.0] - 2026-09-26
 
