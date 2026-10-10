@@ -62,7 +62,15 @@ export function previewSource(config) {
   const name = config?.env?.staging?.name;
   if (typeof name !== "string" || !name) throw new Error("wrangler config has no env.staging.name");
   const source = {};
-  for (const key of ["main", "compatibility_date", "compatibility_flags", "minify", "assets", "observability", "placement"]) {
+  for (const key of [
+    "main",
+    "compatibility_date",
+    "compatibility_flags",
+    "minify",
+    "assets",
+    "observability",
+    "placement",
+  ]) {
     if (config[key] !== undefined) source[key] = config[key];
   }
   if (source.assets && typeof source.assets === "object")
@@ -81,8 +89,12 @@ export function previewSource(config) {
 
 function main() {
   const [sourcePath, outputPath] = process.argv.slice(2);
-  if (!sourcePath || !outputPath) throw new Error("Usage: worker-preview-source.mjs <wrangler.jsonc> <output.json>");
-  writeFileSync(outputPath, `${JSON.stringify(previewSource(JSON.parse(stripJsonc(readFileSync(sourcePath, "utf8")))), null, 2)}\n`);
+  if (!sourcePath || !outputPath)
+    throw new Error("Usage: worker-preview-source.mjs <wrangler.jsonc> <output.json>");
+  writeFileSync(
+    outputPath,
+    `${JSON.stringify(previewSource(JSON.parse(stripJsonc(readFileSync(sourcePath, "utf8")))), null, 2)}\n`,
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

@@ -172,7 +172,11 @@ test("worker-preview-source renders a template renderRuntimeConfig accepts", () 
   assert.equal(source.name, "w-staging");
   assert.equal(source.workers_dev, false);
   assert.equal(source.preview_urls, false);
-  assert.deepEqual(source.assets, { binding: "ASSETS", directory: "dist", run_worker_first: WORKER_FIRST_PATHS });
+  assert.deepEqual(source.assets, {
+    binding: "ASSETS",
+    directory: "dist",
+    run_worker_first: WORKER_FIRST_PATHS,
+  });
   for (const path of ["/robots.txt", "/llms.txt", "/sitemap.xml", "/.well-known/*"])
     assert.ok(WORKER_FIRST_PATHS.includes(path), `${path} must run the Worker first`);
   assert.deepEqual(source.previews, {
@@ -183,7 +187,9 @@ test("worker-preview-source renders a template renderRuntimeConfig accepts", () 
     assert.equal(source[key], undefined);
   const id = "a".repeat(32);
   const rendered = renderRuntimeConfig(`${JSON.stringify(source, null, 2)}\n`, id);
-  assert.deepEqual(JSON.parse(rendered).previews.kv_namespaces, [{ binding: "NEXT_INC_CACHE_KV", id }]);
+  assert.deepEqual(JSON.parse(rendered).previews.kv_namespaces, [
+    { binding: "NEXT_INC_CACHE_KV", id },
+  ]);
   assert.equal(previewSource({ ...config, env: { staging: { name: "other" } } }).name, "other");
   assert.throws(() => previewSource({ ...config, env: {} }), /env\.staging\.name/);
 });
@@ -193,10 +199,13 @@ test("worker-preview-source CLI strips comments and trailing commas", async () =
   try {
     const input = join(dir, "wrangler.jsonc");
     const output = join(dir, "source.json");
-    await writeFile(input, `{ // comment
+    await writeFile(
+      input,
+      `{ // comment
       "main": "w.js", "vars": { "URL": "https://a.test//b" },
       "env": { "staging": { "name": "w-staging", }, },
-      /* block */ "compatibility_flags": ["nodejs_compat",], }`);
+      /* block */ "compatibility_flags": ["nodejs_compat",], }`,
+    );
     const script = new URL("./worker-preview-source.mjs", import.meta.url).pathname;
     const result = spawnSync(process.execPath, [script, input, output]);
     assert.equal(result.status, 0, result.stderr.toString());

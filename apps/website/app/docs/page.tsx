@@ -53,15 +53,15 @@ const harnesses = [
 export default function DocsIndexPage() {
   return (
     <div className="mx-auto max-w-6xl">
-        <DocsHeader />
+      <DocsHeader />
 
-        <SectionCards />
+      <SectionCards />
 
-        <HarnessCards />
+      <HarnessCards />
 
-        <QuickStart />
+      <QuickStart />
 
-        <RelatedLinks />
+      <RelatedLinks />
     </div>
   );
 }
