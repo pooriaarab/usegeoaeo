@@ -14,6 +14,20 @@ All notable changes to geoaeo are recorded here. The format follows
   value keeps every local path allowed. An `http` or `https` URL passed
   to `audit` stays allowed. A path outside the roots returns an error
   that names the path the caller passed.
+- Six audit checks (25 to 31). `schema-valid` fails a JSON-LD block
+  that does not parse or that misses a schema.org context; a `@graph`
+  document passes on its shared context. `faq-schema` pairs visible
+  FAQ copy with FAQPage JSON-LD that carries questions and accepted
+  answers. `favicon`, `viewport`, `image-size`, and `lang` cover the
+  document foundations: a declared icon, `width=device-width`, sized
+  images, and a declared page language. Weights rebalanced so the 31
+  checks still sum to 100.
+
+### Fixed
+
+- The `author` check counts Organization and Brand JSON-LD types. It
+  promised author or organization but only matched Person signals, so a
+  site identified only by Organization schema failed.
 
 ## [0.5.0] - 2026-09-26
 

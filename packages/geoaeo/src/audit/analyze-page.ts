@@ -1,6 +1,7 @@
 import { load } from "cheerio";
 import type { PageSignals } from "./types.js";
 import { extractSourceProse } from "./source-prose.js";
+import { extractJsonLd, type JsonLdFacts } from "./jsonld-facts.js";
 import { sourceHas } from "./utils.js";
 
 interface HtmlContext {
@@ -9,32 +10,11 @@ interface HtmlContext {
   prose: string;
   top: string;
   jsonLdTypes: string[];
+  jsonLd: JsonLdFacts;
   firstParagraph: string;
   questionHeadings: boolean;
   images: ReturnType<ReturnType<typeof load>["prototype"]["toArray"]>;
   $: ReturnType<typeof load>;
-}
-
-function extractJsonLdTypes($: ReturnType<typeof load>): string[] {
-  return $('script[type="application/ld+json"]')
-    .map((_, element) => $(element).text())
-    .get()
-    .flatMap((value) => {
-      try {
-        const parsed = JSON.parse(value) as Record<string, unknown>;
-        const nodes = Array.isArray(parsed)
-          ? parsed
-          : Array.isArray((parsed as { "@graph"?: unknown[] })["@graph"])
-            ? (parsed as { "@graph": unknown[] })["@graph"]
-            : [parsed];
-        return nodes.flatMap((node) => {
-          const type = (node as { "@type"?: string | string[] })?.["@type"];
-          return type ? (Array.isArray(type) ? type : [type]) : [];
-        });
-      } catch {
-        return [];
-      }
-    });
 }
 
 // $.root().text() concatenates every descendant text node, including the
@@ -52,7 +32,8 @@ function buildHtmlContext(source: string): HtmlContext {
   const visible = $.root().text();
   const prose = extractProse($);
   const top = visible.slice(0, 3000);
-  const jsonLdTypes = extractJsonLdTypes($);
+  const jsonLd = extractJsonLd($);
+  const jsonLdTypes = jsonLd.types;
   const firstParagraph = $("p").first().text().trim();
   const questionHeadings = $("h2, h3")
     .toArray()
@@ -63,7 +44,18 @@ function buildHtmlContext(source: string): HtmlContext {
         .endsWith("?"),
     );
   const images = $("img").toArray();
-  return { source, visible, prose, top, jsonLdTypes, firstParagraph, questionHeadings, images, $ };
+  return {
+    source,
+    visible,
+    prose,
+    top,
+    jsonLdTypes,
+    jsonLd,
+    firstParagraph,
+    questionHeadings,
+    images,
+    $,
+  };
 }
 
 function countWords(text: string): number {
@@ -82,6 +74,13 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     twitter: () => ctx.$('meta[name^="twitter:"]').length >= 1,
     jsonLd: () => ctx.jsonLdTypes.length > 0,
     jsonLdTypes: () => ctx.jsonLdTypes,
+    jsonLdBlocks: () => ctx.jsonLd.blocks,
+    jsonLdParseOk: () => ctx.jsonLd.parseOk,
+    faqJsonLd: () => ctx.jsonLd.faq,
+    favicon: () => checkHtmlFavicon(ctx),
+    viewport: () => checkHtmlViewport(ctx),
+    imageSized: () => checkHtmlImageSized(ctx),
+    lang: () => !!ctx.$("html").attr("lang")?.trim(),
     h1: () => ctx.$("h1").length > 0,
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(ctx.visible.slice(0, 5000)),
     directAnswer: () => ctx.firstParagraph.length >= 40 && ctx.firstParagraph.length <= 600,
@@ -112,7 +111,33 @@ function checkHtmlFreshness(ctx: HtmlContext): boolean {
 function checkHtmlAuthor(ctx: HtmlContext): boolean {
   if (ctx.$('meta[name="author"]').attr("content")?.trim()) return true;
   if (ctx.$('[rel="author"], [itemprop="author"]').length > 0) return true;
-  return /"@type"\s*:\s*"Person"/i.test(ctx.source);
+  if (/"@type"\s*:\s*"Person"/i.test(ctx.source)) return true;
+  return ctx.jsonLdTypes.includes("Organization") || ctx.jsonLdTypes.includes("Brand");
+}
+
+function checkHtmlFavicon(ctx: HtmlContext): boolean {
+  return ctx
+    .$("link[rel]")
+    .toArray()
+    .some((element: unknown) =>
+      (ctx.$(element as string).attr("rel") ?? "").split(/\s+/).includes("icon"),
+    );
+}
+
+function checkHtmlViewport(ctx: HtmlContext): boolean {
+  const content = ctx.$('meta[name="viewport"]').attr("content")?.replace(/\s+/g, "") ?? "";
+  return content.split(",").includes("width=device-width");
+}
+
+function checkHtmlImageSized(ctx: HtmlContext): boolean {
+  if (ctx.images.length === 0) return true;
+  return ctx.images.every((element: unknown) => {
+    const image = ctx.$(element as string);
+    return (
+      (image.attr("width") ?? "").trim().length > 0 &&
+      (image.attr("height") ?? "").trim().length > 0
+    );
+  });
 }
 
 function checkHtmlImageAlt(ctx: HtmlContext): boolean {
@@ -133,6 +158,13 @@ function analyzeHtml(source: string): PageSignals {
     "twitter",
     "jsonLd",
     "jsonLdTypes",
+    "jsonLdBlocks",
+    "jsonLdParseOk",
+    "faqJsonLd",
+    "favicon",
+    "viewport",
+    "imageSized",
+    "lang",
     "h1",
     "earlyFaq",
     "directAnswer",
@@ -174,6 +206,17 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
     jsonLd: () => sourceHas(source, [/application\/ld\+json/i, /['"]@type['"]\s*:/i]),
     jsonLdTypes: () =>
       [...source.matchAll(/['"]@type['"]\s*:\s*['"]([^'"]+)['"]/gi)].map((match) => match[1]),
+    // Source holds the constructor (usually JSON.stringify of an object),
+    // not a rendered block, so the block count stays zero and validity is
+    // judged on rendered HTML only.
+    jsonLdBlocks: () => 0,
+    jsonLdParseOk: () => true,
+    faqJsonLd: () => /FAQPage/.test(source) && /acceptedAnswer/.test(source),
+    favicon: () => sourceHas(source, [/rel\s*=\s*["'][^"']*\bicon\b/i, /icons\s*:/i]),
+    viewport: () =>
+      sourceHas(source, [/<meta[^>]*content=["'][^"']*width\s*=\s*device-width/i, /viewport\s*:/i]),
+    imageSized: () => checkSourceImageSized(source),
+    lang: () => /<html[^>]*\blang\s*=/i.test(source),
     h1: () => sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
     directAnswer: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
@@ -196,6 +239,8 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
         /rel=["']author["']/i,
         /itemprop=["']author["']/i,
         /"@type"\s*:\s*"Person"/i,
+        /"@type"\s*:\s*"Organization"/i,
+        /"@type"\s*:\s*"Brand"/i,
       ]),
     headingOrder: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<h2[\s>]/i]),
     imageAlt: () => !/<img(?![^>]*\balt=)[^>]*>/i.test(source),
@@ -203,6 +248,14 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
     hreflang: () => /hreflang/i.test(source),
   };
   return table[key]?.() as PageSignals[keyof PageSignals];
+}
+
+function checkSourceImageSized(source: string): boolean {
+  const tags = [...source.matchAll(/<(img|Image)\b[^>]*>/gi)].map((match) => match[0]);
+  // A fill-layout image sizes itself to its parent and takes no dimensions.
+  const sized = tags.filter((tag) => !/\bfill[\s=/>]/i.test(tag));
+  if (sized.length === 0) return true;
+  return sized.every((tag) => /width\s*=/.test(tag) && /height\s*=/.test(tag));
 }
 
 function analyzeSource(source: string): PageSignals {
@@ -215,6 +268,13 @@ function analyzeSource(source: string): PageSignals {
     "twitter",
     "jsonLd",
     "jsonLdTypes",
+    "jsonLdBlocks",
+    "jsonLdParseOk",
+    "faqJsonLd",
+    "favicon",
+    "viewport",
+    "imageSized",
+    "lang",
     "h1",
     "earlyFaq",
     "directAnswer",

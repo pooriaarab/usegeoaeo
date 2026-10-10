@@ -37,6 +37,13 @@ export interface PageSignals {
   twitter: boolean;
   jsonLd: boolean;
   jsonLdTypes: string[];
+  jsonLdBlocks: number;
+  jsonLdParseOk: boolean;
+  faqJsonLd: boolean;
+  favicon: boolean;
+  viewport: boolean;
+  imageSized: boolean;
+  lang: boolean;
   h1: boolean;
   earlyFaq: boolean;
   directAnswer: boolean;

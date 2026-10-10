@@ -2,6 +2,7 @@ import type { CheckDef } from "./check-types.js";
 import {
   headerNoindex,
   isAnswerable,
+  isFaqSchemaPaired,
   isFullSiteMap,
   isRobotsPolicy,
   isShortSiteMap,
@@ -14,21 +15,21 @@ function artifactChecks(): CheckDef[] {
     {
       id: "llms",
       label: "/llms.txt",
-      weight: 6,
+      weight: 5,
       details: "Short site map is present.",
       passed: (ctx) => isShortSiteMap(ctx.artifacts.get("__llms")),
     },
     {
       id: "llms-full",
       label: "/llms-full.txt",
-      weight: 6,
+      weight: 5,
       details: "Full site map is present.",
       passed: (ctx) => isFullSiteMap(ctx.artifacts.get("__llmsFull")),
     },
     {
       id: "sitemap",
       label: "/sitemap.xml",
-      weight: 6,
+      weight: 5,
       details: "A sitemap artifact is present.",
       passed: (ctx) => isSitemapXml(ctx.artifacts.get("__sitemap")),
     },
@@ -42,7 +43,7 @@ function artifactChecks(): CheckDef[] {
     {
       id: "webmcp",
       label: "WebMCP manifest",
-      weight: 4,
+      weight: 3,
       details: "A WebMCP-style tool manifest is present.",
       passed: (ctx) => isWebmcpManifest(ctx.artifacts.get("__webmcp")),
     },
@@ -141,14 +142,14 @@ function pageSignalChecks(): CheckDef[] {
     {
       id: "json-ld",
       label: "JSON-LD",
-      weight: 7,
+      weight: 5,
       details: "",
       passed: (ctx) => ctx.anyPage((page) => page.jsonLd),
     },
     {
       id: "hreflang",
       label: "hreflang alternates",
-      weight: 3,
+      weight: 2,
       details: "Language alternates are declared.",
       passed: (ctx) => ctx.anyPage((page) => page.hreflang),
     },
@@ -189,23 +190,75 @@ function contentChecks(): CheckDef[] {
     {
       id: "qa-framing",
       label: "Question framing",
-      weight: 5,
+      weight: 4,
       details: "Content is framed as questions an engine can quote.",
       passed: (ctx) => ctx.anyPage((page) => page.questionHeadings || page.earlyFaq),
     },
     {
       id: "freshness",
       label: "Freshness signals",
-      weight: 6,
+      weight: 5,
       details: "Pages show a published or updated date.",
       passed: (ctx) => ctx.anyPage((page) => page.freshness),
     },
     {
       id: "author",
       label: "Author and E-E-A-T",
-      weight: 6,
+      weight: 5,
       details: "Pages name an author or organization.",
       passed: (ctx) => ctx.anyPage((page) => page.author),
+    },
+  ];
+}
+
+function schemaChecks(): CheckDef[] {
+  return [
+    {
+      id: "schema-valid",
+      label: "Valid JSON-LD",
+      weight: 2,
+      details: "",
+      passed: (ctx) => ctx.allPage((page) => page.jsonLdParseOk),
+    },
+    {
+      id: "faq-schema",
+      label: "FAQ schema",
+      weight: 3,
+      details: "",
+      passed: (ctx) => isFaqSchemaPaired(ctx),
+    },
+  ];
+}
+
+function documentChecks(): CheckDef[] {
+  return [
+    {
+      id: "favicon",
+      label: "Favicon",
+      weight: 1,
+      details: "A favicon is declared.",
+      passed: (ctx) => ctx.anyPage((page) => page.favicon),
+    },
+    {
+      id: "viewport",
+      label: "Viewport tag",
+      weight: 2,
+      details: "A viewport tag sets width=device-width.",
+      passed: (ctx) => ctx.anyPage((page) => page.viewport),
+    },
+    {
+      id: "image-size",
+      label: "Sized images",
+      weight: 1,
+      details: "Every image sets width and height.",
+      passed: (ctx) => ctx.allPage((page) => page.imageSized),
+    },
+    {
+      id: "lang",
+      label: "Page language",
+      weight: 1,
+      details: "The document declares its language.",
+      passed: (ctx) => ctx.anyPage((page) => page.lang),
     },
   ];
 }
@@ -216,6 +269,8 @@ export function getCheckDefinitions(): CheckDef[] {
     ...identityChecks(),
     ...pageMetaChecks(),
     ...pageSignalChecks(),
+    ...schemaChecks(),
     ...contentChecks(),
+    ...documentChecks(),
   ];
 }
