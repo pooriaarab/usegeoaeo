@@ -67,12 +67,18 @@ const stdCases: Array<[string, string, string, boolean]> = [
   ["shared graph context", graph, "schema-valid", true],
   ["no blocks", "", "schema-valid", true],
   ["no FAQ copy", org, "faq-schema", true],
+  ["incidental FAQ mention", org, "faq-schema", true],
+  ["bare FAQ heading without schema", org, "faq-schema", false],
+  ["bare FAQ heading with schema", faqOk, "faq-schema", true],
   ["Organization counts as author", org, "author", true],
 ];
 
 const stdBodies: Record<string, string> = {
   "sized image": sizedImg,
   "unsized image": bareImg,
+  "incidental FAQ mention": "<p>Configure pages: ['pricing', 'faq'].</p>",
+  "bare FAQ heading without schema": "<h2>FAQ</h2><p>Q and A below.</p>",
+  "bare FAQ heading with schema": "<h2>FAQ</h2><p>Q and A below.</p>",
 };
 
 describe("schema and document checks on rendered HTML", () => {
@@ -113,6 +119,7 @@ const srcCases: Array<[string, string, string, boolean]> = [
   ["bare img", `<img src="/a.png" />`, "image-size", false],
   ["fill image", `<Image fill />`, "image-size", true],
   ["FAQ pairing", faqSrc, "faq-schema", true],
+  ["incidental mention", `pages: ['pricing', 'faq']`, "faq-schema", true],
   ["constructed JSON-LD", `"@context": "https://schema.org"`, "schema-valid", true],
 ];
 
