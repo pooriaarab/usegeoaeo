@@ -150,8 +150,9 @@ function checkHtmlImageSized(ctx: HtmlContext): boolean {
   return ctx.images.every((element: unknown) => {
     const image = ctx.$(element as string);
     return (
-      (image.attr("width") ?? "").trim().length > 0 &&
-      (image.attr("height") ?? "").trim().length > 0
+      image.attr("data-nimg") === "fill" ||
+      ((image.attr("width") ?? "").trim().length > 0 &&
+        (image.attr("height") ?? "").trim().length > 0)
     );
   });
 }
