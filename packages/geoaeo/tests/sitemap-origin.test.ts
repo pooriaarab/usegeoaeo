@@ -101,6 +101,49 @@ describe("sitemap urls resolve onto the target origin", () => {
     expect(requested).toContain(`${target}/docs.md`);
     expect(check(report.checks, "markdown").passed).toBe(true);
   });
+  it("recurses one sitemap-index level and ignores non-HTML pages", async () => {
+    const index = `<sitemapindex><sitemap><loc>${target}/pages.xml</loc></sitemap></sitemapindex>`;
+    const pages = `<urlset><url><loc>${target}/docs</loc></url><url><loc>${target}/feed.xml</loc></url></urlset>`;
+    const { requested } = stubFetch((url) => {
+      if (url === `${target}/sitemap.xml`) return new Response(index);
+      if (url === `${target}/pages.xml`) return new Response(pages, { headers: { "content-type": "application/xml" } });
+      if (url === target || url === `${target}/docs`) return new Response(htmlPage("Page"), { headers: { "content-type": "text/html" } });
+      if (url === `${target}/feed.xml`) return new Response("<feed/>", { headers: { "content-type": "application/xml" } });
+      return notFound();
+    });
+    const report = await auditTarget(target);
+    expectAllOnTarget(requested);
+    expect(report.pages).toEqual([target, `${target}/docs`]);
+    expect(check(report.checks, "title").passed).toBe(true);
+  });
+
+  it("uses a markdown alternate before fallback probes and falls back to index.md at root", async () => {
+    const { requested } = stubFetch((url) => {
+      if (url === `${target}/sitemap.xml`) return notFound();
+      if (url === target)
+        return new Response(
+          '<html><head><link rel="alternate" type="text/markdown" href="/guide.md"></head><body></body></html>',
+          { headers: { "content-type": "text/html" } },
+        );
+      if (url === `${target}/guide.md`) return new Response("# Guide");
+      return notFound();
+    });
+    const report = await auditTarget(target);
+    expect(requested).toContain(`${target}/guide.md`);
+    expect(requested).not.toContain(`${target}.md`);
+    expect(check(report.checks, "markdown").passed).toBe(true);
+
+    globalThis.fetch = async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === `${target}/sitemap.xml`) return notFound();
+      if (url === target) return new Response(htmlPage("Home"), { headers: { "content-type": "text/html" } });
+      if (url === `${target}/index.md`) return new Response("# Home");
+      return notFound();
+    };
+    const rootFallback = await auditTarget(target);
+    expect(check(rootFallback.checks, "markdown").passed).toBe(true);
+  });
+
 });
 
 function withResponseUrl(response: Response, url: string): Response {
