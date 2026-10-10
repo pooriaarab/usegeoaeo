@@ -6,6 +6,8 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-10
+
 ### Added
 
 - `GEOAEO_ALLOWED_ROOTS` bounds the local paths `audit`, `gen`, and
