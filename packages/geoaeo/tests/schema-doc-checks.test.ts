@@ -49,6 +49,7 @@ const plainCopy = "<h1>Hi</h1><p>Plain copy.</p>";
 const faqCopy = "<h1>Hi</h1><h2>Frequently asked questions</h2>";
 const sizedImg = `<img src="/a.png" alt="a" width="4" height="4">`;
 const bareImg = `<img src="/a.png" alt="a">`;
+const fillImg = `<img src="/a.png" alt="a" data-nimg="fill">`;
 const faqSrc = `"<h2>Frequently asked questions</h2>", "@type": "FAQPage",` + ` acceptedAnswer: {}`;
 
 // [name, head, check id, passed]
@@ -60,6 +61,7 @@ const stdCases: Array<[string, string, string, boolean]> = [
   ["declared language", "", "lang", true],
   ["sized image", "", "image-size", true],
   ["unsized image", "", "image-size", false],
+  ["Next.js fill image", "", "image-size", true],
   ["no images", "", "image-size", true],
   ["valid block", org, "schema-valid", true],
   ["unparseable block", broken, "schema-valid", false],
@@ -77,6 +79,7 @@ const stdCases: Array<[string, string, string, boolean]> = [
 const stdBodies: Record<string, string> = {
   "sized image": sizedImg,
   "unsized image": bareImg,
+  "Next.js fill image": fillImg,
   "incidental FAQ mention": "<p>Configure pages: ['pricing', 'faq'].</p>",
   "quoted phrase in prose": `<p>Audit looks for an early "FAQ" / "frequently asked questions" signal.</p>`,
   "bare FAQ heading without schema": "<h2>FAQ</h2><p>Q and A below.</p>",
