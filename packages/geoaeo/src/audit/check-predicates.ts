@@ -73,15 +73,17 @@ export function answerabilityDetails(ctx: CheckContext): string {
 }
 
 /** FAQ copy without FAQPage schema is invisible structure: engines see the
- * questions but get no typed pairs to quote. Pages without FAQ copy pass. */
+ * questions but get no typed pairs to quote. Pages without an FAQ section
+ * pass: a bare "FAQ" mention (a config field, a file purpose) is not copy. */
 export function isFaqSchemaPaired(ctx: CheckContext): boolean {
   return (
-    ctx.pageSignals.length > 0 && ctx.pageSignals.every((page) => !page.earlyFaq || page.faqJsonLd)
+    ctx.pageSignals.length > 0 &&
+    ctx.pageSignals.every((page) => !page.faqSection || page.faqJsonLd)
   );
 }
 
 export function faqSchemaDetails(ctx: CheckContext): string {
-  if (!ctx.pageSignals.some((page) => page.earlyFaq)) {
+  if (!ctx.pageSignals.some((page) => page.faqSection)) {
     return "No FAQ copy found; nothing to pair.";
   }
   if (isFaqSchemaPaired(ctx)) return "FAQ copy pairs with FAQPage JSON-LD.";

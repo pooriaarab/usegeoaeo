@@ -28,6 +28,10 @@ All notable changes to geoaeo are recorded here. The format follows
 - The `author` check counts Organization and Brand JSON-LD types. It
   promised author or organization but only matched Person signals, so a
   site identified only by Organization schema failed.
+- `faq-schema` pairs on an FAQ section (the "frequently asked
+  questions" phrase or a heading that reads exactly FAQ), not on the
+  bare word. A page that only mentions FAQ as a config field or a
+  file purpose no longer fails for missing FAQPage schema.
 
 ## [0.5.0] - 2026-09-26
 

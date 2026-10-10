@@ -83,6 +83,7 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     lang: () => !!ctx.$("html").attr("lang")?.trim(),
     h1: () => ctx.$("h1").length > 0,
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(ctx.visible.slice(0, 5000)),
+    faqSection: () => checkHtmlFaqSection(ctx),
     directAnswer: () => ctx.firstParagraph.length >= 40 && ctx.firstParagraph.length <= 600,
     wordCount: () => countWords(ctx.prose),
     questionHeadings: () => ctx.questionHeadings,
@@ -129,6 +130,21 @@ function checkHtmlViewport(ctx: HtmlContext): boolean {
   return content.split(",").includes("width=device-width");
 }
 
+function checkHtmlFaqSection(ctx: HtmlContext): boolean {
+  if (/frequently asked questions/i.test(ctx.visible)) return true;
+  return ctx
+    .$("h1, h2, h3")
+    .toArray()
+    .some((element: unknown) =>
+      /^faqs?$/i.test(
+        ctx
+          .$(element as string)
+          .text()
+          .trim(),
+      ),
+    );
+}
+
 function checkHtmlImageSized(ctx: HtmlContext): boolean {
   if (ctx.images.length === 0) return true;
   return ctx.images.every((element: unknown) => {
@@ -167,6 +183,7 @@ function analyzeHtml(source: string): PageSignals {
     "lang",
     "h1",
     "earlyFaq",
+    "faqSection",
     "directAnswer",
     "wordCount",
     "questionHeadings",
@@ -219,6 +236,8 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
     lang: () => /<html[^>]*\blang\s*=/i.test(source),
     h1: () => sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
+    faqSection: () =>
+      sourceHas(source, [/frequently asked questions/i, /<h[123][^>]*>\s*faqs?\s*</i]),
     directAnswer: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
     // Source files have no DOM. Count leftover tokens after extractSourceProse
     // (imports, attribute values, tags stripped) — not raw source. That
@@ -277,6 +296,7 @@ function analyzeSource(source: string): PageSignals {
     "lang",
     "h1",
     "earlyFaq",
+    "faqSection",
     "directAnswer",
     "wordCount",
     "questionHeadings",
