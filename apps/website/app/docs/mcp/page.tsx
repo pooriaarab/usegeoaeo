@@ -19,34 +19,34 @@ const intro =
 export default function McpPage() {
   return (
     <div className="mx-auto max-w-3xl">
-        <DocsPageHeader crumb="MCP" badge="Bin: geoaeo-mcp" title="MCP server" intro={intro} />
+      <DocsPageHeader crumb="MCP" badge="Bin: geoaeo-mcp" title="MCP server" intro={intro} />
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
-          <WhatYouGet />
-          <Prerequisites />
-          <InstallThePlugin harness="shared" />
-          <Install />
-          <Transport />
-          <Tools />
-          <RunDirectly />
-          <ConfigureAHarness />
-          <SetupPrompt />
-          <Troubleshooting />
-        </div>
+      <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border">
+        <WhatYouGet />
+        <Prerequisites />
+        <InstallThePlugin harness="shared" />
+        <Install />
+        <Transport />
+        <Tools />
+        <RunDirectly />
+        <ConfigureAHarness />
+        <SetupPrompt />
+        <Troubleshooting />
+      </div>
 
-        <Card className="mt-8">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">CLI and MCP stay in sync</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Every CLI example has an MCP equivalent. <code>npx geoaeo audit ./ --json</code> and{" "}
-            <code>{`{ "target": "./" }`}</code> hit the same audit code. See the{" "}
-            <Link href="/docs/cli" className="text-primary hover:underline">
-              CLI reference
-            </Link>{" "}
-            for flags.
-          </CardContent>
-        </Card>
+      <Card className="mt-8">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">CLI and MCP stay in sync</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          Every CLI example has an MCP equivalent. <code>npx geoaeo audit ./ --json</code> and{" "}
+          <code>{`{ "target": "./" }`}</code> hit the same audit code. See the{" "}
+          <Link href="/docs/cli" className="text-primary hover:underline">
+            CLI reference
+          </Link>{" "}
+          for flags.
+        </CardContent>
+      </Card>
     </div>
   );
 }

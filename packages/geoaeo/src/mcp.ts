@@ -227,10 +227,7 @@ function registerAuditTool(
   );
 }
 
-function registerGenTool(
-  registerTool: RegisterTool,
-  allowedRoots: readonly string[] | undefined,
-) {
+function registerGenTool(registerTool: RegisterTool, allowedRoots: readonly string[] | undefined) {
   registerTool(
     "gen",
     {

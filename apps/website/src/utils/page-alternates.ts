@@ -4,9 +4,7 @@ import type { Metadata } from "next";
 // canonical: "/", every child inherits the home URL and search engines
 // treat docs pages as duplicates. The site is English only, so en and
 // x-default both point at the same path — do not invent other locales.
-export function pageAlternates(
-  path: string,
-): NonNullable<Metadata["alternates"]> {
+export function pageAlternates(path: string): NonNullable<Metadata["alternates"]> {
   return {
     canonical: path,
     languages: {

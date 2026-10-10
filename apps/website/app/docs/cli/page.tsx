@@ -25,46 +25,46 @@ const intro =
 export default function CliPage() {
   return (
     <div className="mx-auto max-w-3xl">
-        <DocsPageHeader crumb="CLI" badge="Bin: geoaeo" title="CLI reference" intro={intro} />
+      <DocsPageHeader crumb="CLI" badge="Bin: geoaeo" title="CLI reference" intro={intro} />
 
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left">
-              <tr>
-                <th className="px-4 py-2.5 font-semibold">Command</th>
-                <th className="px-4 py-2.5 font-semibold">Purpose</th>
+      <div className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-left">
+            <tr>
+              <th className="px-4 py-2.5 font-semibold">Command</th>
+              <th className="px-4 py-2.5 font-semibold">Purpose</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {commands.map((c) => (
+              <tr key={c.name}>
+                <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">{c.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.purpose}</td>
               </tr>
-            </thead>
-            <tbody className="divide-y">
-              {commands.map((c) => (
-                <tr key={c.name}>
-                  <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">{c.name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{c.purpose}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border mt-8">
-          <AuditCommand />
-          <InitCommand />
-          <GenCommand />
-          <HumanizeCommand />
-          <McpCommand />
-          <Examples />
-        </div>
+      <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:tracking-tight prose-code:text-sm prose-pre:bg-muted prose-pre:border mt-8">
+        <AuditCommand />
+        <InitCommand />
+        <GenCommand />
+        <HumanizeCommand />
+        <McpCommand />
+        <Examples />
+      </div>
 
-        <Card className="mt-8">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Need the MCP server?</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            <Link href="/docs/mcp" className="text-primary hover:underline underline-offset-4">
-              Connect geoaeo-mcp to your harness &rarr;
-            </Link>
-          </CardContent>
-        </Card>
+      <Card className="mt-8">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm">Need the MCP server?</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <Link href="/docs/mcp" className="text-primary hover:underline underline-offset-4">
+            Connect geoaeo-mcp to your harness &rarr;
+          </Link>
+        </CardContent>
+      </Card>
     </div>
   );
 }
