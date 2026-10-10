@@ -72,6 +72,31 @@ export function answerabilityDetails(ctx: CheckContext): string {
   return `No concise direct answer under a clear H1, and not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`;
 }
 
+/** FAQ copy without FAQPage schema is invisible structure: engines see the
+ * questions but get no typed pairs to quote. Pages without FAQ copy pass. */
+export function isFaqSchemaPaired(ctx: CheckContext): boolean {
+  return (
+    ctx.pageSignals.length > 0 && ctx.pageSignals.every((page) => !page.earlyFaq || page.faqJsonLd)
+  );
+}
+
+export function faqSchemaDetails(ctx: CheckContext): string {
+  if (!ctx.pageSignals.some((page) => page.earlyFaq)) {
+    return "No FAQ copy found; nothing to pair.";
+  }
+  if (isFaqSchemaPaired(ctx)) return "FAQ copy pairs with FAQPage JSON-LD.";
+  return "FAQ copy found without FAQPage JSON-LD.";
+}
+
+export function schemaValidDetails(ctx: CheckContext): string {
+  const blocks = ctx.pageSignals.reduce((total, page) => total + page.jsonLdBlocks, 0);
+  if (blocks === 0) return "No JSON-LD blocks to validate.";
+  if (ctx.allPage((page) => page.jsonLdParseOk)) {
+    return `${blocks} JSON-LD block(s) parse with schema.org context.`;
+  }
+  return "A JSON-LD block failed to parse or misses schema.org context.";
+}
+
 /** A body that opens as an HTML document is an error or login page, not the artifact. */
 function looksLikeHtmlDocument(text: string): boolean {
   return /^\s*(?:<!--[\s\S]*?-->\s*)*(?:<!doctype\s+html|<html)[\s>]/i.test(text);

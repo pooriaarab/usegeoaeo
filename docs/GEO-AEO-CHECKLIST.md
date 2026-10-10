@@ -127,6 +127,8 @@ FAQ pairs, trail of pages) instead of guessing from prose.
   `breadcrumbJsonLd`, `generateJsonLd`.
 - Audit check `json-ld` passes when any inspected page exposes JSON-LD / `@type`; the
   report lists detected types when parseable.
+- Audit check `schema-valid` fails a block that does not parse or that misses a
+  schema.org context, so broken schema reads as broken rather than absent.
 
 **Supported kinds today**
 
@@ -138,8 +140,8 @@ FAQ pairs, trail of pages) instead of guessing from prose.
 | `breadcrumb` | `BreadcrumbList` | Home (+ first tool when configured) |
 
 **Not covered yet.** No `Organization`, `WebSite`, `Article`, `HowTo`, `Person`,
-`SpeakableSpecification`, or validation against Google rich-result rules. Audit does not
-require a specific type—only that some JSON-LD exists.
+`SpeakableSpecification`, or validation against Google rich-result rules. Outside FAQ
+copy, the audit does not require a specific type—only that some JSON-LD exists.
 
 ### 3.2 FAQ pairs as first-class data
 
@@ -151,9 +153,11 @@ plus visible FAQ copy is the highest-yield AEO pattern for product sites.
 - `geoaeo gen jsonld --type faq` emits `FAQPage`.
 - Audit `answer-first` looks for an early “FAQ” / “frequently asked questions” signal
   with an H1.
+- Audit `faq-schema` fails visible FAQ copy that ships without FAQPage JSON-LD
+  carrying questions and accepted answers.
 
-**Not covered yet.** No check that visible FAQ text matches JSON-LD, no multi-page FAQ
-graph, no “People also ask” coverage analysis.
+**Not covered yet.** No check that visible FAQ text matches JSON-LD word for word,
+no multi-page FAQ graph, no “People also ask” coverage analysis.
 
 ---
 

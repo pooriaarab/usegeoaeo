@@ -4,7 +4,13 @@ import { analyzePage } from "./analyze-page.js";
 import { blockedAgents } from "./robots-policy.js";
 import type { CheckContext, CheckDef } from "./check-types.js";
 import { getCheckDefinitions } from "./check-definitions.js";
-import { answerabilityDetails, findSharedCanonical, headerNoindex } from "./check-predicates.js";
+import {
+  answerabilityDetails,
+  faqSchemaDetails,
+  findSharedCanonical,
+  headerNoindex,
+  schemaValidDetails,
+} from "./check-predicates.js";
 
 function buildContext(snapshot: TargetSnapshot): CheckContext {
   const llms = snapshot.artifacts.get("llms.txt") ?? "";
@@ -79,6 +85,8 @@ const detailFns: Record<string, (ctx: CheckContext, check: CheckDef) => string> 
   "ai-crawlers": (ctx, check) =>
     ctx.blockedAiAgents.length ? `Blocked: ${ctx.blockedAiAgents.join(", ")}.` : check.details,
   answerability: (ctx) => answerabilityDetails(ctx),
+  "schema-valid": (ctx) => schemaValidDetails(ctx),
+  "faq-schema": (ctx) => faqSchemaDetails(ctx),
 };
 
 function detailFor(check: CheckDef, ctx: CheckContext): string {
@@ -90,6 +98,8 @@ function applyFailurePrefix(check: AuditCheck, ctx: CheckContext): AuditCheck {
     check.passed ||
     check.id === "ai-crawlers" ||
     check.id === "answerability" ||
+    check.id === "schema-valid" ||
+    check.id === "faq-schema" ||
     (check.id === "canonical" && ctx.sharedCanonical !== undefined) ||
     check.details.startsWith("noindex set by ")
   )
