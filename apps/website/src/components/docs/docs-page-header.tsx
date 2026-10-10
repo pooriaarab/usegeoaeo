@@ -22,11 +22,7 @@ export function DocsPageHeader({ crumb, badge, title, intro }: DocsPageHeaderPro
   return (
     <>
       <DocsBreadcrumb
-        crumbs={[
-          { label: "Home", href: "/" },
-          { label: "Docs", href: "/docs" },
-          { label: crumb },
-        ]}
+        crumbs={[{ label: "Home", href: "/" }, { label: "Docs", href: "/docs" }, { label: crumb }]}
       />
 
       <Badge variant="secondary" className="mb-3">
