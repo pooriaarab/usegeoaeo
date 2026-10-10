@@ -131,18 +131,18 @@ function checkHtmlViewport(ctx: HtmlContext): boolean {
 }
 
 function checkHtmlFaqSection(ctx: HtmlContext): boolean {
-  if (/frequently asked questions/i.test(ctx.visible)) return true;
+  // A section is named by its heading. Body prose that quotes the phrase
+  // (docs about this very signal do) is not an FAQ section.
   return ctx
-    .$("h1, h2, h3")
+    .$("h1, h2, h3, h4, h5, h6")
     .toArray()
-    .some((element: unknown) =>
-      /^faqs?$/i.test(
-        ctx
-          .$(element as string)
-          .text()
-          .trim(),
-      ),
-    );
+    .map((element: unknown) =>
+      ctx
+        .$(element as string)
+        .text()
+        .trim(),
+    )
+    .some((heading) => /frequently asked questions/i.test(heading) || /^faqs?$/i.test(heading));
 }
 
 function checkHtmlImageSized(ctx: HtmlContext): boolean {
@@ -212,17 +212,8 @@ function extractSourceCanonicalHref(source: string): string {
   return "";
 }
 
-function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[keyof PageSignals] {
-  const table: Record<string, () => unknown> = {
-    title: () => sourceHas(source, [/<title[\s>]/i, /metadata\s*=|title\s*:/i]),
-    description: () => sourceHas(source, [/name=["']description["']/i, /description\s*:/i]),
-    canonical: () => sourceHas(source, [/rel=["']canonical["']/i, /canonical\s*:/i]),
-    canonicalHref: () => extractSourceCanonicalHref(source),
-    og: () => sourceHas(source, [/og:title/i, /og:description/i]),
-    twitter: () => sourceHas(source, [/twitter:card/i, /twitter:title/i]),
-    jsonLd: () => sourceHas(source, [/application\/ld\+json/i, /['"]@type['"]\s*:/i]),
-    jsonLdTypes: () =>
-      [...source.matchAll(/['"]@type['"]\s*:\s*['"]([^'"]+)['"]/gi)].map((match) => match[1]),
+function sourceDocumentSignals(source: string): Record<string, () => unknown> {
+  return {
     // Source holds the constructor (usually JSON.stringify of an object),
     // not a rendered block, so the block count stays zero and validity is
     // judged on rendered HTML only.
@@ -234,10 +225,28 @@ function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[
       sourceHas(source, [/<meta[^>]*content=["'][^"']*width\s*=\s*device-width/i, /viewport\s*:/i]),
     imageSized: () => checkSourceImageSized(source),
     lang: () => /<html[^>]*\blang\s*=/i.test(source),
+    faqSection: () =>
+      sourceHas(source, [
+        /<h[1-6][^>]*>[^<]*frequently asked questions/i,
+        /<h[1-6][^>]*>\s*faqs?\s*</i,
+      ]),
+  };
+}
+
+function sourceSignalValue(key: keyof PageSignals, source: string): PageSignals[keyof PageSignals] {
+  const table: Record<string, () => unknown> = {
+    title: () => sourceHas(source, [/<title[\s>]/i, /metadata\s*=|title\s*:/i]),
+    description: () => sourceHas(source, [/name=["']description["']/i, /description\s*:/i]),
+    canonical: () => sourceHas(source, [/rel=["']canonical["']/i, /canonical\s*:/i]),
+    canonicalHref: () => extractSourceCanonicalHref(source),
+    og: () => sourceHas(source, [/og:title/i, /og:description/i]),
+    twitter: () => sourceHas(source, [/twitter:card/i, /twitter:title/i]),
+    jsonLd: () => sourceHas(source, [/application\/ld\+json/i, /['"]@type['"]\s*:/i]),
+    jsonLdTypes: () =>
+      [...source.matchAll(/['"]@type['"]\s*:\s*['"]([^'"]+)['"]/gi)].map((match) => match[1]),
+    ...sourceDocumentSignals(source),
     h1: () => sourceHas(source, [/<h1[\s>]/i, /<h1>/i]),
     earlyFaq: () => /\bfaq\b|frequently asked questions/i.test(source.slice(0, 5000)),
-    faqSection: () =>
-      sourceHas(source, [/frequently asked questions/i, /<h[123][^>]*>\s*faqs?\s*</i]),
     directAnswer: () => sourceHas(source, [/<h1[\s>]/i]) && sourceHas(source, [/<p[\s>]/i]),
     // Source files have no DOM. Count leftover tokens after extractSourceProse
     // (imports, attribute values, tags stripped) — not raw source. That
