@@ -46,6 +46,7 @@ export interface PageSignals {
   lang: boolean;
   h1: boolean;
   earlyFaq: boolean;
+  faqSection: boolean;
   directAnswer: boolean;
   wordCount: number;
   questionHeadings: boolean;
