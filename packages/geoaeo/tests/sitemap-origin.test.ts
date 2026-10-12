@@ -106,9 +106,12 @@ describe("sitemap urls resolve onto the target origin", () => {
     const pages = `<urlset><url><loc>${target}/docs</loc></url><url><loc>${target}/feed.xml</loc></url></urlset>`;
     const { requested } = stubFetch((url) => {
       if (url === `${target}/sitemap.xml`) return new Response(index);
-      if (url === `${target}/pages.xml`) return new Response(pages, { headers: { "content-type": "application/xml" } });
-      if (url === target || url === `${target}/docs`) return new Response(htmlPage("Page"), { headers: { "content-type": "text/html" } });
-      if (url === `${target}/feed.xml`) return new Response("<feed/>", { headers: { "content-type": "application/xml" } });
+      if (url === `${target}/pages.xml`)
+        return new Response(pages, { headers: { "content-type": "application/xml" } });
+      if (url === target || url === `${target}/docs`)
+        return new Response(htmlPage("Page"), { headers: { "content-type": "text/html" } });
+      if (url === `${target}/feed.xml`)
+        return new Response("<feed/>", { headers: { "content-type": "application/xml" } });
       return notFound();
     });
     const report = await auditTarget(target);
@@ -136,14 +139,14 @@ describe("sitemap urls resolve onto the target origin", () => {
     globalThis.fetch = async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url === `${target}/sitemap.xml`) return notFound();
-      if (url === target) return new Response(htmlPage("Home"), { headers: { "content-type": "text/html" } });
+      if (url === target)
+        return new Response(htmlPage("Home"), { headers: { "content-type": "text/html" } });
       if (url === `${target}/index.md`) return new Response("# Home");
       return notFound();
     };
     const rootFallback = await auditTarget(target);
     expect(check(rootFallback.checks, "markdown").passed).toBe(true);
   });
-
 });
 
 function withResponseUrl(response: Response, url: string): Response {
