@@ -33,7 +33,7 @@ jobs:
       github.event.action != 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.repository_owner == 'pooriaarab'
-    runs-on: ubicloud-standard-4
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     # Access and Worker IDs are repo variables. Tokens and secrets are secrets.
     env:
@@ -334,7 +334,7 @@ jobs:
       github.event.action == 'closed' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.repository_owner == 'pooriaarab'
-    runs-on: ubicloud-standard-2
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       HEAD_REF: ${{ github.event.pull_request.head.ref }}
