@@ -31,7 +31,7 @@ env:
 jobs:
   deploy:
     name: Deploy website worker
-    runs-on: ubicloud-standard-4
+    runs-on: ubuntu-latest
     environment:
       name: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || (github.ref_name == 'main' && 'staging' || 'production') }}
     env:
