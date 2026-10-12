@@ -136,10 +136,13 @@ function isSitemapIndex(sitemap: string): boolean {
 }
 
 function markdownAlternate(source: string, pageUrl: string): string | undefined {
-  const match = source.match(/<link\b[^>]*>/gi)?.find((tag) =>
-    /\brel\s*=\s*["']?alternate\b/i.test(tag) &&
-    /\btype\s*=\s*["']?text\/markdown\b/i.test(tag),
-  );
+  const match = source
+    .match(/<link\b[^>]*>/gi)
+    ?.find(
+      (tag) =>
+        /\brel\s*=\s*["']?alternate\b/i.test(tag) &&
+        /\btype\s*=\s*["']?text\/markdown\b/i.test(tag),
+    );
   const href = match?.match(/\bhref\s*=\s*["']([^"']+)["']/i)?.[1];
   if (!href) return undefined;
   try {
@@ -172,13 +175,17 @@ async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSna
   const seen = new Set<string>([target.href]);
   const sitemapUrls = parseSitemapUrls(sitemap);
   const pageUrls = isSitemapIndex(sitemap)
-    ? (await Promise.all(
-        sitemapUrls.slice(0, 4).map(async (rawUrl) => {
-          const url = resolveOnTarget(rawUrl, target);
-          if (!url) return [];
-          return parseSitemapUrls((await fetchText(url)).text);
-        }),
-      )).flat().slice(0, 4)
+    ? (
+        await Promise.all(
+          sitemapUrls.slice(0, 4).map(async (rawUrl) => {
+            const url = resolveOnTarget(rawUrl, target);
+            if (!url) return [];
+            return parseSitemapUrls((await fetchText(url)).text);
+          }),
+        )
+      )
+        .flat()
+        .slice(0, 4)
     : sitemapUrls.slice(0, 4);
   for (const rawUrl of pageUrls) {
     const url = resolveOnTarget(rawUrl, target);
@@ -195,7 +202,8 @@ async function fetchMirrors(pages: PageSnapshot[]): Promise<string[]> {
   for (const page of pages.slice(0, 4)) {
     const alternate = markdownAlternate(page.source, page.url);
     const fallbacks = [alternate, `${page.url.replace(/\/$/, "")}.md`];
-    if (new URL(page.url).pathname === "/") fallbacks.push(`${page.url.replace(/\/$/, "")}/index.md`);
+    if (new URL(page.url).pathname === "/")
+      fallbacks.push(`${page.url.replace(/\/$/, "")}/index.md`);
     for (const mirrorUrl of fallbacks.filter((url): url is string => Boolean(url))) {
       const mirror = await fetchText(mirrorUrl);
       if (mirror.status >= 200 && mirror.status < 400 && mirror.text) {
