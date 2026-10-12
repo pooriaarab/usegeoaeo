@@ -12,7 +12,7 @@ on:
 
 jobs:
   publish:
-    runs-on: ubicloud-standard-4
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/geoaeo

@@ -19,7 +19,7 @@ jobs:
   vibecodereview:
     # Only review the repo owner's own PRs (cost + injection guard on public repos).
     if: github.event.pull_request.user.login == github.repository_owner
-    runs-on: ubicloud-standard-2
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
       actions: read
