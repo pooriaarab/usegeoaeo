@@ -38,6 +38,18 @@ export function GET() {
 `;
 }
 
+function svelteKitPoppyRoute(poppyImport: string): string {
+  return `import { generatePoppy } from '${PKG_NAME}';
+import { siteConfig } from '${poppyImport}';
+
+export function GET() {
+  return new Response(JSON.stringify(generatePoppy(siteConfig), null, 2), {
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+  });
+}
+`;
+}
+
 function svelteKitSitemapRoute(sitemapImport: string): string {
   return `import { generateSitemap } from '${PKG_NAME}';
 import { siteConfig } from '${sitemapImport}';
@@ -98,6 +110,10 @@ export function svelteKitTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "src/routes/llms.txt/+server.ts"));
   const llmsFullImport = configImport(root, path.join(root, "src/routes/llms-full.txt/+server.ts"));
   const webmcpImport = configImport(root, path.join(root, "src/routes/webmcp.json/+server.ts"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "src/routes/.well-known/poppy.json/+server.ts"),
+  );
   const sitemapImport = configImport(root, path.join(root, "src/routes/sitemap.xml/+server.ts"));
   const robotsImport = configImport(root, path.join(root, "src/routes/robots.txt/+server.ts"));
   const jsonLdImport = configImport(root, path.join(root, "src/lib/components/JsonLd.svelte"));
@@ -106,6 +122,7 @@ export function svelteKitTemplates(root: string): Map<string, string> {
     ["src/routes/llms.txt/+server.ts", svelteKitLlmsRoute(llmsImport)],
     ["src/routes/llms-full.txt/+server.ts", svelteKitLlmsFullRoute(llmsFullImport)],
     ["src/routes/webmcp.json/+server.ts", svelteKitWebmcpRoute(webmcpImport)],
+    ["src/routes/.well-known/poppy.json/+server.ts", svelteKitPoppyRoute(poppyImport)],
     ["src/routes/sitemap.xml/+server.ts", svelteKitSitemapRoute(sitemapImport)],
     ["src/routes/robots.txt/+server.ts", svelteKitRobotsRoute(robotsImport)],
     ["src/lib/components/JsonLd.svelte", svelteKitJsonLdComponent(jsonLdImport)],

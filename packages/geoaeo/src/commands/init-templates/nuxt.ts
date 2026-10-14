@@ -35,6 +35,17 @@ export default defineEventHandler((event) => {
 `;
 }
 
+function nuxtPoppyRoute(poppyImport: string): string {
+  return `import { generatePoppy } from '${PKG_NAME}';
+import { siteConfig } from '${poppyImport}';
+
+export default defineEventHandler((event) => {
+  setHeader(event, 'content-type', 'application/json; charset=utf-8');
+  return JSON.stringify(generatePoppy(siteConfig), null, 2);
+});
+`;
+}
+
 function nuxtSitemapRoute(sitemapImport: string): string {
   return `import { generateSitemap } from '${PKG_NAME}';
 import { siteConfig } from '${sitemapImport}';
@@ -99,6 +110,10 @@ export function nuxtTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "server/routes/llms.txt.get.ts"));
   const llmsFullImport = configImport(root, path.join(root, "server/routes/llms-full.txt.get.ts"));
   const webmcpImport = configImport(root, path.join(root, "server/routes/webmcp.json.get.ts"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "server/routes/.well-known/poppy.json.get.ts"),
+  );
   const sitemapImport = configImport(root, path.join(root, "server/routes/sitemap.xml.get.ts"));
   const robotsImport = configImport(root, path.join(root, "server/routes/robots.txt.get.ts"));
   const jsonLdImport = configImport(root, path.join(root, "components/SeoJsonLd.vue"));
@@ -107,6 +122,7 @@ export function nuxtTemplates(root: string): Map<string, string> {
     ["server/routes/llms.txt.get.ts", nuxtLlmsRoute(llmsImport)],
     ["server/routes/llms-full.txt.get.ts", nuxtLlmsFullRoute(llmsFullImport)],
     ["server/routes/webmcp.json.get.ts", nuxtWebmcpRoute(webmcpImport)],
+    ["server/routes/.well-known/poppy.json.get.ts", nuxtPoppyRoute(poppyImport)],
     ["server/routes/sitemap.xml.get.ts", nuxtSitemapRoute(sitemapImport)],
     ["server/routes/robots.txt.get.ts", nuxtRobotsRoute(robotsImport)],
     ["components/SeoJsonLd.vue", nuxtJsonLdComponent(jsonLdImport)],

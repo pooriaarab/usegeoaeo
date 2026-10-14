@@ -5,6 +5,7 @@ import { defineConfig, type SiteConfig } from "../config.js";
 import {
   generateLlms,
   generateLlmsFull,
+  generatePoppy,
   generateRobots,
   generateSitemap,
   generateWebmcp,
@@ -175,6 +176,7 @@ function buildStaticFiles(config: SiteConfig): Map<string, string> {
     ["sitemap.xml", generateSitemap(config)],
     ["robots.txt", generateRobots(config)],
     ["webmcp.json", JSON.stringify(generateWebmcp(config), null, 2) + "\n"],
+    [".well-known/poppy.json", JSON.stringify(generatePoppy(config), null, 2) + "\n"],
   ]);
 }
 

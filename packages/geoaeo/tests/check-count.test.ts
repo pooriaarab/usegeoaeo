@@ -92,6 +92,8 @@ describe("audit check count", () => {
       "twenty-five": 25,
       "twenty-six": 26,
       thirty: 30,
+      "thirty-one": 31,
+      "thirty-two": 32,
     };
 
     const stale: string[] = [];

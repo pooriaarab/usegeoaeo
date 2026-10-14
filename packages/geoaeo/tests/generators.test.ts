@@ -8,6 +8,7 @@ import {
   generateLlmsFull,
   generateRobots,
   generateSitemap,
+  generatePoppy,
   generateWebmcp,
   howToJsonLd,
   personJsonLd,
@@ -38,6 +39,13 @@ describe("artifact generators", () => {
     const output = generateLlmsFull(config);
     expect(output).toContain("## Common questions");
     expect(output).toContain("Q: Does it post automatically?");
+  });
+
+  it("generates a discovery-only poppy.json", () => {
+    const document = generatePoppy(config);
+    expect(document.protocol_version).toBe("0.1");
+    expect(document.organization).toEqual({ name: "Reply Kit", domain: "reply.example" });
+    expect(document.web).toEqual({});
   });
 
   it("generates the WebMCP manifest shape", () => {

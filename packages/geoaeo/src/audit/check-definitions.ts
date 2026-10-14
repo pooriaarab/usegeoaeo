@@ -7,6 +7,7 @@ import {
   isRobotsPolicy,
   isShortSiteMap,
   isSitemapXml,
+  isPoppyDocument,
   isWebmcpManifest,
 } from "./check-predicates.js";
 
@@ -69,21 +70,28 @@ function identityChecks(): CheckDef[] {
     {
       id: "mcp-card",
       label: "MCP server card",
-      weight: 4,
+      weight: 3,
       details: "An MCP server card is published at /.well-known/mcp/server-card.json.",
       passed: (ctx) => ctx.has(ctx.artifacts.get("__mcpCard") ?? ""),
     },
     {
       id: "agent-card",
       label: "Agent card",
-      weight: 4,
+      weight: 3,
       details: "An agent card is published at /.well-known/agent-card.json.",
       passed: (ctx) => ctx.has(ctx.artifacts.get("__agentCard") ?? ""),
     },
     {
+      id: "poppy",
+      label: "Poppy discovery",
+      weight: 3,
+      details: "A Personal Agent Protocol document is published at /.well-known/poppy.json.",
+      passed: (ctx) => isPoppyDocument(ctx.artifacts.get("__poppy")),
+    },
+    {
       id: "agent-skills",
       label: "Agent skills",
-      weight: 2,
+      weight: 1,
       details: "An agent-skills index is published under /.well-known/agent-skills/.",
       passed: (ctx) => ctx.has(ctx.artifacts.get("__agentSkills") ?? ""),
     },

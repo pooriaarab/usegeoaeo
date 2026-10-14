@@ -10,6 +10,7 @@ import {
   generateRobots,
   generateRss,
   generateSitemap,
+  generatePoppy,
   generateWebmcp,
   type JsonLdKind,
 } from "../generators/index.js";
@@ -21,6 +22,7 @@ export const GENERATED_ARTIFACTS = [
   "llms-full",
   "jsonld",
   "webmcp",
+  "poppy",
   "sitemap",
   "robots",
   "ogimage",
@@ -41,6 +43,7 @@ function renderArtifact(
     "llms-full": (c) => generateLlmsFull(c),
     jsonld: (c, k) => `${JSON.stringify(generateJsonLd(c, k), null, 2)}\n`,
     webmcp: (c) => `${JSON.stringify(generateWebmcp(c), null, 2)}\n`,
+    poppy: (c) => `${JSON.stringify(generatePoppy(c), null, 2)}\n`,
     sitemap: (c) => generateSitemap(c),
     robots: (c) => generateRobots(c),
     ogimage: (c) => generateOgimage(c),

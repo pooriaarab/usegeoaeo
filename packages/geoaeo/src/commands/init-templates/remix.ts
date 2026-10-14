@@ -38,6 +38,18 @@ export function loader() {
 `;
 }
 
+function remixPoppyRoute(poppyImport: string): string {
+  return `import { generatePoppy } from '${PKG_NAME}';
+import { siteConfig } from '${poppyImport}';
+
+export function loader() {
+  return new Response(JSON.stringify(generatePoppy(siteConfig), null, 2), {
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+  });
+}
+`;
+}
+
 function remixSitemapRoute(sitemapImport: string): string {
   return `import { generateSitemap } from '${PKG_NAME}';
 import { siteConfig } from '${sitemapImport}';
@@ -107,6 +119,10 @@ export function remixTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "app/routes/llms.txt.tsx"));
   const llmsFullImport = configImport(root, path.join(root, "app/routes/llms-full.txt.tsx"));
   const webmcpImport = configImport(root, path.join(root, "app/routes/webmcp[.]json.tsx"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "app/routes/[.]well-known.poppy[.]json.tsx"),
+  );
   const sitemapImport = configImport(root, path.join(root, "app/routes/sitemap[.]xml.tsx"));
   const robotsImport = configImport(root, path.join(root, "app/routes/robots[.]txt.tsx"));
   const jsonLdImport = configImport(root, path.join(root, "app/components/seo/json-ld.tsx"));
@@ -115,6 +131,7 @@ export function remixTemplates(root: string): Map<string, string> {
     ["app/routes/llms.txt.tsx", remixLlmsRoute(llmsImport)],
     ["app/routes/llms-full.txt.tsx", remixLlmsFullRoute(llmsFullImport)],
     ["app/routes/webmcp[.]json.tsx", remixWebmcpRoute(webmcpImport)],
+    ["app/routes/[.]well-known.poppy[.]json.tsx", remixPoppyRoute(poppyImport)],
     ["app/routes/sitemap[.]xml.tsx", remixSitemapRoute(sitemapImport)],
     ["app/routes/robots[.]txt.tsx", remixRobotsRoute(robotsImport)],
     ["app/components/seo/json-ld.tsx", remixJsonLdComponent(jsonLdImport)],
