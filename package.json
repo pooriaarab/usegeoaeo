@@ -1,6 +1,6 @@
 {
   "name": "usegeoaeo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "SEO, GEO, and AEO site audits with llms.txt, JSON-LD, sitemap generators, framework scaffolding, and MCP tools.",
   "workspaces": [
