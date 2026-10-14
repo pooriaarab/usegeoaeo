@@ -22,6 +22,7 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
   const agentCard = snapshot.artifacts.get("agent-card") ?? "";
   const agentSkills = snapshot.artifacts.get("agent-skills") ?? "";
   const apiCatalog = snapshot.artifacts.get("api-catalog") ?? "";
+  const poppy = snapshot.artifacts.get("poppy") ?? "";
   const artifacts = new Map(snapshot.artifacts);
   artifacts.set("__llms", llms);
   artifacts.set("__llmsFull", llmsFull);
@@ -32,6 +33,7 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
   artifacts.set("__agentCard", agentCard);
   artifacts.set("__agentSkills", agentSkills);
   artifacts.set("__apiCatalog", apiCatalog);
+  artifacts.set("__poppy", poppy);
   const pageSignals = snapshot.pages.map((page) => analyzePage(page.source, page.isHtml));
   const anyPage = (predicate: (page: ReturnType<typeof analyzePage>) => boolean) =>
     pageSignals.some(predicate);

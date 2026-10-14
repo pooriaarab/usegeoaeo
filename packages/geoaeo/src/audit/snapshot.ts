@@ -18,6 +18,7 @@ async function collectArtifacts(files: string[]): Promise<Map<string, string>> {
     ["agent-card", /well-known\/agent-card\.json|well-known\/ai-plugin\.json/i],
     ["agent-skills", /well-known\/agent-skills(\/index)?\.json/i],
     ["api-catalog", /well-known\/api-catalog/i],
+    ["poppy", /well-known\/poppy\.json|(?:^|\/)poppy\.json$/i],
   ];
   for (const [key, pattern] of wellKnown) {
     const file = files.find((candidate) => pattern.test(candidate.replaceAll("\\", "/")));
@@ -117,6 +118,7 @@ async function fetchArtifacts(base: string): Promise<Map<string, string>> {
     ["agent-card", ["/.well-known/agent-card.json", "/.well-known/ai-plugin.json"]],
     ["agent-skills", ["/.well-known/agent-skills/index.json", "/.well-known/agent-skills.json"]],
     ["api-catalog", ["/.well-known/api-catalog"]],
+    ["poppy", ["/.well-known/poppy.json"]],
   ];
   const artifacts = new Map<string, string>();
   for (const [name, paths] of artifactPaths) {

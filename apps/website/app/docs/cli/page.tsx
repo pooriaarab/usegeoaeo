@@ -76,7 +76,7 @@ function AuditCommand() {
         <code>geoaeo audit &lt;target&gt;</code>
       </h2>
       <p>
-        Audit a live URL or a local directory. Scores 0–100 across 31 weighted checks including
+        Audit a live URL or a local directory. Scores 0–100 across 32 weighted checks including
         answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.
       </p>
       <pre>
@@ -148,6 +148,7 @@ npx geoaeo gen llms-full --output public/llms-full.txt
 npx geoaeo gen sitemap --output public/sitemap.xml
 npx geoaeo gen robots
 npx geoaeo gen webmcp
+npx geoaeo gen poppy --output public/.well-known/poppy.json
 npx geoaeo gen jsonld --type faq
 npx geoaeo gen ogimage --output public/og.svg
 npx geoaeo gen rss --output public/feed.xml
