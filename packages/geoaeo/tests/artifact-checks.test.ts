@@ -107,6 +107,42 @@ describe("artifact checks on a directory audit", () => {
     expect(check(report, "llms-full").passed).toBe(true);
   });
 
+  it("passes poppy when a valid /.well-known/poppy.json is served", async () => {
+    installFetch({
+      "/.well-known/poppy.json": JSON.stringify({
+        protocol_version: "0.1",
+        organization: { name: "Acme", domain: "artifact.example" },
+        web: {},
+      }),
+    });
+    const report = await auditTarget(liveUrl);
+    expect(check(report, "poppy").passed).toBe(true);
+  });
+
+  it("fails a poppy.json missing organization.domain", async () => {
+    installFetch({
+      "/.well-known/poppy.json": JSON.stringify({
+        protocol_version: "0.1",
+        organization: { name: "Acme" },
+        web: {},
+      }),
+    });
+    const report = await auditTarget(liveUrl);
+    expect(check(report, "poppy").passed).toBe(false);
+  });
+
+  it("passes poppy when route.ts source calls generatePoppy", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "geoaeo-artifacts-"));
+    dirs.push(dir);
+    writeRoute(
+      dir,
+      ".well-known/poppy.json",
+      "import { generatePoppy } from 'geoaeo';\nexport function GET() { return new Response(JSON.stringify(generatePoppy(siteConfig))); }\n",
+    );
+    const report = await auditTarget(dir);
+    expect(check(report, "poppy").passed).toBe(true);
+  });
+
   it("passes robots when route.ts source calls generateRobots", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "geoaeo-artifacts-"));
     dirs.push(dir);

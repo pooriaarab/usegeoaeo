@@ -6,7 +6,7 @@
   <a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.6.0"/></a>
   <a href="https://github.com/pooriaarab/usegeoaeo/actions"><img src="https://github.com/pooriaarab/usegeoaeo/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License MIT"/></a>
-  <a href="docs/GEO-AEO-CHECKLIST.md"><img src="https://img.shields.io/badge/checks-31-informational" alt="31 weighted audit checks"/></a>
+  <a href="docs/GEO-AEO-CHECKLIST.md"><img src="https://img.shields.io/badge/checks-32-informational" alt="32 weighted audit checks"/></a>
 </p>
 
 ```bash
@@ -189,11 +189,11 @@ npx geoaeo gen llms
 ```
 
 `gen` reads `geoaeo.config.ts` from the current directory. Artifacts: `llms`,
-`llms-full`, `jsonld`, `webmcp`, `sitemap`, `robots`, `ogimage`, `rss`,
+`llms-full`, `jsonld`, `webmcp`, `poppy`, `sitemap`, `robots`, `ogimage`, `rss`,
 `hreflang`, `mdmirror`. JSON-LD `--type` values: `software`, `product`, `faq`,
 `breadcrumb`, `organization`, `website`, `article`, `howto`, `person`, `review`.
 
-The audit is 31 weighted checks across answerability, structured data,
+The audit is 32 weighted checks across answerability, structured data,
 `llms.txt`, crawlability, freshness, and E-E-A-T. `--ci --min-score N` exits
 non-zero when the score is below the threshold.
 
@@ -233,7 +233,7 @@ Docs: [usegeoaeo.com/docs](https://usegeoaeo.com/docs) ·
 
 ## How it works
 
-`auditTarget` snapshots a live URL or a local directory, runs 31 weighted
+`auditTarget` snapshots a live URL or a local directory, runs 32 weighted
 checks that sum to 100, and returns the score plus the top missing artifacts.
 Generators take a `SiteConfig` object. They do not read the site themselves.
 `init` writes that config and either framework routes or static files.

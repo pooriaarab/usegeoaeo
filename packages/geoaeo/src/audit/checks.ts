@@ -12,26 +12,30 @@ import {
   schemaValidDetails,
 } from "./check-predicates.js";
 
-function buildContext(snapshot: TargetSnapshot): CheckContext {
-  const llms = snapshot.artifacts.get("llms.txt") ?? "";
-  const llmsFull = snapshot.artifacts.get("llms-full.txt") ?? "";
-  const sitemap = snapshot.artifacts.get("sitemap.xml") ?? "";
-  const robots = snapshot.artifacts.get("robots.txt") ?? "";
-  const webmcp = snapshot.artifacts.get("webmcp") ?? "";
-  const mcpCard = snapshot.artifacts.get("mcp-card") ?? "";
-  const agentCard = snapshot.artifacts.get("agent-card") ?? "";
-  const agentSkills = snapshot.artifacts.get("agent-skills") ?? "";
-  const apiCatalog = snapshot.artifacts.get("api-catalog") ?? "";
+const ARTIFACT_ALIASES: Array<[string, string]> = [
+  ["__llms", "llms.txt"],
+  ["__llmsFull", "llms-full.txt"],
+  ["__sitemap", "sitemap.xml"],
+  ["__robots", "robots.txt"],
+  ["__webmcp", "webmcp"],
+  ["__mcpCard", "mcp-card"],
+  ["__agentCard", "agent-card"],
+  ["__agentSkills", "agent-skills"],
+  ["__apiCatalog", "api-catalog"],
+  ["__poppy", "poppy"],
+];
+
+function aliasedArtifacts(snapshot: TargetSnapshot): Map<string, string> {
   const artifacts = new Map(snapshot.artifacts);
-  artifacts.set("__llms", llms);
-  artifacts.set("__llmsFull", llmsFull);
-  artifacts.set("__sitemap", sitemap);
-  artifacts.set("__robots", robots);
-  artifacts.set("__webmcp", webmcp);
-  artifacts.set("__mcpCard", mcpCard);
-  artifacts.set("__agentCard", agentCard);
-  artifacts.set("__agentSkills", agentSkills);
-  artifacts.set("__apiCatalog", apiCatalog);
+  for (const [alias, key] of ARTIFACT_ALIASES) {
+    artifacts.set(alias, snapshot.artifacts.get(key) ?? "");
+  }
+  return artifacts;
+}
+
+function buildContext(snapshot: TargetSnapshot): CheckContext {
+  const artifacts = aliasedArtifacts(snapshot);
+  const robots = artifacts.get("__robots") ?? "";
   const pageSignals = snapshot.pages.map((page) => analyzePage(page.source, page.isHtml));
   const anyPage = (predicate: (page: ReturnType<typeof analyzePage>) => boolean) =>
     pageSignals.some(predicate);

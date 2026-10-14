@@ -38,6 +38,18 @@ export async function GET() {
 `;
 }
 
+function astroPoppyRoute(poppyImport: string): string {
+  return `import { generatePoppy } from '${PKG_NAME}';
+import { siteConfig } from '${poppyImport}';
+
+export async function GET() {
+  return new Response(JSON.stringify(generatePoppy(siteConfig), null, 2), {
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+  });
+}
+`;
+}
+
 function astroSitemapRoute(sitemapImport: string): string {
   return `import { generateSitemap } from '${PKG_NAME}';
 import { siteConfig } from '${sitemapImport}';
@@ -104,6 +116,7 @@ export function astroTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "src/pages/llms.txt.ts"));
   const llmsFullImport = configImport(root, path.join(root, "src/pages/llms-full.txt.ts"));
   const webmcpImport = configImport(root, path.join(root, "src/pages/webmcp.json.ts"));
+  const poppyImport = configImport(root, path.join(root, "src/pages/.well-known/poppy.json.ts"));
   const sitemapImport = configImport(root, path.join(root, "src/pages/sitemap.xml.ts"));
   const robotsImport = configImport(root, path.join(root, "src/pages/robots.txt.ts"));
   const jsonLdImport = configImport(root, path.join(root, "src/components/seo/JsonLd.astro"));
@@ -112,6 +125,7 @@ export function astroTemplates(root: string): Map<string, string> {
     ["src/pages/llms.txt.ts", astroLlmsRoute(llmsImport)],
     ["src/pages/llms-full.txt.ts", astroLlmsFullRoute(llmsFullImport)],
     ["src/pages/webmcp.json.ts", astroWebmcpRoute(webmcpImport)],
+    ["src/pages/.well-known/poppy.json.ts", astroPoppyRoute(poppyImport)],
     ["src/pages/sitemap.xml.ts", astroSitemapRoute(sitemapImport)],
     ["src/pages/robots.txt.ts", astroRobotsRoute(robotsImport)],
     ["src/components/seo/JsonLd.astro", astroJsonLdComponent(jsonLdImport)],

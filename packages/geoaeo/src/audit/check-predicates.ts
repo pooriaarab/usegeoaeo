@@ -145,3 +145,5 @@ export function isRobotsPolicy(body: string | undefined): boolean {
 export function isWebmcpManifest(body: string | undefined): boolean {
   return /generateWebmcp|"tools"\s*:|tools\s*[:=]/i.test(body ?? "");
 }
+
+export { isPoppyDocument } from "./poppy.js";

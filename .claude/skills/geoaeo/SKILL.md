@@ -56,6 +56,7 @@ The generators read site facts from `geoaeo.config.ts` in the current directory.
 | `/sitemap.xml` | `npx geoaeo gen sitemap -o public/sitemap.xml` |
 | `/robots.txt` | `npx geoaeo gen robots -o public/robots.txt` |
 | `WebMCP manifest` | `npx geoaeo gen webmcp -o public/webmcp.json` |
+| `Poppy discovery` | `npx geoaeo gen poppy -o public/.well-known/poppy.json` |
 | `JSON-LD` | Run `npx geoaeo gen jsonld --type software` (or `product`, `faq`, `breadcrumb`). Embed the output in a `<script type="application/ld+json">` tag on the page. |
 | `Markdown mirrors` | Add a `.md` file per page next to the page, or serve `<page>.md` routes. |
 | `Page titles` | Edit page metadata by hand. geoaeo has no generator for this. |

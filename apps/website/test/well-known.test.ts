@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { GET as getAgentCard } from "../app/.well-known/agent-card.json/route";
+import { GET as getPoppy } from "../app/.well-known/poppy.json/route";
 import { GET as getServerCard } from "../app/.well-known/mcp/server-card.json/route";
 import { GET as getAgentSkillsIndex } from "../app/.well-known/agent-skills/index.json/route";
 import { GET as getSkillFile } from "../app/.well-known/agent-skills/[skill]/SKILL.md/route";
@@ -23,6 +24,18 @@ describe("GET /.well-known/mcp/server-card.json", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("application/json; charset=utf-8");
     await expect(response.text()).resolves.toBe(canonical);
+  });
+});
+
+describe("GET /.well-known/poppy.json", () => {
+  it("serves a valid Personal Agent Protocol discovery document", async () => {
+    const response = getPoppy();
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      protocol_version: "0.1",
+      organization: { name: "geoaeo", domain: "usegeoaeo.com" },
+      web: {},
+    });
   });
 });
 

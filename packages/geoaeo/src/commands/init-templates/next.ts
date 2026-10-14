@@ -44,6 +44,20 @@ export function GET() {
 `;
 }
 
+function nextPoppyRoute(poppyImport: string): string {
+  return `import { generatePoppy } from '${PKG_NAME}';
+import { siteConfig } from '${poppyImport}';
+
+export const dynamic = 'force-static';
+
+export function GET() {
+  return new Response(JSON.stringify(generatePoppy(siteConfig), null, 2), {
+    headers: { 'content-type': 'application/json; charset=utf-8' },
+  });
+}
+`;
+}
+
 function nextSitemapRoute(sitemapImport: string): string {
   return `import type { MetadataRoute } from 'next';
 import { sitemapUrls } from '${PKG_NAME}';
@@ -118,6 +132,10 @@ export function nextTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "src/app/llms.txt/route.ts"));
   const llmsFullImport = configImport(root, path.join(root, "src/app/llms-full.txt/route.ts"));
   const webmcpImport = configImport(root, path.join(root, "src/app/webmcp/route.ts"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "src/app/.well-known/poppy.json/route.ts"),
+  );
   const sitemapImport = configImport(root, path.join(root, "src/app/sitemap.ts"));
   const robotsImport = configImport(root, path.join(root, "src/app/robots.ts"));
   const jsonLdImport = configImport(root, path.join(root, "src/components/seo/json-ld.tsx"));
@@ -126,6 +144,7 @@ export function nextTemplates(root: string): Map<string, string> {
     ["src/app/llms.txt/route.ts", nextLlmsRoute(llmsImport)],
     ["src/app/llms-full.txt/route.ts", nextLlmsFullRoute(llmsFullImport)],
     ["src/app/webmcp/route.ts", nextWebmcpRoute(webmcpImport)],
+    ["src/app/.well-known/poppy.json/route.ts", nextPoppyRoute(poppyImport)],
     ["src/app/sitemap.ts", nextSitemapRoute(sitemapImport)],
     ["src/app/robots.ts", nextRobotsRoute(robotsImport)],
     ["src/components/seo/json-ld.tsx", nextJsonLdComponent(jsonLdImport)],
