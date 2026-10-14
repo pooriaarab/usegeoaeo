@@ -110,7 +110,10 @@ export function nuxtTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "server/routes/llms.txt.get.ts"));
   const llmsFullImport = configImport(root, path.join(root, "server/routes/llms-full.txt.get.ts"));
   const webmcpImport = configImport(root, path.join(root, "server/routes/webmcp.json.get.ts"));
-  const poppyImport = configImport(root, path.join(root, "server/routes/.well-known/poppy.json.get.ts"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "server/routes/.well-known/poppy.json.get.ts"),
+  );
   const sitemapImport = configImport(root, path.join(root, "server/routes/sitemap.xml.get.ts"));
   const robotsImport = configImport(root, path.join(root, "server/routes/robots.txt.get.ts"));
   const jsonLdImport = configImport(root, path.join(root, "components/SeoJsonLd.vue"));

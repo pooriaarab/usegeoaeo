@@ -119,7 +119,10 @@ export function remixTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "app/routes/llms.txt.tsx"));
   const llmsFullImport = configImport(root, path.join(root, "app/routes/llms-full.txt.tsx"));
   const webmcpImport = configImport(root, path.join(root, "app/routes/webmcp[.]json.tsx"));
-  const poppyImport = configImport(root, path.join(root, "app/routes/[.]well-known.poppy[.]json.tsx"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "app/routes/[.]well-known.poppy[.]json.tsx"),
+  );
   const sitemapImport = configImport(root, path.join(root, "app/routes/sitemap[.]xml.tsx"));
   const robotsImport = configImport(root, path.join(root, "app/routes/robots[.]txt.tsx"));
   const jsonLdImport = configImport(root, path.join(root, "app/components/seo/json-ld.tsx"));

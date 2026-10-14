@@ -132,7 +132,10 @@ export function nextTemplates(root: string): Map<string, string> {
   const llmsImport = configImport(root, path.join(root, "src/app/llms.txt/route.ts"));
   const llmsFullImport = configImport(root, path.join(root, "src/app/llms-full.txt/route.ts"));
   const webmcpImport = configImport(root, path.join(root, "src/app/webmcp/route.ts"));
-  const poppyImport = configImport(root, path.join(root, "src/app/.well-known/poppy.json/route.ts"));
+  const poppyImport = configImport(
+    root,
+    path.join(root, "src/app/.well-known/poppy.json/route.ts"),
+  );
   const sitemapImport = configImport(root, path.join(root, "src/app/sitemap.ts"));
   const robotsImport = configImport(root, path.join(root, "src/app/robots.ts"));
   const jsonLdImport = configImport(root, path.join(root, "src/components/seo/json-ld.tsx"));

@@ -18,7 +18,10 @@ export function organizationDomain(siteUrl: string): string {
   try {
     return new URL(siteUrl).hostname.replace(/^www\./i, "");
   } catch {
-    return siteUrl.replace(/^https?:\/\//i, "").replace(/\/.*$/, "").replace(/^www\./i, "");
+    return siteUrl
+      .replace(/^https?:\/\//i, "")
+      .replace(/\/.*$/, "")
+      .replace(/^www\./i, "");
   }
 }
 

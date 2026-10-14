@@ -28,10 +28,10 @@ function hasOrganization(doc: Record<string, unknown>): boolean {
   const organization = asRecord(doc.organization);
   return Boolean(
     organization &&
-      typeof organization.name === "string" &&
-      organization.name.trim() &&
-      typeof organization.domain === "string" &&
-      organization.domain.trim(),
+    typeof organization.name === "string" &&
+    organization.name.trim() &&
+    typeof organization.domain === "string" &&
+    organization.domain.trim(),
   );
 }
 
