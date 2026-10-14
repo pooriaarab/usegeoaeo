@@ -2,7 +2,7 @@
   "name": "geoaeo",
   "version": "0.6.0",
   "mcpName": "io.github.pooriaarab/geoaeo",
-  "description": "GEO and AEO artifacts for answer engines and agents",
+  "description": "SEO, GEO, and AEO site audits with llms.txt, JSON-LD, sitemap generators, framework scaffolding, and MCP tools.",
   "type": "module",
   "license": "MIT",
   "bin": {
@@ -29,14 +29,17 @@
     "seo",
     "geo",
     "aeo",
-    "generative-engine-optimization",
-    "answer-engine-optimization",
     "llms-txt",
-    "structured-data",
     "json-ld",
-    "webmcp",
+    "sitemap",
     "mcp",
-    "ai-search"
+    "Next.js",
+    "Astro",
+    "SvelteKit",
+    "Nuxt",
+    "Remix",
+    "structured-data",
+    "site-audit"
   ],
   "publishConfig": {
     "access": "public"

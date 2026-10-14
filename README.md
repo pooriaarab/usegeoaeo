@@ -1,88 +1,12 @@
 # geoaeo
 
-<p align="center">Scores a site 0-100 and generates GEO/AEO files for owners who want AI citations.</p>
+<a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.6.0"/></a>
+[![Downloads/month](https://img.shields.io/npm/dm/geoaeo)](https://www.npmjs.com/package/geoaeo)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit)
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.6.0"/></a>
-  <a href="https://github.com/pooriaarab/usegeoaeo/actions"><img src="https://github.com/pooriaarab/usegeoaeo/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License MIT"/></a>
-  <a href="docs/GEO-AEO-CHECKLIST.md"><img src="https://img.shields.io/badge/checks-32-informational" alt="32 weighted audit checks"/></a>
-</p>
+[Docs](https://usegeoaeo.com/docs) · [Setup](https://usegeoaeo.com/docs/install) · [CLI reference](https://usegeoaeo.com/docs/cli) · [MCP reference](https://usegeoaeo.com/docs/mcp) · [Compare](#compare) · [llms.txt](https://usegeoaeo.com/llms.txt)
 
-```bash
-npx geoaeo audit https://usegeoaeo.com
-```
-
-```
-https://usegeoaeo.com: 85/100
-
-PASS  /llms.txt: Short site map is present.
-PASS  /llms-full.txt: Full site map is present.
-PASS  /sitemap.xml: A sitemap artifact is present.
-PASS  /robots.txt: Robots policy includes a sitemap URL.
-PASS  AI crawler access: No named AI crawler is disallowed from /.
-PASS  WebMCP manifest: A WebMCP-style tool manifest is present.
-FAIL  Markdown mirrors: Missing: no page markdown mirrors were found.
-PASS  Page titles: Every inspected page has a title.
-
-... 17 more checks ...
-
-Top fixes:
-1. Markdown mirrors
-2. MCP server card
-3. hreflang alternates
-```
-
-## Contents
-
-[Try it](#try-it) · [Set up in your agent](#set-up-in-your-agent) · [Install](#install) · [Quick start](#quick-start) · [Why](#why) · [Usage](#usage) · [How it works](#how-it-works) · [Run it locally](#run-it-locally) · [Contributing](#contributing) · [License](#license)
-
-## Try it
-
-Each path runs the same audit. Start at the top.
-
-1. Run it in the browser. No install: [usegeoaeo.com/tools](https://usegeoaeo.com/tools).
-2. Run one command. No install:
-
-```bash
-npx geoaeo audit https://example.com
-```
-
-3. Add it to a project, and call it from a build script or CI. See [Install](#install).
-
-4. Drive it from your agent over MCP. In Claude Code, Cursor, or Codex:
-
-```
-/plugin marketplace add pooriaarab/usegeoaeo
-/plugin install geoaeo@geoaeo
-```
-
-Windsurf, Gemini CLI, Continue, and Copilot use the JSON fallback in [Set up in your agent](#set-up-in-your-agent).
-
-## Set up in your agent
-
-In Claude Code, Cursor, or Codex, install the plugin:
-
-```
-/plugin marketplace add pooriaarab/usegeoaeo
-/plugin install geoaeo@geoaeo
-```
-
-The plugin starts `npx geoaeo mcp` over stdio. The tools are `audit`, `gen`, and `humanize`.
-
-Windsurf, Gemini CLI, Continue, and Copilot have no plugin dialect. Paste this prompt instead:
-
-```
-Set up geoaeo in this agent. Detect the harness, then configure the
-geoaeo MCP server with command `npx` and args `-y geoaeo mcp`.
-Run an audit on the current directory. Report the score and the
-top three fixes.
-```
-
-Then try one of these:
-
-- `Audit https://example.com and list the top 3 fixes.`
-- `Generate llms.txt for this repo.`
+geoaeo is an open-source site audit and artifact generator for developers. It checks search engine optimization (SEO), generative-engine optimization (GEO), and answer-engine optimization (AEO) signals. It returns a score and generates discovery files from your site configuration.
 
 ## Install
 
@@ -90,184 +14,179 @@ Then try one of these:
 npm install geoaeo
 ```
 
-> [!NOTE]
-> Node.js 20 or later.
+Requires Node.js 20 or newer. The package includes TypeScript types, ES module and CommonJS exports, and five direct dependencies.
 
-Save this as `example.mjs`:
-
-```js
-import { defineConfig, generateLlms } from 'geoaeo'
-
-const llms = generateLlms(
-  defineConfig({
-    siteName: 'Reply Kit',
-    siteUrl: 'https://example.com',
-    description: 'a tool that drafts replies for social posts',
-    tools: [
-      {
-        name: 'Engagement rate calculator',
-        url: '/tools/engagement-rate-calculator',
-        description: 'Calculate the interaction rate for a post or profile.',
-      },
-    ],
-  }),
-)
-process.stdout.write(llms)
-```
-
-## Quick start
+## Send your first audit
 
 ```bash
-node example.mjs
+npx geoaeo audit https://example.com
 ```
 
-```
-# Reply Kit
+No environment variables or API keys are required. Success prints the target, a score out of 100, PASS/FAIL checks, and top fixes.
+Scores depend on the fetched content; a completed audit does not require a passing score.
 
-> a tool that drafts replies for social posts
-
-## Product
-
-Reply Kit is a tool that drafts replies for social posts.
-
-## Free tools
-
-- [Engagement rate calculator](https://example.com/tools/engagement-rate-calculator): Calculate the interaction rate for a post or profile.
-
-## Plans
-
-- No plans listed.
-```
-
-## Why
-
-For site owners who want ChatGPT, Claude, Perplexity, and Google AI to cite
-their pages. GEO is generative-engine optimization. AEO is answer-engine
-optimization. Today those owners write `llms.txt` by hand or use a classic SEO
-plugin such as Yoast. Not a crawler, not a search engine, and not a substitute
-for Yoast if you only need Google search snippets.
-
-The package is free and open source under MIT. There is no paid tier. Hosted
-tools at [usegeoaeo.com/tools](https://usegeoaeo.com/tools) are free.
-
-## Usage
-
-The same capabilities ship as a library, a CLI, and an MCP server, all at one
-version.
-
-| Export | What it does |
-|---|---|
-| `auditTarget` | Scores a URL or directory 0-100 and lists missing artifacts |
-| `generateLlms` | Builds the short `llms.txt` from a `SiteConfig` |
-| `generateLlmsFull` | Builds the long `llms-full.txt` |
-| `generateJsonLd` | Builds schema.org JSON-LD for a named kind |
-| `generateSitemap` | Builds `sitemap.xml` |
-| `generateRobots` | Builds `robots.txt` |
-| `generateWebmcp` | Builds the WebMCP tool manifest |
-| `humanizeText` | Finds AI-writing tells and returns rewritten prose |
-| `defineConfig` | Normalizes a `SiteConfig` object |
+For a deterministic local generator example, save this as `example.mjs`:
 
 ```js
-import { auditTarget, generateLlms, humanizeText } from 'geoaeo'
+import { defineConfig, generateLlms } from 'geoaeo';
+const config = defineConfig({
+  siteName: 'Reply Kit',
+  siteUrl: 'https://example.com',
+  description: 'A tool that drafts replies.',
+  tools: [],
+});
+process.stdout.write(generateLlms(config));
 ```
 
-| Command | What it does |
-|---|---|
-| `geoaeo audit <url\|dir>` | Score 0-100 and list the gaps |
-| `geoaeo init [dir]` | Scaffold artifacts into an existing site |
-| `geoaeo gen <artifact>` | Generate one artifact from `geoaeo.config.ts` |
-| `geoaeo humanize <glob>` | Find AI-writing tells in prose |
-| `geoaeo mcp` | Serve over stdio |
-
-`init` detects Next.js, Astro, SvelteKit, Nuxt, and Remix, and writes routes
-that emit each artifact. Any other directory gets static files. After
-`npm install geoaeo`:
-
-```bash
-npx geoaeo init
-npx geoaeo gen llms
-```
-
-`gen` reads `geoaeo.config.ts` from the current directory. Artifacts: `llms`,
-`llms-full`, `jsonld`, `webmcp`, `poppy`, `sitemap`, `robots`, `ogimage`, `rss`,
-`hreflang`, `mdmirror`. JSON-LD `--type` values: `software`, `product`, `faq`,
-`breadcrumb`, `organization`, `website`, `article`, `howto`, `person`, `review`.
-
-The audit is 32 weighted checks across answerability, structured data,
-`llms.txt`, crawlability, freshness, and E-E-A-T. `--ci --min-score N` exits
-non-zero when the score is below the threshold.
-
-The bundled examples, audited from source:
-
-| Target | Score |
-|---|---|
-| `packages/geoaeo/examples/static-html` | 59 / 100 |
-| `packages/geoaeo/examples/nextjs-app` | 34 / 100 |
-| `packages/geoaeo/examples/astro-site` | 22 / 100 |
-
-Framework apps score lower because the audit reads source directories, not
-built output. Audit the deployed URL for the true score.
-
-Point an MCP client at the server to get the `audit`, `gen`, and `humanize`
-tools:
-
-```json
-{
-  "mcpServers": {
-    "geoaeo": {
-      "command": "npx",
-      "args": ["-y", "geoaeo", "mcp"]
-    }
-  }
-}
-```
-
-Docs: [usegeoaeo.com/docs](https://usegeoaeo.com/docs) ·
-[Install](https://usegeoaeo.com/docs/install) ·
-[CLI](https://usegeoaeo.com/docs/cli) ·
-[MCP](https://usegeoaeo.com/docs/mcp) ·
-[checklist](https://usegeoaeo.com/checklist) ·
-[examples](https://usegeoaeo.com/examples) ·
-[hosted tools](https://usegeoaeo.com/tools).
-[`AGENTS.md`](AGENTS.md) is how an agent should discover and drive this project.
+Run `node example.mjs`. Success prints Markdown headed `# Reply Kit`.
 
 ## How it works
 
-`auditTarget` snapshots a live URL or a local directory, runs 32 weighted
-checks that sum to 100, and returns the score plus the top missing artifacts.
-Generators take a `SiteConfig` object. They do not read the site themselves.
-`init` writes that config and either framework routes or static files.
-
-The published npm package is `geoaeo`. This repository also holds the docs
-site.
-
-| Path | What it is |
-|---|---|
-| `packages/geoaeo/` | The published npm package: library, CLI, and MCP server |
-| `apps/website/` | [usegeoaeo.com](https://usegeoaeo.com) — docs, hosted tools, and the checklist |
-| `workers/` | Cloudflare Workers that back the hosted tools |
-| `docs/` | The GEO/AEO checklist and per-harness setup guides |
-
-## Run it locally
-
-The package needs Node.js 20 or later. It does not start a database or a web
-server.
-
-```bash
-npm install geoaeo
-node example.mjs   # the file from Install, above
+```text
+URL or directory -> snapshot -> 32 weighted checks -> score and top fixes
+SiteConfig -> generator -> discovery text, XML, JSON, HTML, or SVG
+CLI / agent -> audit, generation, prose checks -> shared library behavior
 ```
 
-The docs site at [usegeoaeo.com](https://usegeoaeo.com) lives in `apps/website/`
-and is not required to use the library.
+Generators use your configuration; they do not discover your business facts.
+The repository includes the npm package, the public website, and Workers for website tools.
 
-## Contributing
+## Why it exists
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for this repo's layout, build commands
-and the library/CLI/MCP parity rule. It sits on top of the account-wide
-[contribution guide](https://github.com/pooriaarab/.github/blob/main/CONTRIBUTING.md),
-which carries the issue-first rule, the branch pattern and the 500-line cap.
+Developers need repeatable checks and generated discovery artifacts in their build workflows.
+Yoast SEO provides WordPress editing and metadata workflows. Lighthouse audits web page quality.
+geoaeo exposes configuration-driven artifact generation and discovery checks through code, a CLI, and Model Context Protocol (MCP).
+
+## Compare
+
+Scope checked on 2026-10-14 against [Yoast SEO](https://yoast.com/wordpress/plugins/seo/) and [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview).
+
+| Scope | geoaeo | Yoast SEO | Lighthouse |
+|---|---|---|---|
+| Main workflow | Discovery audits and artifact generation | WordPress SEO editing | Web page quality audits |
+| Configuration | SiteConfig and command flags | WordPress plugin settings | Audit configuration |
+| Execution | Node.js library, CLI, stdio MCP | WordPress | Chrome tooling or CLI |
+
+## Coverage
+
+| Artifact choice | Status | Output |
+|---|---|---|
+| `llms` | ✓ generator | Short llms.txt |
+| `llms-full` | ✓ generator | Detailed llms-full.txt |
+| `jsonld` | ✓ generator | JSON-LD structured data |
+| `webmcp` | manifest only | WebMCP-style discovery JSON |
+| `poppy` | discovery only | Personal Agent Protocol organization and empty web capability |
+| `sitemap` | ✓ generator | XML sitemap |
+| `robots` | ✓ generator | robots.txt |
+| `ogimage` | ✓ generator | SVG image |
+| `rss` | ✓ generator | RSS feed |
+| `hreflang` | ✓ generator | Alternate-language link tags |
+| `mdmirror` | ✓ generator | Markdown content |
+
+The dispatcher has 11 artifact choices. JSON-LD supports 10 kinds: software, product, faq, breadcrumb, organization, website, article, howto, person, review.
+Framework detection includes Next.js, Astro, SvelteKit, Nuxt, and Remix; other directories receive static files.
+These are implemented generators and templates, not credential-verified integrations with answer engines.
+Local tests verify behavior. No ChatGPT, Claude, Perplexity, or Google AI citation outcome is verified by an audit score.
+
+## Common use cases
+
+1. Next.js developers: scaffold discovery routes and review generated site facts.
+2. Astro publishers: generate sitemap, robots, and language artifacts from shared configuration.
+3. SvelteKit teams: inspect deployed HTML and track audit thresholds in CI.
+4. Agent developers: connect Claude Code or Cursor through the stdio MCP server.
+5. Static-site maintainers: generate llms.txt and JSON-LD without a framework plugin.
+
+## Features
+
+- **Audits:** 32 weighted checks return a normalized 0–100 score and up to five top fixes. See the [checklist](https://usegeoaeo.com/checklist).
+- **Generators:** emit artifacts from a shared site configuration. See [installation](https://usegeoaeo.com/docs/install).
+- **Prose checks:** find configured writing patterns and optionally rewrite matching files. See the [CLI reference](https://usegeoaeo.com/docs/cli).
+- **Agent tools:** audit, generate, and check prose over stdio. See the [MCP reference](https://usegeoaeo.com/docs/mcp).
+
+## Runtime surfaces
+
+| CLI command | Behavior |
+|---|---|
+| `geoaeo audit <target>` | Audit a URL or local directory; `--json` returns JSON |
+| `geoaeo init [directory]` | Write starter configuration and framework routes or static artifacts |
+| `geoaeo gen <artifact>` | Read configuration and print an artifact; `--output` writes a file |
+| `geoaeo humanize <glob>` | Report prose findings; `--write` changes files |
+| `geoaeo mcp` | Start the stdio MCP server |
+
+The two bins are `geoaeo` and `geoaeo-mcp`.
+The three MCP tools are `audit`, `gen`, and `humanize`. MCP `gen` returns text without writing a file.
+Library exports include `auditTarget`, `formatAuditReport`, `defineConfig`, `humanizeText`, and the artifact generators.
+`init` is a CLI scaffolding command, not an MCP tool.
+
+## Delivery and behavior limits
+
+- Scores measure implemented heuristics. They do not measure rankings, traffic, or citations.
+- A local source audit can miss rendered framework output. Audit a deployed URL to inspect served HTML.
+- `init` writes placeholder facts. Replace them before publishing; existing files are skipped unless `--force` is set.
+- `gen` reads `geoaeo.config.ts`, `.js`, or `.mjs` from the target directory. Configuration executes as code.
+- WebMCP output does not register executable browser tools. Poppy output does not implement authentication or a company agent.
+- `audit --ci --min-score N` fails below the chosen score. The default threshold is 90.
+- `GEOAEO_ALLOWED_ROOTS` optionally limits local paths for supported CLI and MCP operations. HTTP audit targets remain allowed.
+- Prose rewrites use fixed rules; review every change before publishing.
+
+## Integration guides
+
+- [Install geoaeo and scaffold framework artifacts](https://usegeoaeo.com/docs/install).
+- [Run audits and generate discovery files from the CLI](https://usegeoaeo.com/docs/cli).
+- [Configure an agent with the stdio MCP server](https://usegeoaeo.com/docs/mcp).
+
+For an MCP client, use this server configuration:
+
+```json
+{"mcpServers":{"geoaeo":{"command":"npx","args":["-y","geoaeo","mcp"]}}}
+```
+
+## Status
+
+The package is version 0.6.0. Interfaces can change before 1.0.
+The library is MIT licensed. Public case studies are not yet published.
+Use the repository issue tracker for support if you have access, or consult the [public docs](https://usegeoaeo.com/docs).
+
+### Contributing
+
+`packages/geoaeo` contains the package; `apps/website` contains the documentation site.
+Install workspace dependencies with `bun install`. Run `bun run ci:local` for lint, types, tests, and plugin-skill checks.
+Keep library behavior, CLI commands, and MCP tools aligned when changing shared capabilities.
+
+## FAQ
+
+### Which integrations are verified?
+
+geoaeo includes five framework detectors and a static fallback. Tests cover templates and generators; the audit does not credential-check answer engines.
+
+### Does geoaeo provide a managed SEO service?
+
+geoaeo provides a local package and public browser tools. You deploy generated artifacts to your own site.
+
+### How is geoaeo different from Yoast SEO?
+
+geoaeo uses code and commands to audit discovery signals and generate files. [Yoast SEO](https://yoast.com/wordpress/plugins/seo/) provides WordPress SEO editing and metadata workflows.
+
+### How is geoaeo different from Lighthouse?
+
+geoaeo focuses on discovery checks and configuration-driven artifacts. [Lighthouse](https://developer.chrome.com/docs/lighthouse/overview) audits web page quality, including performance and accessibility.
+
+### Does geoaeo guarantee citations from ChatGPT or Claude?
+
+geoaeo cannot guarantee citations. Its score reports the checks implemented in the package.
+
+### Can geoaeo audit a local directory?
+
+geoaeo accepts directories and HTTP URLs. Source files can differ from rendered pages, so inspect deployed output as well.
+
+### Does geoaeo require an API key?
+
+geoaeo requires no API key for its library, CLI, or stdio MCP server. URL audits need network access.
+
+### Does geoaeo overwrite my files?
+
+geoaeo skips existing scaffolding files unless `init --force` is set. Generation writes only when an output path is supplied; prose rewriting requires an explicit write option.
 
 ## License
 
-[MIT](LICENSE)
+MIT.
