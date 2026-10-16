@@ -4,6 +4,7 @@ import { PAGE_EXTENSIONS } from "./constants.js";
 import {
   createFetchPolicy,
   destinationAllowed,
+  openAudit,
   readLimited,
   type AuditFetchPolicy,
 } from "./fetch-guard.js";
@@ -76,16 +77,11 @@ const MAX_REDIRECTS = 5;
 async function fetchText(rawUrl: string, policy: AuditFetchPolicy): Promise<FetchedText> {
   try {
     let current = new URL(rawUrl);
-    // Keep the caller's URL string on the first hop. new URL().href adds a
-    // trailing slash that existing fetch stubs compare against exactly.
+    // First hop keeps the caller's string. new URL().href adds a slash stubs compare against.
     let requestUrl = rawUrl;
     for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
-      // Check the address before connecting, including each redirect hop.
       if (!(await destinationAllowed(current, policy))) return EMPTY_FETCH;
-      const response = await fetch(requestUrl, {
-        redirect: "manual",
-        signal: AbortSignal.any([policy.signal, AbortSignal.timeout(8000)]),
-      });
+      const response = await openAudit(requestUrl, current, policy);
       if (response.status >= 300 && response.status < 400) {
         const location = response.headers.get("location");
         await response.body?.cancel().catch(() => undefined);
@@ -94,10 +90,6 @@ async function fetchText(rawUrl: string, policy: AuditFetchPolicy): Promise<Fetc
         requestUrl = current.href;
         continue;
       }
-      // response.url reflects the post-redirect URL when a stub or runtime
-      // already followed one. Compare host, not origin, so a same-host
-      // http->https upgrade still passes. Empty response.url (a stubbed
-      // Response in tests) skips this check rather than throwing on new URL('').
       if (response.url && new URL(response.url).host !== current.host) {
         await response.body?.cancel().catch(() => undefined);
         return EMPTY_FETCH;
@@ -128,11 +120,7 @@ function pageFromFetch(url: string, fetched: FetchedText): PageSnapshot {
   return { url, source: fetched.text, isHtml, xRobotsTag: fetched.xRobotsTag };
 }
 
-async function fetchSingleArtifact(
-  base: string,
-  paths: string[],
-  policy: AuditFetchPolicy,
-): Promise<string> {
+async function fetchSingleArtifact(base: string, paths: string[], policy: AuditFetchPolicy): Promise<string> {
   for (const artifactPath of paths) {
     const result = await fetchText(`${base}${artifactPath}`, policy);
     if (result.status >= 200 && result.status < 400 && result.text) return result.text;
@@ -197,11 +185,7 @@ function resolveOnTarget(rawUrl: string, target: URL): string | undefined {
   }
 }
 
-async function fetchSitemapPages(
-  base: string,
-  sitemap: string,
-  policy: AuditFetchPolicy,
-): Promise<PageSnapshot[]> {
+async function fetchSitemapPages(base: string, sitemap: string, policy: AuditFetchPolicy): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
   const home = await fetchText(base, policy);
   if (home.text && pageFromFetch(base, home).isHtml) pages.push(pageFromFetch(base, home));
@@ -266,7 +250,6 @@ export async function snapshotUrl(siteUrl: string): Promise<TargetSnapshot> {
     return { artifacts: new Map(), pages: [], mirrors: [] };
   }
   const policy = createFetchPolicy(target);
-  // One clock for the whole audit, on top of the per-request timeout.
   const timer = setTimeout(() => policy.abort(), 20_000);
   timer.unref();
   try {
