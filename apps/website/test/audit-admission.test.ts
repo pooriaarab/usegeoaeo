@@ -25,8 +25,8 @@ describe("hosted audit admission", () => {
     const results = await Promise.all(pending);
 
     expect(results.filter((result) => result.ok).length).toBe(2);
-    expect(results.some((result) => result.error === "Too many audits are running. Try again shortly.")).toBe(
-      true,
-    );
+    expect(
+      results.some((result) => result.error === "Too many audits are running. Try again shortly."),
+    ).toBe(true);
   });
 });
