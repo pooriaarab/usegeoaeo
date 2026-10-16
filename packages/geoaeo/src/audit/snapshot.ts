@@ -1,6 +1,8 @@
 import path from "node:path";
 import type { PageSnapshot, TargetSnapshot } from "./types.js";
 import { PAGE_EXTENSIONS } from "./constants.js";
+// prettier-ignore
+import { createFetchPolicy, destinationAllowed, openAudit, readLimited, type AuditFetchPolicy as Policy } from "./fetch-guard.js";
 import { findArtifact, readOptional, walkFiles } from "./utils.js";
 
 async function collectArtifacts(files: string[]): Promise<Map<string, string>> {
@@ -64,27 +66,38 @@ interface FetchedText {
   xRobotsTag: string;
 }
 
-async function fetchText(url: string): Promise<FetchedText> {
+const EMPTY_FETCH: FetchedText = { status: 0, text: "", contentType: "", xRobotsTag: "" };
+const MAX_REDIRECTS = 5;
+async function readBody(response: Response, current: URL, policy: Policy): Promise<FetchedText> {
+  if (response.url && new URL(response.url).host !== current.host) {
+    await response.body?.cancel().catch(() => undefined);
+    return EMPTY_FETCH;
+  }
+  const text = await readLimited(response, policy);
+  if (text === undefined) return EMPTY_FETCH;
+  // prettier-ignore
+  return { status: response.status, text, contentType: response.headers.get("content-type") ?? "", xRobotsTag: response.headers.get("x-robots-tag") ?? "" };
+}
+async function fetchText(rawUrl: string, policy: Policy): Promise<FetchedText> {
   try {
-    const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    // response.url reflects the post-redirect URL: a target-served redirect can
-    // otherwise carry the fetch off the pinned host while the result is still
-    // recorded under the pinned URL. Compare host, not origin, so a same-host
-    // http->https upgrade (routine on most sites) still passes. Empty
-    // response.url (e.g. a stubbed Response in tests) skips this check rather
-    // than throwing on new URL('').
-    if (response.url && new URL(response.url).host !== new URL(url).host) {
-      return { status: 0, text: "", contentType: "", xRobotsTag: "" };
+    let current = new URL(rawUrl);
+    let requestUrl = rawUrl;
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
+      if (!(await destinationAllowed(current, policy))) return EMPTY_FETCH;
+      const response = await openAudit(requestUrl, current, policy);
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get("location");
+        await response.body?.cancel().catch(() => undefined);
+        if (!location || hop === MAX_REDIRECTS) return EMPTY_FETCH;
+        current = new URL(location, current);
+        requestUrl = current.href;
+        continue;
+      }
+      return readBody(response, current, policy);
     }
-    const xRobotsTag = response.headers.get("x-robots-tag") ?? "";
-    return {
-      status: response.status,
-      text: await response.text(),
-      contentType: response.headers.get("content-type") ?? "",
-      xRobotsTag,
-    };
+    return EMPTY_FETCH;
   } catch {
-    return { status: 0, text: "", contentType: "", xRobotsTag: "" };
+    return EMPTY_FETCH;
   }
 }
 
@@ -99,15 +112,15 @@ function pageFromFetch(url: string, fetched: FetchedText): PageSnapshot {
   return { url, source: fetched.text, isHtml, xRobotsTag: fetched.xRobotsTag };
 }
 
-async function fetchSingleArtifact(base: string, paths: string[]): Promise<string> {
+async function fetchSingleArtifact(base: string, paths: string[], policy: Policy): Promise<string> {
   for (const artifactPath of paths) {
-    const result = await fetchText(`${base}${artifactPath}`);
+    const result = await fetchText(`${base}${artifactPath}`, policy);
     if (result.status >= 200 && result.status < 400 && result.text) return result.text;
   }
   return "";
 }
 
-async function fetchArtifacts(base: string): Promise<Map<string, string>> {
+async function fetchArtifacts(base: string, policy: Policy): Promise<Map<string, string>> {
   const artifactPaths: Array<[string, string[]]> = [
     ["llms.txt", ["/llms.txt"]],
     ["llms-full.txt", ["/llms-full.txt"]],
@@ -122,7 +135,7 @@ async function fetchArtifacts(base: string): Promise<Map<string, string>> {
   ];
   const artifacts = new Map<string, string>();
   for (const [name, paths] of artifactPaths) {
-    artifacts.set(name, await fetchSingleArtifact(base, paths));
+    artifacts.set(name, await fetchSingleArtifact(base, paths, policy));
   }
   return artifacts;
 }
@@ -164,9 +177,10 @@ function resolveOnTarget(rawUrl: string, target: URL): string | undefined {
   }
 }
 
-async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSnapshot[]> {
+// prettier-ignore
+async function fetchSitemapPages(base: string, sitemap: string, policy: Policy): Promise<PageSnapshot[]> {
   const pages: PageSnapshot[] = [];
-  const home = await fetchText(base);
+  const home = await fetchText(base, policy);
   if (home.text && pageFromFetch(base, home).isHtml) pages.push(pageFromFetch(base, home));
   let target: URL;
   try {
@@ -182,7 +196,7 @@ async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSna
           sitemapUrls.slice(0, 4).map(async (rawUrl) => {
             const url = resolveOnTarget(rawUrl, target);
             if (!url) return [];
-            return parseSitemapUrls((await fetchText(url)).text);
+            return parseSitemapUrls((await fetchText(url, policy)).text);
           }),
         )
       )
@@ -193,13 +207,13 @@ async function fetchSitemapPages(base: string, sitemap: string): Promise<PageSna
     const url = resolveOnTarget(rawUrl, target);
     if (!url || seen.has(url)) continue;
     seen.add(url);
-    const page = await fetchText(url);
+    const page = await fetchText(url, policy);
     if (page.text && pageFromFetch(url, page).isHtml) pages.push(pageFromFetch(url, page));
   }
   return pages;
 }
 
-async function fetchMirrors(pages: PageSnapshot[]): Promise<string[]> {
+async function fetchMirrors(pages: PageSnapshot[], policy: Policy): Promise<string[]> {
   const mirrors: string[] = [];
   for (const page of pages.slice(0, 4)) {
     const alternate = markdownAlternate(page.source, page.url);
@@ -207,7 +221,7 @@ async function fetchMirrors(pages: PageSnapshot[]): Promise<string[]> {
     if (new URL(page.url).pathname === "/")
       fallbacks.push(`${page.url.replace(/\/$/, "")}/index.md`);
     for (const mirrorUrl of fallbacks.filter((url): url is string => Boolean(url))) {
-      const mirror = await fetchText(mirrorUrl);
+      const mirror = await fetchText(mirrorUrl, policy);
       if (mirror.status >= 200 && mirror.status < 400 && mirror.text) {
         mirrors.push(mirrorUrl);
         break;
@@ -219,9 +233,25 @@ async function fetchMirrors(pages: PageSnapshot[]): Promise<string[]> {
 
 export async function snapshotUrl(siteUrl: string): Promise<TargetSnapshot> {
   const base = siteUrl.replace(/\/+$/, "");
-  const artifacts = await fetchArtifacts(base);
-  const sitemap = artifacts.get("sitemap.xml") ?? "";
-  const pages = await fetchSitemapPages(base, sitemap);
-  const mirrors = await fetchMirrors(pages);
-  return { artifacts, pages, mirrors };
+  let target: URL;
+  try {
+    target = new URL(base);
+  } catch {
+    return { artifacts: new Map(), pages: [], mirrors: [] };
+  }
+  if (target.protocol !== "http:" && target.protocol !== "https:") {
+    return { artifacts: new Map(), pages: [], mirrors: [] };
+  }
+  const policy = createFetchPolicy(target);
+  const timer = setTimeout(() => policy.abort(), 20_000);
+  timer.unref();
+  try {
+    const artifacts = await fetchArtifacts(base, policy);
+    const sitemap = artifacts.get("sitemap.xml") ?? "";
+    const pages = await fetchSitemapPages(base, sitemap, policy);
+    const mirrors = await fetchMirrors(pages, policy);
+    return { artifacts, pages, mirrors };
+  } finally {
+    clearTimeout(timer);
+  }
 }
