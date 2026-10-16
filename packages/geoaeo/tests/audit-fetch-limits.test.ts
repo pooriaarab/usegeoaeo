@@ -1,6 +1,10 @@
+import http from "node:http";
 import net from "node:net";
+import zlib from "node:zlib";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { auditTarget } from "../src/audit.js";
+// prettier-ignore
+import { MAX_RESPONSE_BYTES, createFetchPolicy, destinationAllowed, openAudit, readLimited } from "../src/audit/fetch-guard.js";
 const dnsState = vi.hoisted(() => ({
   impl: null as null | (() => Promise<Array<{ address: string; family: number }>>),
 }));
@@ -90,6 +94,39 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
       expect(hosts).toEqual([]);
     } finally {
       net.Socket.prototype.connect = original;
+    }
+  });
+  it("decodes bodies, accepts empty statuses, and dials IPv6 literals", async () => {
+    const html = "<html><h1>Decoded</h1></html>";
+    const packed = zlib.gzipSync(Buffer.alloc(MAX_RESPONSE_BYTES + 100, 120));
+    const server = http.createServer((req, res) => {
+      const status = Number(req.url?.slice(1));
+      if (status === 204 || status === 205 || status === 304) return res.writeHead(status).end();
+      if (req.url === "/gz" || req.url === "/fat") {
+        res.writeHead(200, { "content-encoding": "gzip" });
+        return res.end(req.url === "/gz" ? zlib.gzipSync(html) : packed);
+      }
+      res.end("ok");
+    });
+    await new Promise<void>((resolve) => server.listen(0, "::", resolve));
+    const port = (server.address() as net.AddressInfo).port;
+    const read = async (href: string) => {
+      const url = new URL(href);
+      const policy = createFetchPolicy(url);
+      expect(await destinationAllowed(url, policy)).toBe(true);
+      const response = await openAudit(href, url, policy);
+      return [response.status, await readLimited(response, policy), policy.bytes] as const;
+    };
+    try {
+      expect(await read(`http://[::1]:${port}/`)).toEqual([200, "ok", 2]);
+      for (const status of [204, 205, 304])
+        expect(await read(`http://127.0.0.1:${port}/${status}`)).toEqual([status, "", 0]);
+      expect((await read(`http://127.0.0.1:${port}/gz`))[1]).toBe(html);
+      const fat = await read(`http://127.0.0.1:${port}/fat`);
+      expect(fat[1]).toBeUndefined();
+      expect(fat[2]).toBeGreaterThan(packed.byteLength);
+    } finally {
+      server.close();
     }
   });
 });
