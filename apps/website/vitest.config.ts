@@ -9,6 +9,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Tests import the library source so a missing dist build does not skip them.
+      geoaeo: path.resolve(__dirname, "../../packages/geoaeo/src/index.ts"),
     },
   },
 });
