@@ -6,20 +6,28 @@ import { protectWorkerPreview } from "./src/utils/worker-preview-indexing";
 // Next.js App Router emits inline bootstrap scripts, and pages embed JSON-LD
 // plus one inline style. There is no nonce pipeline, so script-src and
 // style-src allow 'unsafe-inline' to match that loading strategy.
+// next dev wraps client modules in eval() (EvalSourceMapDevToolPlugin),
+// so development also allows 'unsafe-eval'. Production omits it.
 // The site is not embedded, so framing is denied.
-const CONTENT_SECURITY_POLICY = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self'",
-  "connect-src 'self'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-src 'none'",
-  "frame-ancestors 'none'",
-].join("; ");
+function contentSecurityPolicy() {
+  const scriptSrc =
+    process.env.NODE_ENV === "development"
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      : "script-src 'self' 'unsafe-inline'";
+  return [
+    "default-src 'self'",
+    scriptSrc,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-src 'none'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+}
 
 function requestIsHttps(request: NextRequest) {
   if (request.nextUrl.protocol === "https:") return true;
@@ -28,7 +36,7 @@ function requestIsHttps(request: NextRequest) {
 }
 
 function applySecurityHeaders(request: NextRequest, response: Response) {
-  response.headers.set("Content-Security-Policy", CONTENT_SECURITY_POLICY);
+  response.headers.set("Content-Security-Policy", contentSecurityPolicy());
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");

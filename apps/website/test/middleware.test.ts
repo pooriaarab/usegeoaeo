@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 import { config, middleware } from "../middleware";
@@ -24,21 +24,35 @@ describe("browser security headers", () => {
   const previousPreview = process.env.WORKER_PREVIEW;
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     if (previousPreview === undefined) delete process.env.WORKER_PREVIEW;
     else process.env.WORKER_PREVIEW = previousPreview;
   });
 
   it("denies framing and sets nosniff, referrer policy, and HSTS on HTTPS pages", () => {
+    vi.stubEnv("NODE_ENV", "production");
     const response = responseFor("https://usegeoaeo.com/tools");
     const csp = response.headers.get("Content-Security-Policy") ?? "";
 
     expect(csp).toContain("frame-ancestors 'none'");
-    expect(csp).toContain("script-src 'self' 'unsafe-inline'");
+    expect(csp).toMatch(/script-src 'self' 'unsafe-inline'(;|$)/);
+    expect(csp).not.toContain("unsafe-eval");
     expect(csp).toContain("style-src 'self' 'unsafe-inline'");
     expect(response.headers.get("X-Frame-Options")).toBe("DENY");
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
     expect(response.headers.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
     expect(response.headers.get("Strict-Transport-Security")).toBe("max-age=31536000");
+  });
+
+  it("allows eval in development for Next.js client bundles", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    const response = responseFor("https://usegeoaeo.com/tools");
+    const csp = response.headers.get("Content-Security-Policy") ?? "";
+
+    expect(csp).toMatch(/script-src 'self' 'unsafe-inline' 'unsafe-eval'(;|$)/);
+    expect(csp).toContain("frame-ancestors 'none'");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+    expect(response.headers.get("X-Frame-Options")).toBe("DENY");
   });
 
   it("omits HSTS on cleartext requests and keeps the home Link header", () => {
