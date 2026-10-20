@@ -93,7 +93,7 @@ async function fetchText(rawUrl: string, policy: Policy): Promise<FetchedText> {
         requestUrl = current.href;
         continue;
       }
-      return readBody(response, current, policy);
+      return await readBody(response, current, policy);
     }
     return EMPTY_FETCH;
   } catch {

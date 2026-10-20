@@ -1,7 +1,7 @@
 import http from "node:http";
 import https from "node:https";
 import * as dns from "node:dns/promises";
-import { Readable } from "node:stream";
+import { PassThrough, pipeline, Readable } from "node:stream";
 import zlib from "node:zlib";
 import { BlockList, isIP } from "node:net";
 export const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
@@ -128,17 +128,18 @@ function decodedSource(incoming: http.IncomingMessage, headers: Headers): Readab
   }
   // prettier-ignore
   const codings = (headers.get("content-encoding") ?? "").split(",").map((item) => item.trim().toLowerCase()).filter((item) => item && item !== "identity");
-  let source: Readable = incoming;
-  for (const coding of [...codings].reverse()) {
+  if (codings.length === 0) return incoming;
+  const decoders = [...codings].reverse().map((coding) => {
     const decoder = DECODERS[coding]?.();
     if (!decoder) throw new Error(`unsupported content-encoding: ${coding}`);
-    source = source.pipe(decoder) as unknown as Readable;
-  }
-  if (codings.length > 0) {
-    headers.delete("content-encoding");
-    headers.delete("content-length");
-  }
-  return source;
+    return decoder;
+  });
+  const output = new PassThrough();
+  // prettier-ignore
+  pipeline([incoming, ...decoders, output], (error) => { if (error && !output.destroyed) output.destroy(error); });
+  headers.delete("content-encoding");
+  headers.delete("content-length");
+  return output;
 }
 function responseFrom(incoming: http.IncomingMessage): Response {
   const headers = new Headers();

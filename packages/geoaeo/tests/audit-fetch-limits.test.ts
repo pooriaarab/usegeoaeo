@@ -129,4 +129,29 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
       server.close();
     }
   });
+  it("survives corrupt gzip, cut bodies, and aborted compressed reads", async () => {
+    const badGzip = Buffer.from([0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff]);
+    const cut = (res: http.ServerResponse, head: http.OutgoingHttpHeaders, chunk: Buffer | string) => {
+      res.writeHead(200, head);
+      res.write(chunk);
+      setTimeout(() => res.destroy(), 20);
+    };
+    const server = http.createServer((req, res) => {
+      if (req.url === "/llms.txt") return res.writeHead(200, { "content-encoding": "gzip" }).end(badGzip);
+      if (req.url === "/llms-full.txt")
+        return cut(res, { "content-encoding": "gzip" }, zlib.gzipSync("x".repeat(8_000)).subarray(0, 40));
+      if (req.url === "/robots.txt") return cut(res, {}, "User-agent: *\n");
+      if (req.url === "/") return res.end("<html><body><h1>Home</h1></body></html>");
+      res.writeHead(404).end();
+    });
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const port = (server.address() as net.AddressInfo).port;
+    try {
+      // prettier-ignore
+      const report = await Promise.race([auditTarget(`http://127.0.0.1:${port}/`), new Promise<never>((_, reject) => setTimeout(() => reject(new Error("audit hung past deadline")), 12_000))]);
+      expect(report.score).toBeGreaterThanOrEqual(0);
+    } finally {
+      server.close();
+    }
+  });
 });
