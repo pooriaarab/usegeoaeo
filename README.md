@@ -144,7 +144,7 @@ For an MCP client, use this server configuration:
 
 ## Status
 
-The package is version 0.7.0. Interfaces can change before 1.0.
+The package is version 0.8.0. Interfaces can change before 1.0.
 The library is MIT licensed. Public case studies are not yet published.
 Use the repository issue tracker for support if you have access, or consult the [public docs](https://usegeoaeo.com/docs).
 
