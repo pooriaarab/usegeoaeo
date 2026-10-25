@@ -2,14 +2,26 @@ import type { SiteConfig } from "../config.js";
 import { AI_EXCLUDED_PATHS } from "../constants.js";
 
 export interface AiTxtOptions {
-  /** ISO date (YYYY-MM-DD). Defaults to today in UTC. */
+  /** ISO date (YYYY-MM-DD). Defaults to config.lastUpdated, then today in UTC. */
   lastUpdated?: string;
-  /** Contact line. Defaults to the site URL. */
+  /** Contact line. Defaults to config.contact, then the site URL. */
   contact?: string;
 }
 
+/** A configured page may be a path or an absolute URL; a scope entry is a path. */
+function pagePath(page: string): string {
+  if (/^https?:\/\//i.test(page)) {
+    try {
+      return new URL(page).pathname;
+    } catch {
+      return `/${page}`;
+    }
+  }
+  return `/${page.replace(/^\/+|\/+$/g, "")}`;
+}
+
 function includedPaths(config: SiteConfig): string[] {
-  return ["/", ...(config.pages ?? []).map((page) => `/${page.replace(/^\/+|\/+$/g, "")}`)];
+  return [...new Set(["/", ...(config.pages ?? []).map(pagePath)])];
 }
 
 /**
@@ -18,8 +30,9 @@ function includedPaths(config: SiteConfig): string[] {
  * Organization JSON-LD. Scope exclusions come from AI_EXCLUDED_PATHS.
  */
 export function generateAiTxt(config: SiteConfig, options: AiTxtOptions = {}): string {
-  const lastUpdated = options.lastUpdated ?? new Date().toISOString().slice(0, 10);
-  const contact = options.contact ?? config.siteUrl;
+  const lastUpdated =
+    options.lastUpdated ?? config.lastUpdated ?? new Date().toISOString().slice(0, 10);
+  const contact = options.contact ?? config.contact ?? config.siteUrl;
   const contactLine = /^https?:\/\//.test(contact) ? `url: ${contact}` : `email: ${contact}`;
   const included = includedPaths(config)
     .map((path) => `include: ${path}`)
