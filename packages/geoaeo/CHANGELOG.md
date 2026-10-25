@@ -8,10 +8,8 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ### Added
 
-- `generateMarkdownPage`, `markdownHeaders`, and `markdownResponse` build a markdown
-  mirror and the response around it: `text/markdown`, `X-Markdown-Tokens`,
-  `X-Robots-Tag: noindex, follow`, `Content-Location`, `Cache-Control`, CORS, and
-  `Vary: Accept` when the response was negotiated.
+- `generateMarkdownPage` writes a markdown mirror: title, summary, canonical URL, last
+  updated, body, and related links.
 - Audit check `ai-summary` (34 checks) requires `<meta name="ai-summary">` on every
   inspected page. `title` and `description` drop from 4 to 3 so the checks still sum
   to 100.
@@ -35,10 +33,9 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ### Changed
 
-- `generateMdmirror` writes the page shape: summary, canonical URL, last updated, body,
-  and related links. It defaults the canonical URL to the site root and the date to
-  `SiteConfig.lastUpdated`, so `geoaeo gen mdmirror` carries both; a route that serves
-  one page passes its path and related links.
+- `generateMdmirror` writes the page shape. It defaults the canonical URL to the site
+  root, the date to `SiteConfig.lastUpdated`, and the related links to the other
+  configured pages, so `geoaeo gen mdmirror` reaches every field from config.
 - `llms.txt` gains a `Core pages` section and a `Machine-readable` section that
   links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
 - `llms-full.txt` gains a `Generated:` date, a `<!-- source: <url> -->` marker
