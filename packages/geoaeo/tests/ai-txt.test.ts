@@ -66,6 +66,8 @@ describe("generateAiTxt", () => {
     });
     expect(output).toContain("Last updated: 2026-01-02");
     expect(output).toContain("contact: hello@reply.example");
+    expect(output).toContain("[contact]\nemail: hello@reply.example");
+    expect(output).not.toContain("url: hello@reply.example");
   });
 });
 
