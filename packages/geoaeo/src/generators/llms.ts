@@ -2,7 +2,7 @@ import type { SiteConfig } from "../config.js";
 import { absoluteUrl } from "../config.js";
 
 export interface LlmsFullOptions {
-  /** ISO date (YYYY-MM-DD). Defaults to today in UTC. */
+  /** ISO date (YYYY-MM-DD). Defaults to config.lastUpdated, then today in UTC. */
   generated?: string;
 }
 
@@ -49,7 +49,7 @@ function corePagesBlock(config: SiteConfig): string {
 
 function machineReadableBlock(config: SiteConfig): string {
   const entries: Array<[string, string, string]> = [
-    ["Full content", "/llms-full.txt", "Every page and FAQ answer in one fetch."],
+    ["Full content", "/llms-full.txt", "Site facts, plans, and FAQ answers in one fetch."],
     ["Sitemap", "/sitemap.xml", "Every indexable page URL."],
     ["AI usage policy", "/ai.txt", "What an AI system may summarise, quote, cite, and index."],
   ];
@@ -90,7 +90,8 @@ ${machineReadableBlock(config)}
 }
 
 export function generateLlmsFull(config: SiteConfig, options: LlmsFullOptions = {}): string {
-  const generated = options.generated ?? new Date().toISOString().slice(0, 10);
+  const generated =
+    options.generated ?? config.lastUpdated ?? new Date().toISOString().slice(0, 10);
   const platforms = config.platforms?.length
     ? config.platforms.map((platform) => `- ${platform}`).join("\n")
     : "- No platforms listed.";

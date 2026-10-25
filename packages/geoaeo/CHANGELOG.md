@@ -29,8 +29,9 @@ All notable changes to geoaeo are recorded here. The format follows
 - `llms.txt` gains a `Core pages` section and a `Machine-readable` section that
   links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
 - `llms-full.txt` gains a `Generated:` date, a `<!-- source: <url> -->` marker
-  per block, and one block per configured page. `generateLlmsFull` accepts an
-  optional `{ generated }` date so a build can pin it.
+  per block, and one block per configured page. The date comes from
+  `SiteConfig.lastUpdated`, then the build date; a library caller can override
+  it with `{ generated }`.
 
 
 ## [0.7.0] - 2026-10-25
