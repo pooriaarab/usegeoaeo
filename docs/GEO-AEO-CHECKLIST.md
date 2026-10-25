@@ -97,6 +97,8 @@ unfurlers cannot build a better summary.
 
 **How geoaeo covers it.**
 - Audit checks `title` and `description` on every inspected page (all-pages pass rule).
+- Audit check `ai-summary` requires `<meta name="ai-summary">` on every inspected page:
+  one or two factual sentences written for a model that has already fetched the page.
 - Works for HTML and for common Next-style metadata source patterns.
 
 **Not covered yet.** No length or uniqueness scoring, no keyword stuffing detection, no
@@ -220,10 +222,15 @@ route that serves Markdown) is easier to quote than a heavy HTML document.
 **How geoaeo covers it.**
 - Audit check `markdown` looks for local `*.md` mirrors (excluding README-like names) or,
   for live URLs, successful fetch of `{page}.md`.
+- `generateMarkdownPage`, `markdownHeaders`, and `markdownResponse` build the mirror and
+  the headers it needs: `text/markdown`, `X-Markdown-Tokens`, `X-Robots-Tag: noindex`,
+  `Content-Location`, `Cache-Control`, CORS, and `Vary: Accept` on a negotiated response.
+- `geoaeo gen mdmirror` writes the page shape: summary, canonical, last updated, body,
+  related links.
 - Weight 6.
 
-**Not covered yet.** `gen` does not emit per-page Markdown mirrors. `init` focuses on
-artifact routes/files, not a full MD mirror tree. No parity check (HTML vs MD content).
+**Not covered yet.** `gen` does not walk a site and emit one mirror per route. No parity
+check (HTML vs MD content).
 
 ---
 

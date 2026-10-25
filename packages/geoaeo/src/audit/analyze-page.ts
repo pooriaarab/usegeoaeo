@@ -93,6 +93,7 @@ function htmlSignalValue(key: keyof PageSignals, ctx: HtmlContext): PageSignals[
     imageAlt: () => checkHtmlImageAlt(ctx),
     metaRobotsOk: () => !/noindex/i.test(ctx.$('meta[name="robots"]').attr("content") ?? ""),
     hreflang: () => ctx.$('link[rel="alternate"][hreflang]').length > 0,
+    aiSummary: () => !!ctx.$('meta[name="ai-summary"]').attr("content")?.trim().length,
   };
   return table[key]?.() as PageSignals[keyof PageSignals];
 }
@@ -194,6 +195,7 @@ function analyzeHtml(source: string): PageSignals {
     "imageAlt",
     "metaRobotsOk",
     "hreflang",
+    "aiSummary",
   ];
   const result = {} as PageSignals;
   for (const key of keys) result[key] = htmlSignalValue(key, ctx) as never;
@@ -231,6 +233,7 @@ function sourceDocumentSignals(source: string): Record<string, () => unknown> {
         /<h[1-6][^>]*>[^<]*frequently asked questions/i,
         /<h[1-6][^>]*>\s*faqs?\s*</i,
       ]),
+    aiSummary: () => sourceHas(source, [/name=["']ai-summary["']/i, /["']ai-summary["']\s*:/i]),
   };
 }
 
@@ -316,6 +319,7 @@ function analyzeSource(source: string): PageSignals {
     "imageAlt",
     "metaRobotsOk",
     "hreflang",
+    "aiSummary",
   ];
   const result = {} as PageSignals;
   for (const key of keys) result[key] = sourceSignalValue(key, source) as never;
