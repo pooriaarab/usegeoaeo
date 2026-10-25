@@ -18,4 +18,6 @@ export default defineConfig({
   ],
   faq: [{ question: "Does it post automatically?", answer: "No. You review and send each draft." }],
   pages: ["pricing", "faq"],
+  // false disallows training crawlers and keeps answer engines allowed.
+  allowTrainingCrawlers: true,
 });

@@ -16,6 +16,22 @@ All notable changes to geoaeo are recorded here. The format follows
   `[identity]` and `[permissions]`, or a route whose source calls
   `generateAiTxt`. The `llms` and `llms-full` weights drop from 5 to 4 so the
   checks still sum to 100.
+- `AI_SEARCH_AGENTS` and `AI_TRAINING_AGENTS` split the crawler list.
+  `Claude-SearchBot`, `Claude-User`, and `Perplexity-User` join the search list.
+  `SiteConfig.allowTrainingCrawlers` defaults to true; false disallows only the
+  training crawlers. The `ai-crawlers` check reads the search list, so an
+  opted-out site is not reported as blocking itself.
+- `robots.txt` now disallows every path in `AI_EXCLUDED_PATHS` for all agents
+  and points at `/llms.txt` and `/ai.txt`.
+
+### Changed
+
+- `llms.txt` gains a `Core pages` section and a `Machine-readable` section that
+  links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
+- `llms-full.txt` gains a `Generated:` date, a `<!-- source: <url> -->` marker
+  per block, and one block per configured page. `generateLlmsFull` accepts an
+  optional `{ generated }` date so a build can pin it.
+
 
 ## [0.7.0] - 2026-10-25
 
