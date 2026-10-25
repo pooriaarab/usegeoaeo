@@ -56,4 +56,5 @@ export interface PageSignals {
   imageAlt: boolean;
   metaRobotsOk: boolean;
   hreflang: boolean;
+  aiSummary: boolean;
 }
