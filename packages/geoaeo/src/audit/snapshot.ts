@@ -68,6 +68,16 @@ interface FetchedText {
 
 const EMPTY_FETCH: FetchedText = { status: 0, text: "", contentType: "", xRobotsTag: "" };
 const MAX_REDIRECTS = 5;
+async function readBody(response: Response, current: URL, policy: Policy): Promise<FetchedText> {
+  if (response.url && new URL(response.url).host !== current.host) {
+    await response.body?.cancel().catch(() => undefined);
+    return EMPTY_FETCH;
+  }
+  const text = await readLimited(response, policy);
+  if (text === undefined) return EMPTY_FETCH;
+  // prettier-ignore
+  return { status: response.status, text, contentType: response.headers.get("content-type") ?? "", xRobotsTag: response.headers.get("x-robots-tag") ?? "" };
+}
 async function fetchText(rawUrl: string, policy: Policy): Promise<FetchedText> {
   try {
     let current = new URL(rawUrl);
@@ -83,14 +93,7 @@ async function fetchText(rawUrl: string, policy: Policy): Promise<FetchedText> {
         requestUrl = current.href;
         continue;
       }
-      if (response.url && new URL(response.url).host !== current.host) {
-        await response.body?.cancel().catch(() => undefined);
-        return EMPTY_FETCH;
-      }
-      const text = await readLimited(response, policy);
-      if (text === undefined) return EMPTY_FETCH;
-      // prettier-ignore
-      return { status: response.status, text, contentType: response.headers.get("content-type") ?? "", xRobotsTag: response.headers.get("x-robots-tag") ?? "" };
+      return await readBody(response, current, policy);
     }
     return EMPTY_FETCH;
   } catch {

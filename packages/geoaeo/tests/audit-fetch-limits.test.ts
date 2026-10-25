@@ -107,10 +107,12 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
       net.Socket.prototype.connect = original;
     }
   });
-  it("decodes bodies, accepts empty statuses, and dials IPv6 literals", async () => {
+  it("decodes bodies, accepts empty statuses, dials IPv6, and settles a 101", async () => {
     const html = "<html><h1>Decoded</h1></html>";
     const packed = zlib.gzipSync(Buffer.alloc(MAX_RESPONSE_BYTES + 100, 120));
     const server = http.createServer((req, res) => {
+      if (req.url === "/101")
+        return res.writeHead(101, { Connection: "Upgrade", Upgrade: "websocket" }).end();
       const status = Number(req.url?.slice(1));
       if (status === 204 || status === 205 || status === 304) return res.writeHead(status).end();
       if (req.url === "/gz" || req.url === "/fat") {
@@ -136,21 +138,7 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
       const fat = await read(`http://127.0.0.1:${port}/fat`);
       expect(fat[1]).toBeUndefined();
       expect(fat[2]).toBeGreaterThan(packed.byteLength);
-    } finally {
-      server.close();
-    }
-  });
-  it("settles a request that answers with 101", async () => {
-    const server = http.createServer((_req, res) =>
-      res.writeHead(101, { Connection: "Upgrade", Upgrade: "websocket" }).end(),
-    );
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const port = (server.address() as net.AddressInfo).port;
-    const url = new URL(`http://127.0.0.1:${port}/`);
-    const policy = createFetchPolicy(url);
-    try {
-      await destinationAllowed(url, policy);
-      await expect(openAudit(url.href, url, policy)).rejects.toThrow("upgrade");
+      await expect(read(`http://127.0.0.1:${port}/101`)).rejects.toThrow("upgrade");
     } finally {
       server.close();
     }
