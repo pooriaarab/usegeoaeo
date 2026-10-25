@@ -6,7 +6,14 @@ import { createFetchPolicy, destinationAllowed, openAudit, readLimited, type Aud
 import { findArtifact, readOptional, walkFiles } from "./utils.js";
 
 async function collectArtifacts(files: string[]): Promise<Map<string, string>> {
-  const artifactNames = ["llms.txt", "llms-full.txt", "ai.txt", "sitemap.xml", "robots.txt", "webmcp.json"];
+  const artifactNames = [
+    "llms.txt",
+    "llms-full.txt",
+    "ai.txt",
+    "sitemap.xml",
+    "robots.txt",
+    "webmcp.json",
+  ];
   const artifacts = new Map<string, string>();
   for (const name of artifactNames) {
     const file =
