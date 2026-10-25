@@ -1,4 +1,4 @@
-import { generatePoppy } from "geoaeo";
+import { generatePoppy } from "geoaeo/poppy";
 import { NextResponse } from "next/server";
 
 import siteConfig from "../../../geoaeo.config";

@@ -5,6 +5,8 @@ export default defineConfig({
     cli: "src/cli.ts",
     mcp: "src/mcp.ts",
     index: "src/index.ts",
+    config: "src/config.ts",
+    poppy: "src/generators/poppy.ts",
   },
   format: ["esm", "cjs"],
   dts: true,

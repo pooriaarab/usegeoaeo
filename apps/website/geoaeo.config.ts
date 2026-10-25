@@ -1,4 +1,4 @@
-import { defineConfig } from "geoaeo";
+import { defineConfig } from "geoaeo/config";
 
 export default defineConfig({
   siteName: "geoaeo",
