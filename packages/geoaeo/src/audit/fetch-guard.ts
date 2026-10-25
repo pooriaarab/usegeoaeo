@@ -107,6 +107,10 @@ export async function destinationAllowed(url: URL, policy: AuditFetchPolicy): Pr
   if (!policy.allowPrivate && isLocalName(url.hostname)) return false;
   if (rememberLiteral(url, policy)) return true;
   if (literalIp(url.hostname)) return false;
+  // Workers cannot resolve a name: dns.lookup throws there, and caching that
+  // failure would refuse every public host. Workers egress reaches the public
+  // internet only, so the host and literal checks above are what it can enforce.
+  if (onWorkers()) return true;
   return (await resolvePinned(url.hostname, policy.dnsCache, policy.allowPrivate)) !== false;
 }
 function lookupPinned(

@@ -70,6 +70,17 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
     await auditTarget(target);
     expect(pulled.n).toBeLessThanOrEqual(8 * 1024 * 1024 + chunk.byteLength * 6);
   });
+  it("allows a public host on Workers, where a name cannot be resolved", async () => {
+    vi.stubGlobal("navigator", { userAgent: "Cloudflare-Workers" });
+    try {
+      dnsState.impl = () => Promise.reject(new Error("dns down"));
+      const policy = createFetchPolicy(new URL(target));
+      expect(await destinationAllowed(new URL(`${target}/page`), policy)).toBe(true);
+      expect(await destinationAllowed(new URL("https://elsewhere.example/"), policy)).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   it("connects to the validated address and stops when DNS fails", async () => {
     let calls = 0;
     dnsState.impl = async () => [
