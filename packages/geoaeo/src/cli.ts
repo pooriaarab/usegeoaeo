@@ -7,6 +7,7 @@ import { initProject } from "./commands/init.js";
 import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from "./commands/gen.js";
 import { JSON_LD_KINDS, type JsonLdKind } from "./generators/index.js";
 import { humanizeGlob } from "./commands/humanize.js";
+import { submitIndexNow } from "./submit.js";
 
 async function assertCliPath(input: string, allowHttpUrl = false): Promise<void> {
   await assertAllowedPath(input, readAllowedRoots(), allowHttpUrl);
@@ -93,6 +94,35 @@ program
     }
     if (options.check || !options.write) process.exitCode = findings ? 1 : 0;
   });
+
+program
+  .command("submit <url...>")
+  .description("Announce URLs to IndexNow, which reaches Bing, Yandex, Naver, Seznam, and Yep.")
+  .option("--host <host>", "host that owns the URLs (defaults to the first URL's host)")
+  .option("--key <key>", "IndexNow key, served at https://<host>/<key>.txt (or INDEXNOW_KEY)")
+  .option("--key-location <url>", "absolute URL of the key file")
+  .option("--json", "print JSON instead of the summary")
+  .action(
+    async (
+      urls: string[],
+      options: { host?: string; key?: string; keyLocation?: string; json?: boolean },
+    ) => {
+      const key = options.key ?? process.env.INDEXNOW_KEY;
+      if (!key) throw new Error("submit: pass --key or set INDEXNOW_KEY");
+      const host = options.host ?? new URL(urls[0]).hostname;
+      const result = await submitIndexNow({
+        host,
+        key,
+        keyLocation: options.keyLocation,
+        urls,
+      });
+      process.stdout.write(
+        options.json
+          ? `${JSON.stringify(result, null, 2)}\n`
+          : `sent ${result.sent} URL(s) in ${result.batches} batch(es), last status ${result.status}\n`,
+      );
+    },
+  );
 
 program
   .command("mcp")

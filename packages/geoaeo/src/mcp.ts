@@ -13,6 +13,8 @@ import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from ".
 import { ConfigLoadError } from "./commands/load-config.js";
 import { JSON_LD_KINDS, type JsonLdKind } from "./generators/index.js";
 import { humanizeGlob } from "./commands/humanize.js";
+import { registerSubmitTool } from "./mcp-submit.js";
+import type { RegisterTool } from "./mcp-types.js";
 import type { HumanizeFinding } from "./humanize.js";
 
 // Built from the shared arrays so a new artifact or kind cannot land in one face only.
@@ -46,16 +48,19 @@ const artifactSchema = genArtifactSchema.describe(
 const artifactTypeSchema = genTypeSchema
   .optional()
   .describe("Applies only when artifact is jsonld.");
+
 export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
 export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
 const MCP_INSTRUCTIONS = [
-  "Call only audit, gen, or humanize.",
+  "Call only audit, gen, humanize, or submit.",
   "Audit a local directory or an http(s) URL first.",
   "audit returns a report and writes no files.",
   "gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text.",
   "It writes no file.",
   "humanize writes a file only when write is true and the text changes.",
+  "submit posts URLs to IndexNow, which reaches Bing, Yandex, Naver, Seznam, and Yep.",
+  "It sends a request to a third party; ask the user before you call it.",
   "Ask the user before you set write.",
   "When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root.",
   "An http(s) audit URL stays allowed.",
@@ -197,18 +202,6 @@ export async function genHandler(
   }
 }
 
-type RegisterTool = (
-  name: string,
-  config: {
-    title: string;
-    description: string;
-    inputSchema: Record<string, unknown>;
-    outputSchema?: unknown;
-    annotations: Record<string, boolean>;
-  },
-  handler: (...args: never[]) => unknown,
-) => void;
-
 function registerAuditTool(
   registerTool: RegisterTool,
   allowedRoots: readonly string[] | undefined,
@@ -283,6 +276,7 @@ export function createMcpServer(
   registerAuditTool(registerTool, allowedRoots);
   registerGenTool(registerTool, allowedRoots);
   registerHumanizeTool(registerTool, allowedRoots);
+  registerSubmitTool(registerTool);
   // registerTool merges tools.listChanged back to true. These three tools never change.
   server.server.registerCapabilities({ tools: { listChanged: false } });
   return server;

@@ -106,6 +106,32 @@ describe("createMcpServer", () => {
     expect(text.text.startsWith(`${structured.target}: ${structured.score}/100`)).toBe(true);
   });
 
+  it("submits to IndexNow and returns text plus a structured count", async () => {
+    const sent: Array<{ url: string; body: { keyLocation: string } }> = [];
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      sent.push({ url: String(input), body: JSON.parse(String(init?.body)) });
+      return new Response(null, { status: 200 });
+    }) as typeof fetch;
+    try {
+      const result = await callMcpTool("submit", {
+        urls: ["https://public.example/"],
+        key: "06626485515dfd3425d8166046126bbb",
+        keyLocation: "https://public.example/keys/indexnow.txt",
+      });
+      const text = result.content[0];
+      if (text.type !== "text") throw new Error("expected a text content block");
+      expect(text.text).toBe("sent 1 URL(s) in 1 batch(es), last status 200");
+      expect(result.structuredContent).toMatchObject({ sent: 1, batches: 1, status: 200 });
+      expect(sent[0]).toEqual({
+        url: "https://api.indexnow.org/indexnow",
+        body: expect.objectContaining({ keyLocation: "https://public.example/keys/indexnow.txt" }),
+      });
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
   it("returns a humanize count line plus a structured findings array", async () => {
     const result = await callMcpTool("humanize", { glob: "examples/static-html/README.md" });
     const text = result.content[0];
@@ -192,7 +218,7 @@ describe("MCP tools over an in-memory transport", () => {
     await withClient(async (client) => {
       expect(client.getServerCapabilities()?.tools?.listChanged).toBe(false);
       expect(client.getInstructions()).toBe(
-        "Call only audit, gen, or humanize. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. Ask the user before you set write. When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root. An http(s) audit URL stays allowed. A path outside the roots is an error.",
+        "Call only audit, gen, humanize, or submit. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. submit posts URLs to IndexNow, which reaches Bing, Yandex, Naver, Seznam, and Yep. It sends a request to a third party; ask the user before you call it. Ask the user before you set write. When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root. An http(s) audit URL stays allowed. A path outside the roots is an error.",
       );
     });
   });
@@ -201,7 +227,7 @@ describe("MCP tools over an in-memory transport", () => {
     await withClient(async (client) => {
       const { tools } = await client.listTools();
       const byName = new Map(tools.map((tool) => [tool.name, tool]));
-      expect(tools.map((tool) => tool.name).sort()).toEqual(["audit", "gen", "humanize"]);
+      expect(tools.map((tool) => tool.name).sort()).toEqual(["audit", "gen", "humanize", "submit"]);
       for (const tool of tools) {
         expect(typeof tool.title, `${tool.name} needs a title`).toBe("string");
         expect(typeof tool.description).toBe("string");
