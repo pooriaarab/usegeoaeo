@@ -6,6 +6,11 @@ export interface LlmsFullOptions {
   generated?: string;
 }
 
+/** A description that already ends in a stop keeps one, not two. */
+function sentence(text: string): string {
+  return text.replace(/[.!?]+$/, "");
+}
+
 function toolsBlock(config: SiteConfig): string {
   if (config.tools.length === 0) return "- No tools listed.";
   return config.tools
@@ -69,7 +74,7 @@ export function generateLlms(config: SiteConfig): string {
 
 > ${config.description}
 
-${config.siteName} is ${config.description}.${platformLine}
+${config.siteName} is ${sentence(config.description)}.${platformLine}
 
 ## Core pages
 
@@ -116,7 +121,7 @@ Generated: ${generated}
 <!-- source: ${absoluteUrl(config.siteUrl, "/")} -->
 ## What it is
 
-${config.siteName} is ${config.description}.
+${config.siteName} is ${sentence(config.description)}.
 
 ## Platforms
 

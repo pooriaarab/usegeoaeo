@@ -81,6 +81,12 @@ describe("llms.txt for agents", () => {
     expect(output).toContain("- [faq](https://reply.example/faq): The faq page.");
   });
 
+  it("does not double the stop when the description ends in one", () => {
+    const output = generateLlms(config);
+    expect(output).toContain("Reply Kit is Draft replies for social posts.\n");
+    expect(output).not.toContain("social posts..");
+  });
+
   it("links the machine-readable files", () => {
     const output = generateLlms(config);
     expect(output).toContain("## Machine-readable");
