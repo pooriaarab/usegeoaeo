@@ -15,12 +15,12 @@ function includedPaths(config: SiteConfig): string[] {
 /**
  * ai.txt states how AI systems may use the site: the ai-txt spec v1.1.1.
  * Facts come from SiteConfig so the identity block matches llms.txt and the
- * Organization JSON-LD. Scope exclusions are the shared private-path list, so
- * robots.txt and ai.txt cannot disagree about what is private.
+ * Organization JSON-LD. Scope exclusions come from AI_EXCLUDED_PATHS.
  */
 export function generateAiTxt(config: SiteConfig, options: AiTxtOptions = {}): string {
   const lastUpdated = options.lastUpdated ?? new Date().toISOString().slice(0, 10);
   const contact = options.contact ?? config.siteUrl;
+  const contactLine = /^https?:\/\//.test(contact) ? `url: ${contact}` : `email: ${contact}`;
   const included = includedPaths(config)
     .map((path) => `include: ${path}`)
     .join("\n");
@@ -54,7 +54,7 @@ ${included}
 ${excluded}
 
 [contact]
-url: ${contact}
+${contactLine}
 
 Last updated: ${lastUpdated}
 `;
