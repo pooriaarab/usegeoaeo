@@ -60,6 +60,9 @@ describe("robots.txt AI crawler policy", () => {
     const output = generateRobots(config);
     expect(output).toContain("User-agent: *\nAllow: /\nDisallow: /api/");
     expect(output).toContain("Disallow: /auth/");
+    for (const agent of [...AI_SEARCH_AGENTS, ...AI_TRAINING_AGENTS]) {
+      expect(blockedAgents(output, [agent], "/auth/")).toEqual([agent]);
+    }
   });
 
   it("points at llms.txt and ai.txt and keeps the sitemap line", () => {
