@@ -47,16 +47,18 @@ content. Client-only shells with empty first HTML give them nothing to index or 
 the systems you want to cite you.
 
 **How geoaeo covers it.**
-- `geoaeo gen robots` emits a robots policy that includes a `Sitemap:` line from config
-  and an `Allow: /` group for each named AI crawler.
+- `geoaeo gen robots` emits a robots policy that includes a `Sitemap:` line from config,
+  an `Allow: /` group for each answer-engine crawler, a separate group for training
+  crawlers, and a `Disallow` line for every private path.
 - Audit check `robots` requires a robots artifact that mentions a user-agent policy and a
   sitemap URL.
-- Audit check `ai-crawlers` parses the policy's user-agent groups and fails when a named
-  AI crawler (GPTBot, ClaudeBot, PerplexityBot, and peers) is disallowed from `/`. A
-  crawler with no block of its own inherits the `*` group.
+- Audit check `ai-crawlers` parses the policy's user-agent groups and fails when an
+  answer-engine crawler (OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User,
+  PerplexityBot, Perplexity-User) is disallowed from `/`. Training crawlers are reported
+  only when the site has not opted out. A crawler with no block of its own inherits the
+  `*` group.
 
-**Not covered yet.** No AI-bot allowlist presets beyond the generator's fixed list, no
-live robots negotiation beyond fetching `/robots.txt`.
+**Not covered yet.** No live robots negotiation beyond fetching `/robots.txt`.
 
 ### 1.3 Stable, linkable URLs
 
@@ -171,7 +173,9 @@ everything.
 
 **How geoaeo covers it.**
 - `geoaeo gen llms` and `geoaeo init` (static or Next route).
-- Audit check `llms` (weight 10).
+- The map carries `Core pages`, `Free tools`, `Plans`, and a `Machine-readable` section
+  that links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
+- Audit check `llms` (weight 4).
 
 ### 4.2 Long map (`/llms-full.txt`)
 
@@ -180,7 +184,9 @@ agents that will read a larger context window.
 
 **How geoaeo covers it.**
 - `geoaeo gen llms-full`.
-- Audit check `llms-full` (weight 10), including section-shape heuristics used by the
+- The file opens with a `Generated:` date, marks each block with
+  `<!-- source: <url> -->`, and adds one block per configured page.
+- Audit check `llms-full` (weight 4), including section-shape heuristics used by the
   generator.
 
 **Not covered yet.** No automatic change-detection publish, no content-hash freshness

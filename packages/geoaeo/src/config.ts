@@ -25,6 +25,8 @@ export interface SiteConfig {
   plans?: PlanConfig[];
   faq?: FaqConfig[];
   pages?: string[];
+  /** Default true. false disallows training crawlers and keeps answer engines allowed. */
+  allowTrainingCrawlers?: boolean;
 }
 
 export function defineConfig(config: SiteConfig): SiteConfig {
@@ -36,6 +38,7 @@ export function defineConfig(config: SiteConfig): SiteConfig {
     plans: config.plans ?? [],
     faq: config.faq ?? [],
     pages: config.pages ?? [],
+    allowTrainingCrawlers: config.allowTrainingCrawlers ?? true,
   };
 }
 
