@@ -16,6 +16,7 @@ All notable changes to geoaeo are recorded here. The format follows
   `[identity]` and `[permissions]`, or a route whose source calls
   `generateAiTxt`. The `llms` and `llms-full` weights drop from 5 to 4 so the
   checks still sum to 100.
+
 ## [0.7.0] - 2026-10-25
 
 ### Added
