@@ -76,7 +76,7 @@ function AuditCommand() {
         <code>geoaeo audit &lt;target&gt;</code>
       </h2>
       <p>
-        Audit a live URL or a local directory. Scores 0–100 across 33 weighted checks including
+        Audit a live URL or a local directory. Scores 0–100 across 34 weighted checks including
         answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.
       </p>
       <pre>

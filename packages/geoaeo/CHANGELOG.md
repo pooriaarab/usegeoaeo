@@ -8,13 +8,20 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ### Added
 
+- `generateMarkdownPage`, `markdownHeaders`, and `markdownResponse` build a markdown
+  mirror and the response around it: `text/markdown`, `X-Markdown-Tokens`,
+  `X-Robots-Tag: noindex, follow`, `Content-Location`, `Cache-Control`, CORS, and
+  `Vary: Accept` when the response was negotiated.
+- Audit check `ai-summary` (34 checks) requires `<meta name="ai-summary">` on every
+  inspected page. `title` and `description` drop from 4 to 3 so the checks still sum
+  to 100.
 - `geoaeo gen ai-txt` writes an AI usage policy in the ai-txt v1.1.1 shape:
   `[identity]`, `[permissions]`, `[restrictions]`, `[attribution]`, `[scope]`,
   and `[contact]`. Facts come from `SiteConfig`. Scope exclusions come from
   `AI_EXCLUDED_PATHS` in `constants.ts`. `SiteConfig.contact` and
   `SiteConfig.lastUpdated` set the contact line and the date, so the CLI and
   MCP surfaces reach them from config; a library caller can override both.
-- Audit check `ai-txt` (33 checks). It passes a live `/ai.txt` that carries
+- Audit check `ai-txt` (34 checks). It passes a live `/ai.txt` that carries
   `[identity]` and `[permissions]`, or a route whose source calls
   `generateAiTxt`. The `llms` and `llms-full` weights drop from 5 to 4 so the
   checks still sum to 100.
@@ -28,6 +35,9 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ### Changed
 
+- `generateMdmirror` writes the full page shape: summary, canonical URL, last updated,
+  body, and related links. A caller that passes no page still gets the site root as the
+  canonical URL.
 - `llms.txt` gains a `Core pages` section and a `Machine-readable` section that
   links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
 - `llms-full.txt` gains a `Generated:` date, a `<!-- source: <url> -->` marker
