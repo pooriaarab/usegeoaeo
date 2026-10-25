@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  WRANGLER_VERSION: "4.127.1"
+  WRANGLER_VERSION: "4.152.0"
   PREVIEW_WORKER: usegeoaeo-website-staging
   MARKER: "<!-- worker-preview -->"
   TURBO_API: ${{ vars.TURBO_API }}
