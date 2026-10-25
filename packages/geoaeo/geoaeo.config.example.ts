@@ -20,4 +20,6 @@ export default defineConfig({
   pages: ["pricing", "faq"],
   // false disallows training crawlers and keeps answer engines allowed.
   allowTrainingCrawlers: true,
+  // Contact line for ai.txt. lastUpdated pins the ai.txt and llms-full.txt date.
+  contact: "hello@example.com",
 });
