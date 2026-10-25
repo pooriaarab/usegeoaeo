@@ -96,6 +96,18 @@ describe("llms-full.txt for agents", () => {
     expect(output).toContain("Generated: 2026-10-25");
   });
 
+  it("pins the date from the site config, so the CLI and MCP can reach it", () => {
+    const configured = defineConfig({ ...config, lastUpdated: "2026-03-04" });
+    const output = generateLlmsFull(configured);
+    expect(output).toContain("Generated: 2026-03-04");
+  });
+
+  it("lets the caller override the configured date", () => {
+    const configured = defineConfig({ ...config, lastUpdated: "2026-03-04" });
+    const output = generateLlmsFull(configured, { generated: "2026-01-02" });
+    expect(output).toContain("Generated: 2026-01-02");
+  });
+
   it("marks each block with its source URL", () => {
     const output = generateLlmsFull(config, { generated: "2026-10-25" });
     expect(output).toContain("<!-- source: https://reply.example/ -->");
