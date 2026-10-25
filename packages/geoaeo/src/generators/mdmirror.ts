@@ -19,7 +19,7 @@ export function generateMdmirror(config: SiteConfig, page: MdmirrorPage = {}): s
     // would print the same sentence twice.
     summary: page.body ? config.description : undefined,
     canonical: absoluteUrl(config.siteUrl, page.path ?? "/"),
-    lastUpdated: page.lastUpdated,
+    lastUpdated: page.lastUpdated ?? config.lastUpdated,
     body: page.body ?? config.description,
     related: page.related,
   });

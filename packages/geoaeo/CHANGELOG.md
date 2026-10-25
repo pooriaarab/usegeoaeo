@@ -35,9 +35,10 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ### Changed
 
-- `generateMdmirror` writes the full page shape: summary, canonical URL, last updated,
-  body, and related links. A caller that passes no page still gets the site root as the
-  canonical URL.
+- `generateMdmirror` writes the page shape: summary, canonical URL, last updated, body,
+  and related links. It defaults the canonical URL to the site root and the date to
+  `SiteConfig.lastUpdated`, so `geoaeo gen mdmirror` carries both; a route that serves
+  one page passes its path and related links.
 - `llms.txt` gains a `Core pages` section and a `Machine-readable` section that
   links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
 - `llms-full.txt` gains a `Generated:` date, a `<!-- source: <url> -->` marker

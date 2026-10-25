@@ -50,7 +50,10 @@ export function markdownHeaders(
     "access-control-allow-origin": "*",
   });
   if (options.negotiated) headers.set("vary", "Accept");
-  if (page.lastUpdated) headers.set("last-modified", page.lastUpdated);
+  const modified = page.lastUpdated ? new Date(page.lastUpdated) : undefined;
+  if (modified && !Number.isNaN(modified.getTime())) {
+    headers.set("last-modified", modified.toUTCString());
+  }
   return headers;
 }
 
