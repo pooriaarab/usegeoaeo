@@ -55,7 +55,8 @@ describe("ai-crawlers audit check", () => {
     const aiCrawlers = report.checks.find((check) => check.id === "ai-crawlers");
     expect(robots?.passed).toBe(true);
     expect(aiCrawlers?.passed).toBe(false);
-    expect(aiCrawlers?.details).toBe("Blocked: GPTBot, ClaudeBot, PerplexityBot, Google-Extended.");
+    // Training crawlers stay out of the report: only answer engines decide citations.
+    expect(aiCrawlers?.details).toBe("Blocked: Claude-SearchBot, PerplexityBot.");
   });
 
   it("passes on the output of generateRobots()", async () => {
