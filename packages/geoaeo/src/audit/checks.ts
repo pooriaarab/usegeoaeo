@@ -15,6 +15,7 @@ import {
 const ARTIFACT_ALIASES: Array<[string, string]> = [
   ["__llms", "llms.txt"],
   ["__llmsFull", "llms-full.txt"],
+  ["__aiTxt", "ai.txt"],
   ["__sitemap", "sitemap.xml"],
   ["__robots", "robots.txt"],
   ["__webmcp", "webmcp"],

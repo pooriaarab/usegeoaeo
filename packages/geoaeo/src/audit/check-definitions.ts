@@ -9,6 +9,7 @@ import {
   isSitemapXml,
   isPoppyDocument,
   isWebmcpManifest,
+  isAiTxt,
 } from "./check-predicates.js";
 
 function artifactChecks(): CheckDef[] {
@@ -16,16 +17,23 @@ function artifactChecks(): CheckDef[] {
     {
       id: "llms",
       label: "/llms.txt",
-      weight: 5,
+      weight: 4,
       details: "Short site map is present.",
       passed: (ctx) => isShortSiteMap(ctx.artifacts.get("__llms")),
     },
     {
       id: "llms-full",
       label: "/llms-full.txt",
-      weight: 5,
+      weight: 4,
       details: "Full site map is present.",
       passed: (ctx) => isFullSiteMap(ctx.artifacts.get("__llmsFull")),
+    },
+    {
+      id: "ai-txt",
+      label: "/ai.txt",
+      weight: 2,
+      details: "An AI usage policy is published at /ai.txt.",
+      passed: (ctx) => isAiTxt(ctx.artifacts.get("__aiTxt")),
     },
     {
       id: "sitemap",
