@@ -69,7 +69,7 @@
     },
     "packages/geoaeo": {
       "name": "geoaeo",
-      "version": "0.8.0",
+      "version": "0.8.1",
       "bin": {
         "geoaeo": "dist/cli.js",
         "geoaeo-mcp": "dist/mcp.js",
