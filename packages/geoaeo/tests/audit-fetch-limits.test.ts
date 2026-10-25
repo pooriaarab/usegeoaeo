@@ -80,6 +80,9 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
     net.Socket.prototype.connect = function connect(this: net.Socket, ...args: unknown[]) {
       this.on("lookup", (_error: Error | null, address: string) => {
         hosts.push(address);
+        // The request may have detached its socket listeners by now, so an
+        // unhandled destroy error would fail the run instead of the request.
+        this.on("error", () => {});
         this.destroy(new Error("pin-probe"));
       });
       return original.apply(this, args as never);
