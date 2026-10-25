@@ -4,7 +4,7 @@ import zlib from "node:zlib";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { auditTarget } from "../src/audit.js";
 // prettier-ignore
-import { MAX_RESPONSE_BYTES, createFetchPolicy, destinationAllowed, openAudit, readLimited } from "../src/audit/fetch-guard.js";
+import { MAX_AUDIT_BYTES, MAX_RESPONSE_BYTES, createFetchPolicy, destinationAllowed, openAudit, readLimited } from "../src/audit/fetch-guard.js";
 const dnsState = vi.hoisted(() => ({
   impl: null as null | (() => Promise<Array<{ address: string; family: number }>>),
 }));
@@ -70,6 +70,17 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
     };
     await auditTarget(target);
     expect(pulled.n).toBeLessThanOrEqual(8 * 1024 * 1024 + chunk.byteLength * 6);
+  });
+  it("refuses a private answer behind a replaced fetch", async () => {
+    globalThis.fetch = async () => new Response("", { status: 404 });
+    dnsState.impl = async () => [{ address: "127.0.0.1", family: 4 }];
+    const policy = createFetchPolicy(new URL(target));
+    expect(await destinationAllowed(new URL(`${target}/`), policy)).toBe(false);
+  });
+  it("opens no connection once the audit budget is spent", async () => {
+    const policy = createFetchPolicy(new URL(target));
+    policy.bytes = MAX_AUDIT_BYTES;
+    await expect(openAudit(target, new URL(target), policy)).rejects.toThrow("budget-spent");
   });
   it("allows a public host on Workers, where a name cannot be resolved", async () => {
     vi.stubGlobal("navigator", { userAgent: "Cloudflare-Workers" });
@@ -145,6 +156,7 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
   });
   it("survives corrupt gzip, cut bodies, and aborted compressed reads", async () => {
     const badGzip = Buffer.from([0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff]);
+    let homeHits = 0;
     const cut = (
       res: http.ServerResponse,
       head: http.OutgoingHttpHeaders,
@@ -164,7 +176,10 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
           zlib.gzipSync("x".repeat(8_000)).subarray(0, 40),
         );
       if (req.url === "/robots.txt") return cut(res, {}, "User-agent: *\n");
-      if (req.url === "/") return res.end("<html><body><h1>Home</h1></body></html>");
+      if (req.url === "/") {
+        homeHits += 1;
+        return res.end("<html><body><h1>Home</h1></body></html>");
+      }
       res.writeHead(404).end();
     });
     await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -173,6 +188,8 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
       // prettier-ignore
       const report = await Promise.race([auditTarget(`http://127.0.0.1:${port}/`), new Promise<never>((_, reject) => setTimeout(() => reject(new Error("audit hung past deadline")), 12_000))]);
       expect(report.score).toBeGreaterThanOrEqual(0);
+      // A corrupt artifact must not stop the home page from being read.
+      expect(homeHits).toBe(1);
     } finally {
       server.close();
     }

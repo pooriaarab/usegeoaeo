@@ -1,6 +1,6 @@
 # geoaeo
 
-<a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.6.0"/></a>
+<a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.7.0"/></a>
 [![Downloads/month](https://img.shields.io/npm/dm/geoaeo)](https://www.npmjs.com/package/geoaeo)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit)
 
