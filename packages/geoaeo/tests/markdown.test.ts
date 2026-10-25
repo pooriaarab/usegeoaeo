@@ -83,7 +83,7 @@ describe("markdownHeaders", () => {
     const headers = markdownHeaders(page);
     expect(headers.get("cache-control")).toContain("s-maxage=3600");
     expect(headers.get("access-control-allow-origin")).toBe("*");
-    expect(headers.get("last-modified")).toBe("2026-10-25");
+    expect(headers.get("last-modified")).toBe("Sun, 25 Oct 2026 00:00:00 GMT");
   });
 });
 
@@ -106,6 +106,11 @@ describe("generateMdmirror", () => {
     const output = generateMdmirror(config);
     expect(output).toContain("Canonical: https://reply.example/");
     expect(output.match(/Draft replies for social posts\./g)).toHaveLength(1);
+  });
+
+  it("takes the date from the site config, so the CLI can reach it", () => {
+    const configured = defineConfig({ ...config, lastUpdated: "2026-03-04" });
+    expect(generateMdmirror(configured)).toContain("Last updated: 2026-03-04");
   });
 });
 
