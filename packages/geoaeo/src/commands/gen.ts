@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { loadSiteConfig } from "./load-config.js";
 import {
+  generateAiTxt,
   generateHreflang,
   generateJsonLd,
   generateLlms,
@@ -20,6 +21,7 @@ import type { SiteConfig } from "../config.js";
 export const GENERATED_ARTIFACTS = [
   "llms",
   "llms-full",
+  "ai-txt",
   "jsonld",
   "webmcp",
   "poppy",
@@ -41,6 +43,7 @@ function renderArtifact(
   const map: Record<GeneratedArtifact, (c: SiteConfig, k: JsonLdKind) => string> = {
     llms: (c) => generateLlms(c),
     "llms-full": (c) => generateLlmsFull(c),
+    "ai-txt": (c) => generateAiTxt(c),
     jsonld: (c, k) => `${JSON.stringify(generateJsonLd(c, k), null, 2)}\n`,
     webmcp: (c) => `${JSON.stringify(generateWebmcp(c), null, 2)}\n`,
     poppy: (c) => `${JSON.stringify(generatePoppy(c), null, 2)}\n`,

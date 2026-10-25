@@ -12,7 +12,7 @@ This project follows the `agentification` skill (pooriaarab/skills).
 
 ## What geoaeo does
 
-geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates these artifacts: `llms`, `llms-full`, `jsonld`, `webmcp`, `poppy`, `sitemap`, `robots`, `ogimage`, `rss`, `hreflang`, `mdmirror`.
+geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates these artifacts: `llms`, `llms-full`, `ai-txt`, `jsonld`, `webmcp`, `poppy`, `sitemap`, `robots`, `ogimage`, `rss`, `hreflang`, `mdmirror`.
 
 ## Who it is for
 
@@ -21,7 +21,7 @@ Indie hackers to enterprise teams who want their site cited by ChatGPT, Claude, 
 ## How an agent should use it
 
 - Library: `import { auditTarget, generateLlms, humanizeText } from 'geoaeo'`
-- CLI: `npx geoaeo audit|init|gen|humanize|mcp`
+- CLI: `npx geoaeo audit|init|gen|humanize|submit|mcp`
 - MCP: `npx geoaeo mcp` over stdio (also shipped as the `geoaeo-mcp` bin)
 
 ## MCP tools
@@ -31,6 +31,7 @@ Indie hackers to enterprise teams who want their site cited by ChatGPT, Claude, 
 | `audit` | Audit a live URL or local site directory for GEO and AEO gaps. |
 | `gen` | Generate one GEO or AEO artifact from the local site config. |
 | `humanize` | Find AI-writing tells in prose files. Set write to update them. |
+| `submit` | Announce URLs to IndexNow, which reaches Bing, Yandex, Naver, Seznam, and Yep. |
 
 ## The loop
 
@@ -75,9 +76,9 @@ Generators take a config object. They do not read files themselves.
 
 Docs, help text, comments, and commit messages must describe only what the code does today.
 
-- CLI commands: `audit`, `init`, `gen`, `humanize`, `mcp`.
+- CLI commands: `audit`, `init`, `gen`, `humanize`, `submit`, `mcp`.
 - npm bins: `geoaeo` and `geoaeo-mcp`.
-- MCP tools: `audit`, `gen`, `humanize`.
+- MCP tools: `audit`, `gen`, `humanize`, `submit`.
 - JSON-LD kinds: `software`, `product`, `faq`, `breadcrumb`, `organization`, `website`, `article`, `howto`, `person`, `review`.
 
 If a doc needs a capability that is not built yet, mark it `<!-- TODO(v0.5): not built -->`. Do not pretend it works.

@@ -9,6 +9,7 @@ import {
   isSitemapXml,
   isPoppyDocument,
   isWebmcpManifest,
+  isAiTxt,
 } from "./check-predicates.js";
 
 function artifactChecks(): CheckDef[] {
@@ -16,16 +17,23 @@ function artifactChecks(): CheckDef[] {
     {
       id: "llms",
       label: "/llms.txt",
-      weight: 5,
+      weight: 4,
       details: "Short site map is present.",
       passed: (ctx) => isShortSiteMap(ctx.artifacts.get("__llms")),
     },
     {
       id: "llms-full",
       label: "/llms-full.txt",
-      weight: 5,
+      weight: 4,
       details: "Full site map is present.",
       passed: (ctx) => isFullSiteMap(ctx.artifacts.get("__llmsFull")),
+    },
+    {
+      id: "ai-txt",
+      label: "/ai.txt",
+      weight: 2,
+      details: "An AI usage policy is published at /ai.txt.",
+      passed: (ctx) => isAiTxt(ctx.artifacts.get("__aiTxt")),
     },
     {
       id: "sitemap",
@@ -110,16 +118,23 @@ function pageMetaChecks(): CheckDef[] {
     {
       id: "title",
       label: "Page titles",
-      weight: 4,
+      weight: 3,
       details: "Every inspected page has a title.",
       passed: (ctx) => ctx.allPage((page) => page.title),
     },
     {
       id: "description",
       label: "Meta descriptions",
-      weight: 4,
+      weight: 3,
       details: "Every inspected page has a meta description.",
       passed: (ctx) => ctx.allPage((page) => page.description),
+    },
+    {
+      id: "ai-summary",
+      label: "AI summary meta",
+      weight: 2,
+      details: "Every inspected page carries a meta ai-summary tag.",
+      passed: (ctx) => ctx.allPage((page) => page.aiSummary),
     },
     {
       id: "canonical",

@@ -47,16 +47,18 @@ content. Client-only shells with empty first HTML give them nothing to index or 
 the systems you want to cite you.
 
 **How geoaeo covers it.**
-- `geoaeo gen robots` emits a robots policy that includes a `Sitemap:` line from config
-  and an `Allow: /` group for each named AI crawler.
+- `geoaeo gen robots` emits a robots policy that includes a `Sitemap:` line from config,
+  an `Allow: /` group for each answer-engine crawler, a separate group for training
+  crawlers, and a `Disallow` line for every private path.
 - Audit check `robots` requires a robots artifact that mentions a user-agent policy and a
   sitemap URL.
-- Audit check `ai-crawlers` parses the policy's user-agent groups and fails when a named
-  AI crawler (GPTBot, ClaudeBot, PerplexityBot, and peers) is disallowed from `/`. A
-  crawler with no block of its own inherits the `*` group.
+- Audit check `ai-crawlers` parses the policy's user-agent groups and fails when an
+  answer-engine crawler (OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User,
+  PerplexityBot, Perplexity-User) is disallowed from `/`. Training crawlers are reported
+  only when the site has not opted out. A crawler with no block of its own inherits the
+  `*` group.
 
-**Not covered yet.** No AI-bot allowlist presets beyond the generator's fixed list, no
-live robots negotiation beyond fetching `/robots.txt`.
+**Not covered yet.** No live robots negotiation beyond fetching `/robots.txt`.
 
 ### 1.3 Stable, linkable URLs
 
@@ -95,6 +97,8 @@ unfurlers cannot build a better summary.
 
 **How geoaeo covers it.**
 - Audit checks `title` and `description` on every inspected page (all-pages pass rule).
+- Audit check `ai-summary` requires `<meta name="ai-summary">` on every inspected page:
+  one or two factual sentences written for a model that has already fetched the page.
 - Works for HTML and for common Next-style metadata source patterns.
 
 **Not covered yet.** No length or uniqueness scoring, no keyword stuffing detection, no
@@ -171,7 +175,9 @@ everything.
 
 **How geoaeo covers it.**
 - `geoaeo gen llms` and `geoaeo init` (static or Next route).
-- Audit check `llms` (weight 10).
+- The map carries `Core pages`, `Free tools`, `Plans`, and a `Machine-readable` section
+  that links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
+- Audit check `llms` (weight 4).
 
 ### 4.2 Long map (`/llms-full.txt`)
 
@@ -180,11 +186,29 @@ agents that will read a larger context window.
 
 **How geoaeo covers it.**
 - `geoaeo gen llms-full`.
-- Audit check `llms-full` (weight 10), including section-shape heuristics used by the
+- The file opens with a `Generated:` date, marks each block with
+  `<!-- source: <url> -->`, and adds one block per configured page.
+- Audit check `llms-full` (weight 4), including section-shape heuristics used by the
   generator.
 
 **Not covered yet.** No automatic change-detection publish, no content-hash freshness
 header, no multi-locale llms files.
+
+### 4.3 Usage policy (`/ai.txt`)
+
+**Why it matters.** [ai.txt](https://ai-visibility.org.uk/ai-txt) states how AI systems
+may use the site: what they may summarise, quote, cite, and index, what they must not
+invent, and how to attribute. It sits next to `robots.txt` and answers the questions a
+crawler policy does not.
+
+**How geoaeo covers it.**
+- `geoaeo gen ai-txt` and the MCP `gen` tool.
+- Audit check `ai-txt` looks for the `[identity]` and `[permissions]` sections on a live
+  `/ai.txt`, or a route whose source calls `generateAiTxt`.
+- Scope exclusions come from `AI_EXCLUDED_PATHS`, one list in `constants.ts`.
+
+**Not covered yet.** No per-locale `ai.txt`, and no enforcement. A policy is a statement,
+not a gate.
 
 ---
 
@@ -198,10 +222,18 @@ route that serves Markdown) is easier to quote than a heavy HTML document.
 **How geoaeo covers it.**
 - Audit check `markdown` looks for local `*.md` mirrors (excluding README-like names) or,
   for live URLs, successful fetch of `{page}.md`.
+- `generateMarkdownPage` writes the mirror shape: title, canonical URL, last
+  updated, body, and related links.
+- `geoaeo gen mdmirror` reaches every field from config: the site root as the canonical
+  URL, `SiteConfig.lastUpdated` as the date, and the other configured pages as related
+  links.
+- The response headers belong to the route, because geoaeo does not serve HTTP. A route
+  should send `text/markdown`, `X-Markdown-Tokens`, `X-Robots-Tag: noindex, follow`,
+  `Content-Location`, and `Vary: Accept` when it negotiated the response.
 - Weight 6.
 
-**Not covered yet.** `gen` does not emit per-page Markdown mirrors. `init` focuses on
-artifact routes/files, not a full MD mirror tree. No parity check (HTML vs MD content).
+**Not covered yet.** `gen` does not walk a site and emit one mirror per route. No parity
+check (HTML vs MD content).
 
 ---
 

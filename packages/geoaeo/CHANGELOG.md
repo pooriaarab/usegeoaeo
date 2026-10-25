@@ -6,6 +6,44 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `generateMarkdownPage` writes a markdown mirror: title, canonical URL, last
+  updated, body, and related links.
+- Audit check `ai-summary` (34 checks) requires `<meta name="ai-summary">` on every
+  inspected page. `title` and `description` drop from 4 to 3 so the checks still sum
+  to 100.
+- `geoaeo gen ai-txt` writes an AI usage policy in the ai-txt v1.1.1 shape:
+  `[identity]`, `[permissions]`, `[restrictions]`, `[attribution]`, `[scope]`,
+  and `[contact]`. Facts come from `SiteConfig`. Scope exclusions come from
+  `AI_EXCLUDED_PATHS` in `constants.ts`. `SiteConfig.contact` and
+  `SiteConfig.lastUpdated` set the contact line and the date, so the CLI and
+  MCP surfaces reach them from config; a library caller can override both.
+- Audit check `ai-txt` (34 checks). It passes a live `/ai.txt` that carries
+  `[identity]` and `[permissions]`, or a route whose source calls
+  `generateAiTxt`. The `llms` and `llms-full` weights drop from 5 to 4 so the
+  checks still sum to 100.
+- `AI_SEARCH_AGENTS` and `AI_TRAINING_AGENTS` split the crawler list.
+  `Claude-SearchBot`, `Claude-User`, and `Perplexity-User` join the search list.
+  `SiteConfig.allowTrainingCrawlers` defaults to true; false disallows only the
+  training crawlers. The `ai-crawlers` check reads the search list, so an
+  opted-out site is not reported as blocking itself.
+- `robots.txt` now disallows every path in `AI_EXCLUDED_PATHS` for all agents
+  and points at `/llms.txt` and `/ai.txt`.
+
+### Changed
+
+- `generateMdmirror` writes the page shape. It defaults the canonical URL to the site
+  root, the date to `SiteConfig.lastUpdated`, and the related links to the other
+  configured pages, so `geoaeo gen mdmirror` reaches every field from config.
+- `llms.txt` gains a `Core pages` section and a `Machine-readable` section that
+  links `llms-full.txt`, `sitemap.xml`, and `ai.txt`.
+- `llms-full.txt` gains a `Generated:` date, a `<!-- source: <url> -->` marker
+  per block, and one block per configured page. The date comes from
+  `SiteConfig.lastUpdated`, then the build date; a library caller can override
+  it with `{ generated }`.
+
+
 ## [0.7.0] - 2026-10-25
 
 ### Added

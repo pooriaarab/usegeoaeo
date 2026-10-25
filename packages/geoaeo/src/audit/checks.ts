@@ -1,5 +1,5 @@
 import type { AuditCheck, TargetSnapshot } from "./types.js";
-import { AI_AGENTS } from "../generators/robots.js";
+import { AI_SEARCH_AGENTS } from "../generators/robots.js";
 import { analyzePage } from "./analyze-page.js";
 import { blockedAgents } from "./robots-policy.js";
 import type { CheckContext, CheckDef } from "./check-types.js";
@@ -15,6 +15,7 @@ import {
 const ARTIFACT_ALIASES: Array<[string, string]> = [
   ["__llms", "llms.txt"],
   ["__llmsFull", "llms-full.txt"],
+  ["__aiTxt", "ai.txt"],
   ["__sitemap", "sitemap.xml"],
   ["__robots", "robots.txt"],
   ["__webmcp", "webmcp"],
@@ -43,7 +44,7 @@ function buildContext(snapshot: TargetSnapshot): CheckContext {
     pageSignals.length > 0 && pageSignals.every(predicate);
   const jsonTypes = [...new Set(pageSignals.flatMap((page) => page.jsonLdTypes))];
   const has = (value: string) => value.trim().length > 0;
-  const blockedAiAgents = blockedAgents(robots, AI_AGENTS);
+  const blockedAiAgents = blockedAgents(robots, AI_SEARCH_AGENTS);
   const sharedCanonical = findSharedCanonical(snapshot.pages, pageSignals);
   return {
     artifacts,

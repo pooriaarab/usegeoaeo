@@ -46,6 +46,7 @@ stay unchanged unless you pass `--force`.
 ```bash
 npx geoaeo gen llms
 npx geoaeo gen llms-full --output public/llms-full.txt
+npx geoaeo gen ai-txt --output public/ai.txt
 npx geoaeo gen jsonld --type faq
 npx geoaeo gen webmcp
 npx geoaeo gen sitemap --output public/sitemap.xml

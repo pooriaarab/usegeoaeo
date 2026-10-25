@@ -76,7 +76,7 @@ function AuditCommand() {
         <code>geoaeo audit &lt;target&gt;</code>
       </h2>
       <p>
-        Audit a live URL or a local directory. Scores 0–100 across 32 weighted checks including
+        Audit a live URL or a local directory. Scores 0–100 across 34 weighted checks including
         answerability, structured data, llms.txt, crawlability, freshness, and E-E-A-T.
       </p>
       <pre>
@@ -168,7 +168,7 @@ npx geoaeo gen mdmirror`}</code>
         </li>
       </ul>
       <p>
-        Available artifacts: llms, llms-full, jsonld, webmcp, sitemap, robots, ogimage, rss,
+        Available artifacts: llms, llms-full, ai-txt, jsonld, webmcp, sitemap, robots, ogimage, rss,
         hreflang, mdmirror.
       </p>
     </>

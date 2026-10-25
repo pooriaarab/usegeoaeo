@@ -14,7 +14,7 @@ export const faqs: LandingFaq[] = [
   {
     question: "What does geoaeo do?",
     answer:
-      "geoaeo audits any site from 0 to 100 across 32 weighted checks, then generates missing discovery artifacts. It outputs llms.txt, llms-full.txt, sitemaps, robots.txt, JSON-LD schemas, WebMCP manifests, poppy.json, and Markdown mirrors. It also includes an AI copy humanizer and an MCP server.",
+      "geoaeo audits any site from 0 to 100 across 34 weighted checks, then generates missing discovery artifacts. It outputs llms.txt, llms-full.txt, sitemaps, robots.txt, JSON-LD schemas, WebMCP manifests, poppy.json, and Markdown mirrors. It also includes an AI copy humanizer and an MCP server.",
   },
   {
     question: "Does geoaeo work with my framework?",
