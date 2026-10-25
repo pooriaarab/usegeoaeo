@@ -33,7 +33,7 @@ describe("answerability word floor", () => {
     expect(check.weight).toBe(9);
     expect(check.details).toBe(`Not enough words to quote (need ${ANSWERABILITY_WORD_FLOOR}).`);
     expect(check.details).toMatch(/word/i);
-    expect(report.checks).toHaveLength(32);
+    expect(report.checks).toHaveLength(33);
   });
 
   it("passes a page with a direct opening and enough words to quote", async () => {

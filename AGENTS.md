@@ -12,7 +12,7 @@ This project follows the `agentification` skill (pooriaarab/skills).
 
 ## What geoaeo does
 
-geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates these artifacts: `llms`, `llms-full`, `jsonld`, `webmcp`, `poppy`, `sitemap`, `robots`, `ogimage`, `rss`, `hreflang`, `mdmirror`.
+geoaeo audits any site for SEO, GEO, and AEO, scores it 0-100, and generates these artifacts: `llms`, `llms-full`, `ai-txt`, `jsonld`, `webmcp`, `poppy`, `sitemap`, `robots`, `ogimage`, `rss`, `hreflang`, `mdmirror`.
 
 ## Who it is for
 

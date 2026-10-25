@@ -25,6 +25,10 @@ export interface SiteConfig {
   plans?: PlanConfig[];
   faq?: FaqConfig[];
   pages?: string[];
+  /** Contact line for ai.txt. Defaults to siteUrl. */
+  contact?: string;
+  /** ISO date for ai.txt. Defaults to the build date. */
+  lastUpdated?: string;
 }
 
 export function defineConfig(config: SiteConfig): SiteConfig {
