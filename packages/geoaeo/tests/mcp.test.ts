@@ -192,7 +192,7 @@ describe("MCP tools over an in-memory transport", () => {
     await withClient(async (client) => {
       expect(client.getServerCapabilities()?.tools?.listChanged).toBe(false);
       expect(client.getInstructions()).toBe(
-        "Call only audit, gen, or humanize. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. Ask the user before you set write. When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root. An http(s) audit URL stays allowed. A path outside the roots is an error.",
+        "Call only audit, gen, humanize, or submit. Audit a local directory or an http(s) URL first. audit returns a report and writes no files. gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text. It writes no file. humanize writes a file only when write is true and the text changes. submit posts URLs to IndexNow, which reaches Bing, Yandex, Naver, Seznam, and Yep. It sends a request to a third party; ask the user before you call it. Ask the user before you set write. When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root. An http(s) audit URL stays allowed. A path outside the roots is an error.",
       );
     });
   });
@@ -201,7 +201,7 @@ describe("MCP tools over an in-memory transport", () => {
     await withClient(async (client) => {
       const { tools } = await client.listTools();
       const byName = new Map(tools.map((tool) => [tool.name, tool]));
-      expect(tools.map((tool) => tool.name).sort()).toEqual(["audit", "gen", "humanize"]);
+      expect(tools.map((tool) => tool.name).sort()).toEqual(["audit", "gen", "humanize", "submit"]);
       for (const tool of tools) {
         expect(typeof tool.title, `${tool.name} needs a title`).toBe("string");
         expect(typeof tool.description).toBe("string");

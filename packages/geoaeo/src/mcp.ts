@@ -13,6 +13,7 @@ import { generateArtifact, GENERATED_ARTIFACTS, type GeneratedArtifact } from ".
 import { ConfigLoadError } from "./commands/load-config.js";
 import { JSON_LD_KINDS, type JsonLdKind } from "./generators/index.js";
 import { humanizeGlob } from "./commands/humanize.js";
+import { submitIndexNow } from "./submit.js";
 import type { HumanizeFinding } from "./humanize.js";
 
 // Built from the shared arrays so a new artifact or kind cannot land in one face only.
@@ -46,16 +47,29 @@ const artifactSchema = genArtifactSchema.describe(
 const artifactTypeSchema = genTypeSchema
   .optional()
   .describe("Applies only when artifact is jsonld.");
+const submitHostSchema = z
+  .string()
+  .optional()
+  .describe("Host that owns the URLs, without a scheme. Defaults to the first URL's host.");
+const submitKeySchema = z
+  .string()
+  .describe("IndexNow key the site serves at https://<host>/<key>.txt. 8 to 128 hex characters.");
+const submitUrlsSchema = z
+  .array(z.string())
+  .min(1)
+  .describe("Absolute http(s) URLs to announce. Every one must sit on the host.");
 export const MCP_GEN_ARTIFACTS = genArtifactSchema.options;
 export const MCP_JSON_LD_KINDS = genTypeSchema.options;
 
 const MCP_INSTRUCTIONS = [
-  "Call only audit, gen, or humanize.",
+  "Call only audit, gen, humanize, or submit.",
   "Audit a local directory or an http(s) URL first.",
   "audit returns a report and writes no files.",
   "gen reads geoaeo.config.ts, .js, or .mjs and returns the artifact as text.",
   "It writes no file.",
   "humanize writes a file only when write is true and the text changes.",
+  "submit posts URLs to IndexNow, which reaches Bing, Yandex, Naver, Seznam, and Yep.",
+  "It sends a request to a third party; ask the user before you call it.",
   "Ask the user before you set write.",
   "When GEOAEO_ALLOWED_ROOTS is set, a local path must resolve inside one root.",
   "An http(s) audit URL stays allowed.",
@@ -246,6 +260,29 @@ function registerGenTool(registerTool: RegisterTool, allowedRoots: readonly stri
   );
 }
 
+function registerSubmitTool(registerTool: RegisterTool) {
+  registerTool(
+    "submit",
+    {
+      title: "Announce URLs to IndexNow",
+      description:
+        "Post URLs to IndexNow so Bing, Yandex, Naver, Seznam, and Yep recrawl them. Needs the key the site already serves at https://<host>/<key>.txt. This calls a third party; ask the user first.",
+      inputSchema: {
+        urls: submitUrlsSchema,
+        key: submitKeySchema,
+        host: submitHostSchema,
+      },
+      annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+    },
+    (input: { urls: string[]; key: string; host?: string }) =>
+      submitIndexNow({
+        host: input.host ?? new URL(input.urls[0]).hostname,
+        key: input.key,
+        urls: input.urls,
+      }),
+  );
+}
+
 function registerHumanizeTool(
   registerTool: RegisterTool,
   allowedRoots: readonly string[] | undefined,
@@ -283,6 +320,7 @@ export function createMcpServer(
   registerAuditTool(registerTool, allowedRoots);
   registerGenTool(registerTool, allowedRoots);
   registerHumanizeTool(registerTool, allowedRoots);
+  registerSubmitTool(registerTool);
   // registerTool merges tools.listChanged back to true. These three tools never change.
   server.server.registerCapabilities({ tools: { listChanged: false } });
   return server;
