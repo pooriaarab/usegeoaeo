@@ -108,8 +108,7 @@ export async function destinationAllowed(url: URL, policy: AuditFetchPolicy): Pr
   if (rememberLiteral(url, policy)) return true;
   if (literalIp(url.hostname)) return false;
   // Workers cannot resolve a name: dns.lookup throws there, and caching that
-  // failure would refuse every public host. Workers egress reaches the public
-  // internet only, so the host and literal checks above are what it can enforce.
+  // failure would refuse every public host. Its egress is public only.
   if (onWorkers()) return true;
   return (await resolvePinned(url.hostname, policy.dnsCache, policy.allowPrivate)) !== false;
 }
@@ -170,9 +169,8 @@ function pinnedRequest(current: URL, addresses: PinnedAddress[], signal: AbortSi
       }
     });
     req.on("error", reject);
-    // A 101 arrives as an upgrade and a request closed before its response
-    // arrives as neither, so both must settle here or the request outlives its
-    // own timeout.
+    // A 101 arrives as an upgrade and a closed request arrives as neither, so
+    // both must settle here or the request outlives its own timeout.
     // prettier-ignore
     req.on("upgrade", (_res, socket) => { socket.destroy(); reject(new Error("upgrade")); });
     req.on("close", () => reject(new Error("closed")));
