@@ -1,13 +1,7 @@
 import { describe, expect, it, afterEach } from "vitest";
 import { defineConfig } from "../src/config.js";
 import { generateMdmirror } from "../src/generators/index.js";
-import {
-  estimateTokens,
-  generateMarkdownPage,
-  markdownHeaders,
-  markdownResponse,
-  type MarkdownPage,
-} from "../src/markdown.js";
+import { generateMarkdownPage, type MarkdownPage } from "../src/markdown.js";
 import { auditTarget, type AuditCheck } from "../src/audit.js";
 
 const page: MarkdownPage = {
@@ -24,6 +18,7 @@ const config = defineConfig({
   siteUrl: "https://reply.example",
   description: "Draft replies for social posts.",
   tools: [],
+  pages: ["pricing", "docs"],
 });
 
 const liveUrl = "https://artifact.example";
@@ -61,40 +56,6 @@ describe("generateMarkdownPage", () => {
   });
 });
 
-describe("markdownHeaders", () => {
-  it("sets the markdown content type and keeps the page out of the index", () => {
-    const headers = markdownHeaders(page);
-    expect(headers.get("content-type")).toBe("text/markdown; charset=utf-8");
-    expect(headers.get("x-robots-tag")).toBe("noindex, follow");
-    expect(headers.get("content-location")).toBe("https://reply.example/pricing");
-  });
-
-  it("reports the token estimate for the body it will send", () => {
-    const body = generateMarkdownPage(page);
-    expect(markdownHeaders(page).get("x-markdown-tokens")).toBe(String(estimateTokens(body)));
-  });
-
-  it("varies on Accept only for a negotiated response", () => {
-    expect(markdownHeaders(page).get("vary")).toBeNull();
-    expect(markdownHeaders(page, { negotiated: true }).get("vary")).toBe("Accept");
-  });
-
-  it("sets caching, CORS, and last-modified", () => {
-    const headers = markdownHeaders(page);
-    expect(headers.get("cache-control")).toContain("s-maxage=3600");
-    expect(headers.get("access-control-allow-origin")).toBe("*");
-    expect(headers.get("last-modified")).toBe("Sun, 25 Oct 2026 00:00:00 GMT");
-  });
-});
-
-describe("markdownResponse", () => {
-  it("returns the markdown body with the markdown headers", async () => {
-    const response = markdownResponse(page);
-    expect(await response.text()).toContain("# Pricing");
-    expect(response.headers.get("x-robots-tag")).toBe("noindex, follow");
-  });
-});
-
 describe("generateMdmirror", () => {
   it("names the canonical page for the mirror", () => {
     const output = generateMdmirror(config, { path: "/pricing", title: "Pricing", body: "Plans." });
@@ -111,6 +72,12 @@ describe("generateMdmirror", () => {
   it("takes the date from the site config, so the CLI can reach it", () => {
     const configured = defineConfig({ ...config, lastUpdated: "2026-03-04" });
     expect(generateMdmirror(configured)).toContain("Last updated: 2026-03-04");
+  });
+
+  it("lists the other configured pages as related links", () => {
+    const output = generateMdmirror(config, { path: "/pricing" });
+    expect(output).toContain("- [docs](https://reply.example/docs)");
+    expect(output).not.toContain("- [pricing](https://reply.example/pricing)");
   });
 });
 

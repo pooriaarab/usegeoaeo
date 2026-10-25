@@ -222,12 +222,14 @@ route that serves Markdown) is easier to quote than a heavy HTML document.
 **How geoaeo covers it.**
 - Audit check `markdown` looks for local `*.md` mirrors (excluding README-like names) or,
   for live URLs, successful fetch of `{page}.md`.
-- `generateMarkdownPage`, `markdownHeaders`, and `markdownResponse` build the mirror and
-  the headers it needs: `text/markdown`, `X-Markdown-Tokens`, `X-Robots-Tag: noindex`,
-  `Content-Location`, `Cache-Control`, CORS, and `Vary: Accept` on a negotiated response.
-- `geoaeo gen mdmirror` writes the site-root mirror: canonical URL, the config date, and
-  the description. A route that serves one page passes its path, title, body, and related
-  links to the library helpers.
+- `generateMarkdownPage` writes the mirror shape: title, summary, canonical URL, last
+  updated, body, and related links.
+- `geoaeo gen mdmirror` reaches every field from config: the site root as the canonical
+  URL, `SiteConfig.lastUpdated` as the date, and the other configured pages as related
+  links.
+- The response headers belong to the route, because geoaeo does not serve HTTP. A route
+  should send `text/markdown`, `X-Markdown-Tokens`, `X-Robots-Tag: noindex, follow`,
+  `Content-Location`, and `Vary: Accept` when it negotiated the response.
 - Weight 6.
 
 **Not covered yet.** `gen` does not walk a site and emit one mirror per route. No parity
