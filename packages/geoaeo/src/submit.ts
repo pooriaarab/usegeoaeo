@@ -33,7 +33,11 @@ export interface SubmitIndexNowResult {
 const KEY_PATTERN = /^[a-f0-9]{8,128}$/i;
 
 function bareHost(host: string): string {
-  const text = host.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  const text = host
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "");
   try {
     // URL normalizes a name to punycode and an IPv6 literal to its compressed
     // form, so a host typed either way compares equal.
@@ -58,7 +62,8 @@ function onHost(url: string, host: string): boolean {
 
 export function submitBatches<T>(items: readonly T[], size = INDEXNOW_BATCH_SIZE): T[][] {
   const batches: T[][] = [];
-  for (let index = 0; index < items.length; index += size) batches.push(items.slice(index, index + size));
+  for (let index = 0; index < items.length; index += size)
+    batches.push(items.slice(index, index + size));
   return batches;
 }
 
@@ -76,7 +81,9 @@ export async function submitIndexNow(
   if (options.urls.length === 0) throw new Error("submit: at least one URL is required");
   const offHost = options.urls.filter((url) => !onHost(url, host));
   if (offHost.length > 0)
-    throw new Error(`submit: ${offHost.length} URL(s) are not on ${host}, starting with ${offHost[0]}`);
+    throw new Error(
+      `submit: ${offHost.length} URL(s) are not on ${host}, starting with ${offHost[0]}`,
+    );
   const keyLocation = options.keyLocation ?? `https://${host}/${options.key}.txt`;
   const endpoint = options.endpoint ?? INDEXNOW_ENDPOINT;
   const send = options.fetchImpl ?? globalThis.fetch;

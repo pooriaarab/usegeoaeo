@@ -5,7 +5,10 @@ const host = "public.example";
 const key = "06626485515dfd3425d8166046126bbb";
 
 function recorder(status = 200) {
-  const calls: Array<{ url: string; body: { host: string; key: string; keyLocation: string; urlList: string[] } }> = [];
+  const calls: Array<{
+    url: string;
+    body: { host: string; key: string; keyLocation: string; urlList: string[] };
+  }> = [];
   const fetchImpl = (async (input: RequestInfo | URL, init?: RequestInit) => {
     calls.push({ url: String(input), body: JSON.parse(String(init?.body)) });
     return new Response(null, { status });
