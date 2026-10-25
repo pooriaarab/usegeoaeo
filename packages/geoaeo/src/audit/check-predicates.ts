@@ -146,4 +146,10 @@ export function isWebmcpManifest(body: string | undefined): boolean {
   return /generateWebmcp|"tools"\s*:|tools\s*[:=]/i.test(body ?? "");
 }
 
+/** ai.txt is sectioned text. A directory audit may instead read the route source. */
+export function isAiTxt(body: string | undefined): boolean {
+  const text = body ?? "";
+  return /generateAiTxt/i.test(text) || (/\[identity\]/i.test(text) && /\[permissions\]/i.test(text));
+}
+
 export { isPoppyDocument } from "./poppy.js";

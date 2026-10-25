@@ -1,3 +1,4 @@
+export * from "./ai-txt.js";
 export * from "./hreflang.js";
 export * from "./jsonld.js";
 export * from "./llms.js";

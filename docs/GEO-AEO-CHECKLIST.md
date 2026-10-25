@@ -186,6 +186,22 @@ agents that will read a larger context window.
 **Not covered yet.** No automatic change-detection publish, no content-hash freshness
 header, no multi-locale llms files.
 
+### 4.3 Usage policy (`/ai.txt`)
+
+**Why it matters.** [ai.txt](https://ai-visibility.org.uk/ai-txt) states how AI systems
+may use the site: what they may summarise, quote, cite, and index, what they must not
+invent, and how to attribute. It sits next to `robots.txt` and answers the questions a
+crawler policy does not.
+
+**How geoaeo covers it.**
+- `geoaeo gen ai-txt` and the MCP `gen` tool.
+- Audit check `ai-txt` looks for the `[identity]` and `[permissions]` sections on a live
+  `/ai.txt`, or a route whose source calls `generateAiTxt`.
+- Scope exclusions come from `AI_EXCLUDED_PATHS`, one list in `constants.ts`.
+
+**Not covered yet.** No per-locale `ai.txt`, and no enforcement. A policy is a statement,
+not a gate.
+
 ---
 
 ## 5. Markdown mirrors

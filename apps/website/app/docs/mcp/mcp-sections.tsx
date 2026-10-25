@@ -30,7 +30,7 @@ export function Tools() {
 { "artifact": "jsonld", "type": "software" }`}</code>
       </pre>
       <p>
-        <code>artifact</code> enum: llms, llms-full, jsonld, webmcp, sitemap, robots, ogimage, rss,
+        <code>artifact</code> enum: llms, llms-full, ai-txt, jsonld, webmcp, sitemap, robots, ogimage, rss,
         hreflang, mdmirror. For jsonld, <code>type</code> may be software, product, faq, breadcrumb,
         organization, website, article, howto, person, or review. Reads{" "}
         <code>geoaeo.config.ts</code> in the current directory.
