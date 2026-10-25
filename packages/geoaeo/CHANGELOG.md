@@ -6,6 +6,17 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `geoaeo gen ai-txt` writes an AI usage policy in the ai-txt v1.1.1 shape:
+  `[identity]`, `[permissions]`, `[restrictions]`, `[attribution]`, `[scope]`,
+  and `[contact]`. Facts come from `SiteConfig`. Scope exclusions come from the
+  shared `AI_EXCLUDED_PATHS` list in `constants.ts`.
+- Audit check `ai-txt` (33 checks). It passes a live `/ai.txt` that carries
+  `[identity]` and `[permissions]`, or a route whose source calls
+  `generateAiTxt`. The `llms` and `llms-full` weights drop from 5 to 4 so the
+  checks still sum to 100.
+
 ## [0.6.0] - 2026-10-10
 
 ### Added

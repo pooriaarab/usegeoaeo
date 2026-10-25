@@ -11,9 +11,9 @@ components at `apps/website/src/components/landing/*.tsx`, shadcn primitives fro
   Optimization). Install: `npm install geoaeo`. Free and open source (MIT).
 - Real commands only: `geoaeo audit <url|dir>` (0–100 score + gap list), `geoaeo init`
   (scaffold artifacts into Next/Astro/SvelteKit/Nuxt/Remix/static), `geoaeo gen <artifact>`
-  (llms.txt, llms-full, sitemap, robots, jsonld, webmcp, ogimage, rss, hreflang, mdmirror),
+  (llms.txt, llms-full, ai.txt, sitemap, robots, jsonld, webmcp, ogimage, rss, hreflang, mdmirror),
   `geoaeo humanize` (strip AI-writing tells), `geoaeo mcp` (MCP server, bin `geoaeo-mcp`,
-  tools audit/gen/humanize). Audit = 32 weighted checks (answerability, structured data,
+  tools audit/gen/humanize). Audit = 33 weighted checks (answerability, structured data,
   llms.txt, crawlability, freshness, E-E-A-T…).
 - Audience: indie hackers → enterprise teams who want their site cited by ChatGPT, Claude,
   Perplexity, Google AI. Source of truth: `packages/geoaeo/README.md`,

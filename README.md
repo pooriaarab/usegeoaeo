@@ -43,7 +43,7 @@ Run `node example.mjs`. Success prints Markdown headed `# Reply Kit`.
 ## How it works
 
 ```text
-URL or directory -> snapshot -> 32 weighted checks -> score and top fixes
+URL or directory -> snapshot -> 33 weighted checks -> score and top fixes
 SiteConfig -> generator -> discovery text, XML, JSON, HTML, or SVG
 CLI / agent -> audit, generation, prose checks -> shared library behavior
 ```
@@ -73,6 +73,7 @@ Scope checked on 2026-10-14 against [Yoast SEO](https://yoast.com/wordpress/plug
 |---|---|---|
 | `llms` | ✓ generator | Short llms.txt |
 | `llms-full` | ✓ generator | Detailed llms-full.txt |
+| `ai-txt` | ✓ generator | AI usage policy (ai.txt) |
 | `jsonld` | ✓ generator | JSON-LD structured data |
 | `webmcp` | manifest only | WebMCP-style discovery JSON |
 | `poppy` | discovery only | Personal Agent Protocol organization and empty web capability |
@@ -83,7 +84,7 @@ Scope checked on 2026-10-14 against [Yoast SEO](https://yoast.com/wordpress/plug
 | `hreflang` | ✓ generator | Alternate-language link tags |
 | `mdmirror` | ✓ generator | Markdown content |
 
-The dispatcher has 11 artifact choices. JSON-LD supports 10 kinds: software, product, faq, breadcrumb, organization, website, article, howto, person, review.
+The dispatcher has 12 artifact choices. JSON-LD supports 10 kinds: software, product, faq, breadcrumb, organization, website, article, howto, person, review.
 Framework detection includes Next.js, Astro, SvelteKit, Nuxt, and Remix; other directories receive static files.
 These are implemented generators and templates, not credential-verified integrations with answer engines.
 Local tests verify behavior. No ChatGPT, Claude, Perplexity, or Google AI citation outcome is verified by an audit score.
@@ -98,7 +99,7 @@ Local tests verify behavior. No ChatGPT, Claude, Perplexity, or Google AI citati
 
 ## Features
 
-- **Audits:** 32 weighted checks return a normalized 0–100 score and up to five top fixes. See the [checklist](https://usegeoaeo.com/checklist).
+- **Audits:** 33 weighted checks return a normalized 0–100 score and up to five top fixes. See the [checklist](https://usegeoaeo.com/checklist).
 - **Generators:** emit artifacts from a shared site configuration. See [installation](https://usegeoaeo.com/docs/install).
 - **Prose checks:** find configured writing patterns and optionally rewrite matching files. See the [CLI reference](https://usegeoaeo.com/docs/cli).
 - **Agent tools:** audit, generate, and check prose over stdio. See the [MCP reference](https://usegeoaeo.com/docs/mcp).
@@ -143,7 +144,7 @@ For an MCP client, use this server configuration:
 
 ## Status
 
-The package is version 0.6.0. Interfaces can change before 1.0.
+The package is version 0.7.0. Interfaces can change before 1.0.
 The library is MIT licensed. Public case studies are not yet published.
 Use the repository issue tracker for support if you have access, or consult the [public docs](https://usegeoaeo.com/docs).
 
