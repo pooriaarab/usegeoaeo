@@ -29,9 +29,10 @@ export const AI_TRAINING_AGENTS = [
 /** Every named AI crawler: the search list first, then the training list. */
 export const AI_AGENTS: readonly string[] = [...AI_SEARCH_AGENTS, ...AI_TRAINING_AGENTS];
 
-function agentBlocks(agents: readonly string[], allow: boolean): string {
-  const rule = allow ? "Allow" : "Disallow";
-  return agents.map((agent) => `User-agent: ${agent}\n${rule}: /`).join("\n\n");
+// A named group replaces the `*` group, so an allowed agent repeats the private-path disallows.
+function agentBlocks(agents: readonly string[], allow: boolean, privatePaths: string): string {
+  const rules = allow ? `Allow: /\n${privatePaths}` : "Disallow: /";
+  return agents.map((agent) => `User-agent: ${agent}\n${rules}`).join("\n\n");
 }
 
 export function generateRobots(config: SiteConfig): string {
@@ -41,10 +42,10 @@ export function generateRobots(config: SiteConfig): string {
     `# AI answer engines may read and cite this site.\n` +
     `# Keep this file in sync with /llms.txt and /ai.txt.\n\n` +
     `User-agent: *\nAllow: /\n${privatePaths}\n\n` +
-    `${agentBlocks(AI_SEARCH_AGENTS, true)}\n\n` +
+    `${agentBlocks(AI_SEARCH_AGENTS, true, privatePaths)}\n\n` +
     `# Training crawlers. Blocking these does not stop the search crawlers\n` +
     `# above from citing the site.\n` +
-    `${agentBlocks(AI_TRAINING_AGENTS, trainingAllowed)}\n\n` +
+    `${agentBlocks(AI_TRAINING_AGENTS, trainingAllowed, privatePaths)}\n\n` +
     `Sitemap: ${absoluteUrl(config.siteUrl, "/sitemap.xml")}\n`
   );
 }
