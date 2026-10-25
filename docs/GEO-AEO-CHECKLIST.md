@@ -222,7 +222,7 @@ route that serves Markdown) is easier to quote than a heavy HTML document.
 **How geoaeo covers it.**
 - Audit check `markdown` looks for local `*.md` mirrors (excluding README-like names) or,
   for live URLs, successful fetch of `{page}.md`.
-- `generateMarkdownPage` writes the mirror shape: title, summary, canonical URL, last
+- `generateMarkdownPage` writes the mirror shape: title, canonical URL, last
   updated, body, and related links.
 - `geoaeo gen mdmirror` reaches every field from config: the site root as the canonical
   URL, `SiteConfig.lastUpdated` as the date, and the other configured pages as related
