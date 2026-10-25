@@ -31,7 +31,7 @@ function plansBlock(config: SiteConfig): string {
 function pageEntries(config: SiteConfig): Array<{ label: string; url: string }> {
   const pages = ["", ...(config.pages ?? []).map((page) => page.replace(/^\/+|\/+$/g, ""))];
   return [...new Set(pages)].map((page) => ({
-    label: page === "" ? "Home" : page.split("/").at(-1) ?? page,
+    label: page === "" ? "Home" : (page.split("/").at(-1) ?? page),
     url: absoluteUrl(config.siteUrl, page),
   }));
 }
@@ -54,7 +54,10 @@ function machineReadableBlock(config: SiteConfig): string {
     ["AI usage policy", "/ai.txt", "What an AI system may summarise, quote, cite, and index."],
   ];
   return entries
-    .map(([label, path, description]) => `- [${label}](${absoluteUrl(config.siteUrl, path)}): ${description}`)
+    .map(
+      ([label, path, description]) =>
+        `- [${label}](${absoluteUrl(config.siteUrl, path)}): ${description}`,
+    )
     .join("\n");
 }
 

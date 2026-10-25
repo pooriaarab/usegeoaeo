@@ -14,7 +14,9 @@ const config = defineConfig({
   siteName: "Reply Kit",
   siteUrl: "https://reply.example",
   description: "Draft replies for social posts.",
-  tools: [{ name: "Rate calculator", url: "/tools/rate", description: "Calculate interaction rate." }],
+  tools: [
+    { name: "Rate calculator", url: "/tools/rate", description: "Calculate interaction rate." },
+  ],
   pages: ["pricing", "/faq/"],
 });
 
