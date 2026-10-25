@@ -143,6 +143,21 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
       server.close();
     }
   });
+  it("settles a request that answers with 101", async () => {
+    const server = http.createServer((_req, res) =>
+      res.writeHead(101, { Connection: "Upgrade", Upgrade: "websocket" }).end(),
+    );
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const port = (server.address() as net.AddressInfo).port;
+    const url = new URL(`http://127.0.0.1:${port}/`);
+    const policy = createFetchPolicy(url);
+    try {
+      expect(await destinationAllowed(url, policy)).toBe(true);
+      await expect(openAudit(url.href, url, policy)).rejects.toThrow("upgrade");
+    } finally {
+      server.close();
+    }
+  });
   it("survives corrupt gzip, cut bodies, and aborted compressed reads", async () => {
     const badGzip = Buffer.from([0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff]);
     const cut = (
