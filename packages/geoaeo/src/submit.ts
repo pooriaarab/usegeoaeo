@@ -33,16 +33,20 @@ export interface SubmitIndexNowResult {
 const KEY_PATTERN = /^[a-f0-9]{8,128}$/i;
 
 function bareHost(host: string): string {
-  return host
-    .trim()
-    .toLowerCase()
-    .replace(/^https?:\/\//, "")
-    .replace(/\/.*$/, "");
+  const text = host.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  try {
+    // URL normalizes a name to punycode and an IPv6 literal to its compressed
+    // form, so a host typed either way compares equal.
+    return new URL(`https://${text}`).hostname;
+  } catch {
+    return "";
+  }
 }
 
 function onHost(url: string, host: string): boolean {
   try {
     const parsed = new URL(url);
+    if (parsed.username || parsed.password) return false;
     return (
       (parsed.protocol === "https:" || parsed.protocol === "http:") &&
       parsed.hostname.toLowerCase() === host
@@ -85,7 +89,7 @@ export async function submitIndexNow(
       headers: { "content-type": "application/json; charset=utf-8" },
       body: JSON.stringify({ host, key: options.key, keyLocation, urlList }),
     });
-    if (response.status >= 400)
+    if (!response.ok)
       throw new Error(`submit: IndexNow answered ${response.status} for ${urlList.length} URL(s)`);
     status = response.status;
     sent += urlList.length;

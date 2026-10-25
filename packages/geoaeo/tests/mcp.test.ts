@@ -106,6 +106,32 @@ describe("createMcpServer", () => {
     expect(text.text.startsWith(`${structured.target}: ${structured.score}/100`)).toBe(true);
   });
 
+  it("submits to IndexNow and returns text plus a structured count", async () => {
+    const sent: Array<{ url: string; body: { keyLocation: string } }> = [];
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      sent.push({ url: String(input), body: JSON.parse(String(init?.body)) });
+      return new Response(null, { status: 200 });
+    }) as typeof fetch;
+    try {
+      const result = await callMcpTool("submit", {
+        urls: ["https://public.example/"],
+        key: "06626485515dfd3425d8166046126bbb",
+        keyLocation: "https://public.example/keys/indexnow.txt",
+      });
+      const text = result.content[0];
+      if (text.type !== "text") throw new Error("expected a text content block");
+      expect(text.text).toBe("sent 1 URL(s) in 1 batch(es), last status 200");
+      expect(result.structuredContent).toMatchObject({ sent: 1, batches: 1, status: 200 });
+      expect(sent[0]).toEqual({
+        url: "https://api.indexnow.org/indexnow",
+        body: expect.objectContaining({ keyLocation: "https://public.example/keys/indexnow.txt" }),
+      });
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
+
   it("returns a humanize count line plus a structured findings array", async () => {
     const result = await callMcpTool("humanize", { glob: "examples/static-html/README.md" });
     const text = result.content[0];
