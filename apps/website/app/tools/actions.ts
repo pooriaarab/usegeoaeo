@@ -8,7 +8,6 @@ import {
   defineConfig,
   type JsonLdKind,
 } from "geoaeo";
-import { releaseAudit, tryAdmitAudit } from "./audit-admission";
 
 export interface AuditResult {
   ok: boolean;
@@ -22,16 +21,11 @@ export async function auditUrl(url: string): Promise<AuditResult> {
   if (!/^https?:\/\//i.test(trimmed)) {
     return { ok: false, error: "Enter a full URL, including https://" };
   }
-  if (!tryAdmitAudit()) {
-    return { ok: false, error: "Too many audits are running. Try again shortly." };
-  }
   try {
     const report = await auditTarget(trimmed);
     return { ok: true, score: report.score, report: formatAuditReport(report) };
   } catch {
     return { ok: false, error: "Could not fetch that site. Check the URL and try again." };
-  } finally {
-    releaseAudit();
   }
 }
 
