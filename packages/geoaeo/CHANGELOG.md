@@ -6,6 +6,31 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-25
+
+### Added
+
+- The Poppy protocol. `audit` scores `/.well-known/poppy.json`, `gen` writes
+  one, and a directory audit looks for it under `.well-known` only.
+
+### Fixed
+
+- A URL audit requests only the site it was given. Markdown alternates,
+  redirect hops, and IPv6 literals stay on that host, and a private, loopback,
+  or link-local answer is refused unless the operator audits that local site.
+- The address a name resolved to is the address the audit connects to, so a
+  second answer cannot move the request somewhere else.
+- Each response stops at 2 MiB and the whole audit stops at 8 MiB, counted
+  after decompression. Compressed bodies are decoded instead of read as raw
+  bytes, and a bodyless status stays inside the request.
+- A request that answers with `101 Switching Protocols`, or closes before its
+  response, settles instead of outliving its own timeout.
+- The hosted audit keeps working on Workers, where the runtime has no
+  `dns.lookup` to resolve a name.
+- A live audit finds artifacts and pages that are served through a redirect.
+- A Next.js `fill` image counts as a sized image in the HTML audit.
+- The sitemap audit accepts an index and a urlset in either formatting.
+
 ## [0.6.0] - 2026-10-10
 
 ### Added

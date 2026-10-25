@@ -87,12 +87,19 @@ async function resolvePinned(
   cache.set(key, resolved);
   return resolved;
 }
-function stubDestinationAllowed(url: URL, policy: AuditFetchPolicy): boolean {
-  if (policy.allowPrivate || !isLocalName(url.hostname)) {
-    const ip = literalIp(url.hostname);
-    return !ip || policy.allowPrivate || !isBlockedIp(ip);
+// A replaced fetch means a stubbed or wrapped transport, so the connection
+// cannot be pinned. The name is still checked when a resolver is present: an
+// unknown answer must not refuse a public host, but a private answer refuses it.
+async function stubDestinationAllowed(url: URL, policy: AuditFetchPolicy): Promise<boolean> {
+  const ip = literalIp(url.hostname);
+  if (ip) return policy.allowPrivate || !isBlockedIp(ip);
+  if (policy.allowPrivate) return true;
+  try {
+    const records = await dns.lookup(bareHost(url.hostname), { all: true });
+    return records.every((record) => !isBlockedIp(record.address));
+  } catch {
+    return true;
   }
-  return false;
 }
 function rememberLiteral(url: URL, policy: AuditFetchPolicy): boolean {
   const ip = literalIp(url.hostname);
@@ -126,7 +133,9 @@ if (typeof zlib.createZstdDecompress === "function")
   DECODERS.zstd = () => zlib.createZstdDecompress();
 function decodedSource(incoming: http.IncomingMessage, headers: Headers): Readable | null {
   if (NULL_BODY.has(incoming.statusCode ?? 0)) {
-    incoming.resume();
+    // A body here is unexpected, so it must not be read: draining it would
+    // spend bytes the audit budget never counts.
+    incoming.destroy();
     return null;
   }
   // prettier-ignore
@@ -179,6 +188,9 @@ function pinnedRequest(current: URL, addresses: PinnedAddress[], signal: AbortSi
 }
 // prettier-ignore
 export async function openAudit(requestUrl: string, current: URL, policy: AuditFetchPolicy): Promise<Response> {
+  // The budget is shared across the whole audit, so a spent budget stops new
+  // connections instead of opening one only to cancel it.
+  if (policy.bytes >= MAX_AUDIT_BYTES) throw new Error("budget-spent");
   const signal = AbortSignal.any([policy.signal, AbortSignal.timeout(8000)]);
   if (globalThis.fetch !== nativeFetch || onWorkers())
     return fetch(requestUrl, { redirect: "manual", signal });
