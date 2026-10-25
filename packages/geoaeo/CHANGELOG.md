@@ -8,7 +8,7 @@ All notable changes to geoaeo are recorded here. The format follows
 
 ### Added
 
-- `generateMarkdownPage` writes a markdown mirror: title, summary, canonical URL, last
+- `generateMarkdownPage` writes a markdown mirror: title, canonical URL, last
   updated, body, and related links.
 - Audit check `ai-summary` (34 checks) requires `<meta name="ai-summary">` on every
   inspected page. `title` and `description` drop from 4 to 3 so the checks still sum

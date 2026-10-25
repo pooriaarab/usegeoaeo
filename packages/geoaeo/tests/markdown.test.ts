@@ -6,7 +6,6 @@ import { auditTarget, type AuditCheck } from "../src/audit.js";
 
 const page: MarkdownPage = {
   title: "Pricing",
-  summary: "What a seat costs.",
   canonical: "https://reply.example/pricing",
   lastUpdated: "2026-10-25",
   body: "## Plans\n\n- Pro: $9 a month.",
@@ -35,9 +34,9 @@ function check(report: { checks: AuditCheck[] }, id: string): AuditCheck {
 }
 
 describe("generateMarkdownPage", () => {
-  it("writes the title, summary, canonical, and date in order", () => {
+  it("writes the title, canonical, and date in order", () => {
     const output = generateMarkdownPage(page);
-    expect(output.startsWith("# Pricing\n\n> What a seat costs.\n\n")).toBe(true);
+    expect(output.startsWith("# Pricing\n\nCanonical:")).toBe(true);
     expect(output).toContain("Canonical: https://reply.example/pricing");
     expect(output).toContain("Last updated: 2026-10-25");
     expect(output).toContain("## Plans");
@@ -49,9 +48,8 @@ describe("generateMarkdownPage", () => {
     expect(output).toContain("- [Docs](https://reply.example/docs)");
   });
 
-  it("leaves out the summary and related block when absent", () => {
+  it("leaves out the related block when absent", () => {
     const output = generateMarkdownPage({ title: "T", canonical: "https://x.test/", body: "Body" });
-    expect(output).not.toContain(">");
     expect(output).not.toContain("## Related");
   });
 });
@@ -60,7 +58,7 @@ describe("generateMdmirror", () => {
   it("names the canonical page for the mirror", () => {
     const output = generateMdmirror(config, { path: "/pricing", title: "Pricing", body: "Plans." });
     expect(output).toContain("Canonical: https://reply.example/pricing");
-    expect(output).toContain("> Draft replies for social posts.");
+    expect(output).toContain("Plans.");
   });
 
   it("defaults to the site root and does not repeat the description", () => {
