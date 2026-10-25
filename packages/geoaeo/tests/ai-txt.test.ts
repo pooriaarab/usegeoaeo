@@ -59,15 +59,42 @@ describe("generateAiTxt", () => {
     expect(output).toContain("exclude: /admin/");
   });
 
-  it("takes the last-updated date and contact from the caller", () => {
-    const output = generateAiTxt(config, {
-      lastUpdated: "2026-01-02",
-      contact: "hello@reply.example",
+  it("turns an absolute page URL into a scope path", () => {
+    const absolute = defineConfig({
+      ...config,
+      pages: ["https://reply.example/pricing", "https://reply.example/docs/cli"],
     });
-    expect(output).toContain("Last updated: 2026-01-02");
+    const output = generateAiTxt(absolute);
+    expect(output).toContain("include: /pricing");
+    expect(output).toContain("include: /docs/cli");
+    expect(output).not.toContain("include: /https://reply.example/pricing");
+  });
+
+  it("takes the contact and date from the site config", () => {
+    const configured = defineConfig({
+      ...config,
+      contact: "hello@reply.example",
+      lastUpdated: "2026-03-04",
+    });
+    const output = generateAiTxt(configured);
+    expect(output).toContain("Last updated: 2026-03-04");
     expect(output).toContain("contact: hello@reply.example");
     expect(output).toContain("[contact]\nemail: hello@reply.example");
     expect(output).not.toContain("url: hello@reply.example");
+  });
+
+  it("lets a caller override the configured contact and date", () => {
+    const configured = defineConfig({
+      ...config,
+      contact: "hello@reply.example",
+      lastUpdated: "2026-03-04",
+    });
+    const output = generateAiTxt(configured, {
+      contact: "https://reply.example/contact",
+      lastUpdated: "2026-01-02",
+    });
+    expect(output).toContain("Last updated: 2026-01-02");
+    expect(output).toContain("[contact]\nurl: https://reply.example/contact");
   });
 });
 

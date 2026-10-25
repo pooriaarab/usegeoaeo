@@ -27,6 +27,10 @@ export interface SiteConfig {
   pages?: string[];
   /** Default true. false disallows training crawlers and keeps answer engines allowed. */
   allowTrainingCrawlers?: boolean;
+  /** Contact line for ai.txt. Defaults to siteUrl. */
+  contact?: string;
+  /** ISO date for ai.txt and llms-full.txt. Defaults to the build date. */
+  lastUpdated?: string;
 }
 
 export function defineConfig(config: SiteConfig): SiteConfig {

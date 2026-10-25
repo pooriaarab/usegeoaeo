@@ -11,7 +11,9 @@ All notable changes to geoaeo are recorded here. The format follows
 - `geoaeo gen ai-txt` writes an AI usage policy in the ai-txt v1.1.1 shape:
   `[identity]`, `[permissions]`, `[restrictions]`, `[attribution]`, `[scope]`,
   and `[contact]`. Facts come from `SiteConfig`. Scope exclusions come from
-  `AI_EXCLUDED_PATHS` in `constants.ts`.
+  `AI_EXCLUDED_PATHS` in `constants.ts`. `SiteConfig.contact` and
+  `SiteConfig.lastUpdated` set the contact line and the date, so the CLI and
+  MCP surfaces reach them from config; a library caller can override both.
 - Audit check `ai-txt` (33 checks). It passes a live `/ai.txt` that carries
   `[identity]` and `[permissions]`, or a route whose source calls
   `generateAiTxt`. The `llms` and `llms-full` weights drop from 5 to 4 so the
