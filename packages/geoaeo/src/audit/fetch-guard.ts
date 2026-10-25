@@ -160,12 +160,8 @@ function pinnedRequest(current: URL, addresses: PinnedAddress[], signal: AbortSi
   const lib = current.protocol === "https:" ? https : http;
   const hostname = bareHost(current.hostname);
   return new Promise((resolve, reject) => {
-    let settled = false;
-    // prettier-ignore
-    const fail = (error: Error) => { if (settled) return; settled = true; reject(error); };
     // prettier-ignore
     const req = lib.request({ hostname, port: current.port || undefined, path: `${current.pathname}${current.search}`, method: "GET", headers: { host: current.host }, servername: hostname, signal, lookup: (_hostname, options, callback) => lookupPinned(addresses, options, callback) }, (incoming) => {
-      settled = true;
       try {
         resolve(responseFrom(incoming));
       } catch (error) {
@@ -173,12 +169,13 @@ function pinnedRequest(current: URL, addresses: PinnedAddress[], signal: AbortSi
         reject(error instanceof Error ? error : new Error(String(error)));
       }
     });
-    req.on("error", fail);
-    // A 101 arrives as an upgrade and a closed request arrives as neither, so
-    // both must settle here or the request outlives its own timeout.
+    req.on("error", reject);
+    // A 101 arrives as an upgrade and a request closed before its response
+    // arrives as neither, so both must settle here or the request outlives its
+    // own timeout.
     // prettier-ignore
-    req.on("upgrade", (_res, socket) => { socket.destroy(); fail(new Error("upgrade")); });
-    req.on("close", () => fail(new Error("closed")));
+    req.on("upgrade", (_res, socket) => { socket.destroy(); reject(new Error("upgrade")); });
+    req.on("close", () => reject(new Error("closed")));
     req.end();
   });
 }

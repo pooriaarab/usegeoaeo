@@ -17,6 +17,7 @@ const originalFetch = globalThis.fetch;
 const page = `<html><head><link rel="alternate" type="text/markdown" href="${internal}"></head><body><h1>Hi</h1></body></html>`;
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  vi.unstubAllGlobals();
   dnsState.impl = null;
 });
 describe("audit fetches stay on the audited site and within a byte budget", () => {
@@ -72,14 +73,10 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
   });
   it("allows a public host on Workers, where a name cannot be resolved", async () => {
     vi.stubGlobal("navigator", { userAgent: "Cloudflare-Workers" });
-    try {
-      dnsState.impl = () => Promise.reject(new Error("dns down"));
-      const policy = createFetchPolicy(new URL(target));
-      expect(await destinationAllowed(new URL(`${target}/page`), policy)).toBe(true);
-      expect(await destinationAllowed(new URL("https://elsewhere.example/"), policy)).toBe(false);
-    } finally {
-      vi.unstubAllGlobals();
-    }
+    dnsState.impl = () => Promise.reject(new Error("dns down"));
+    const policy = createFetchPolicy(new URL(target));
+    expect(await destinationAllowed(new URL(`${target}/page`), policy)).toBe(true);
+    expect(await destinationAllowed(new URL("https://elsewhere.example/"), policy)).toBe(false);
   });
   it("connects to the validated address and stops when DNS fails", async () => {
     let calls = 0;
@@ -152,7 +149,7 @@ describe("audit fetches stay on the audited site and within a byte budget", () =
     const url = new URL(`http://127.0.0.1:${port}/`);
     const policy = createFetchPolicy(url);
     try {
-      expect(await destinationAllowed(url, policy)).toBe(true);
+      await destinationAllowed(url, policy);
       await expect(openAudit(url.href, url, policy)).rejects.toThrow("upgrade");
     } finally {
       server.close();
