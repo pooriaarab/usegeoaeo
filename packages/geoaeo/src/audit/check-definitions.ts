@@ -118,16 +118,23 @@ function pageMetaChecks(): CheckDef[] {
     {
       id: "title",
       label: "Page titles",
-      weight: 4,
+      weight: 3,
       details: "Every inspected page has a title.",
       passed: (ctx) => ctx.allPage((page) => page.title),
     },
     {
       id: "description",
       label: "Meta descriptions",
-      weight: 4,
+      weight: 3,
       details: "Every inspected page has a meta description.",
       passed: (ctx) => ctx.allPage((page) => page.description),
+    },
+    {
+      id: "ai-summary",
+      label: "AI summary meta",
+      weight: 2,
+      details: "Every inspected page carries a meta ai-summary tag.",
+      passed: (ctx) => ctx.allPage((page) => page.aiSummary),
     },
     {
       id: "canonical",

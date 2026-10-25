@@ -1,10 +1,36 @@
 import type { SiteConfig } from "../config.js";
+import { absoluteUrl } from "../config.js";
+import { generateMarkdownPage } from "../markdown.js";
 
-export function generateMdmirror(
+export interface MdmirrorPage {
+  title?: string;
+  body?: string;
+  /** Path or URL this mirror stands for. Defaults to the site root. */
+  path?: string;
+  /** ISO date (YYYY-MM-DD). */
+  lastUpdated?: string;
+  related?: Array<{ title: string; url: string }>;
+}
+
+/** The configured pages, minus the one this mirror stands for. */
+function relatedFromConfig(
   config: SiteConfig,
-  page?: { title?: string; body?: string },
-): string {
-  const title = page?.title ?? config.siteName;
-  const body = page?.body ?? config.description;
-  return `# ${title}\n\n${body}\n`;
+  path: string,
+): Array<{ title: string; url: string }> {
+  const own = absoluteUrl(config.siteUrl, path);
+  return [...new Set(config.pages ?? [])]
+    .map((page) => absoluteUrl(config.siteUrl, page))
+    .filter((url) => url !== own)
+    .map((url) => ({ title: url.split("/").filter(Boolean).at(-1) ?? "Home", url }));
+}
+
+export function generateMdmirror(config: SiteConfig, page: MdmirrorPage = {}): string {
+  const path = page.path ?? "/";
+  return generateMarkdownPage({
+    title: page.title ?? config.siteName,
+    canonical: absoluteUrl(config.siteUrl, path),
+    lastUpdated: page.lastUpdated ?? config.lastUpdated,
+    body: page.body ?? config.description,
+    related: page.related ?? relatedFromConfig(config, path),
+  });
 }

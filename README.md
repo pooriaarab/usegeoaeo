@@ -43,7 +43,7 @@ Run `node example.mjs`. Success prints Markdown headed `# Reply Kit`.
 ## How it works
 
 ```text
-URL or directory -> snapshot -> 33 weighted checks -> score and top fixes
+URL or directory -> snapshot -> 34 weighted checks -> score and top fixes
 SiteConfig -> generator -> discovery text, XML, JSON, HTML, or SVG
 CLI / agent -> audit, generation, prose checks -> shared library behavior
 ```
@@ -99,7 +99,7 @@ Local tests verify behavior. No ChatGPT, Claude, Perplexity, or Google AI citati
 
 ## Features
 
-- **Audits:** 33 weighted checks return a normalized 0–100 score and up to five top fixes. See the [checklist](https://usegeoaeo.com/checklist).
+- **Audits:** 34 weighted checks return a normalized 0–100 score and up to five top fixes. See the [checklist](https://usegeoaeo.com/checklist).
 - **Generators:** emit artifacts from a shared site configuration. See [installation](https://usegeoaeo.com/docs/install).
 - **Prose checks:** find configured writing patterns and optionally rewrite matching files. See the [CLI reference](https://usegeoaeo.com/docs/cli).
 - **Agent tools:** audit, generate, and check prose over stdio. See the [MCP reference](https://usegeoaeo.com/docs/mcp).
