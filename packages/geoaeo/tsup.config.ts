@@ -9,6 +9,8 @@ export default defineConfig({
     "ai-txt": "src/generators/ai-txt.ts",
     llms: "src/generators/llms.ts",
     robots: "src/generators/robots.ts",
+    jsonld: "src/generators/jsonld.ts",
+    audit: "src/audit.ts",
     mdmirror: "src/generators/mdmirror.ts",
     poppy: "src/generators/poppy.ts",
   },
