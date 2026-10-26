@@ -25,6 +25,16 @@
       "import": "./dist/mdmirror.js",
       "require": "./dist/mdmirror.cjs"
     },
+    "./llms": {
+      "types": "./dist/llms.d.ts",
+      "import": "./dist/llms.js",
+      "require": "./dist/llms.cjs"
+    },
+    "./robots": {
+      "types": "./dist/robots.d.ts",
+      "import": "./dist/robots.js",
+      "require": "./dist/robots.cjs"
+    },
     "./config": {
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js",
