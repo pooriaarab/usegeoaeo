@@ -1,14 +1,14 @@
 import { LandingHeader } from "@/components/landing/landing-header";
 import { Footer } from "@/components/landing/footer";
 import { ToolsClient } from "./tools-client";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata = {
+export const metadata = withAiSummary({
   title: "Free GEO & AEO tools — audit, llms.txt, JSON-LD",
   description:
     "Audit any site 0-100 for SEO, GEO, and AEO, and generate llms.txt and JSON-LD structured data. Free, powered by the open-source geoaeo package.",
   alternates: pageAlternates("/tools"),
-};
+});
 
 export default function ToolsPage() {
   return (

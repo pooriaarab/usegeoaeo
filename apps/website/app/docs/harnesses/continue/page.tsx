@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "geoaeo in Continue — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Continue with the geoaeo-mcp server. Configure config.yaml, verify three tools, audit your site, and generate artifacts from Chat.",
   alternates: pageAlternates("/docs/harnesses/continue"),
-};
+});
 
 const intro =
   "Connect the geoaeo MCP server to Continue. Audit a site and generate GEO and AEO artifacts from Continue Chat and Agent.";

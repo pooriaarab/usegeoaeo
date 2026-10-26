@@ -20,6 +20,99 @@ function responseFor(url: string, headers?: HeadersInit) {
   return middleware(new NextRequest(url, headers ? { headers } : undefined));
 }
 
+describe("markdown negotiation", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it.each<[string, string | undefined, string, string?]>([
+    ["/", "text/markdown", "/"],
+    ["/docs/harnesses/claude-code", "text/markdown", "/docs/harnesses/claude-code"],
+    ["/brand", "text/markdown", "/brand"],
+    ["/docs/install.md", undefined, "/docs/install"],
+    ["/index.md", undefined, "/"],
+    ["/docs/install.md", undefined, "/docs/install", "HEAD"],
+    ["/index.md", undefined, "/", "HEAD"],
+    ["/docs", "text/markdown", "/docs", "HEAD"],
+    ...[
+      "text/markdown",
+      "text/html;q=0.5, text/markdown;q=0.9",
+      "TEXT/MARKDOWN; charset=utf-8; q=0.8, text/html;q=0.2",
+      "text/*;q=0.5, text/markdown;q=0.9",
+    ].map((accept): [string, string, string] => ["/docs", accept, "/docs"]),
+  ])("rewrites %s with Accept %s", (path, accept, page, method = "GET") => {
+    const request = new NextRequest(`https://usegeoaeo.com${path}`, { method });
+    if (accept) request.headers.set("accept", accept);
+    const response = middleware(request);
+    expect(response.headers.get("x-middleware-rewrite")).toBe(
+      `https://usegeoaeo.com/api/markdown?path=${encodeURIComponent(page)}`,
+    );
+    expect(response.headers.get("Vary")).toContain("Accept");
+    expect(response.headers.get("Content-Security-Policy")).toContain("frame-ancestors 'none'");
+  });
+
+  it.each([
+    undefined,
+    "*/*",
+    "text/*",
+    "text/html",
+    "text/markdown;q=0",
+    "text/markdown, text/html",
+    "text/markdown;q=0.5, text/html;q=0.9",
+    "text/markdown;q=0.5, */*;q=0.9",
+    "text/markdown;q=invalid",
+    "text/markdown;q=1.1",
+    "text/markdown;q=0.8, text/html;q=1, text/html;q=0.1",
+  ])("keeps HTML without a higher markdown preference: %s", (accept) => {
+    const response = responseFor("https://usegeoaeo.com/docs", accept ? { accept } : undefined);
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+    expect(response.headers.get("Vary")).toContain("Accept");
+  });
+
+  it.each([
+    "/llms.txt",
+    "/llms-full.txt",
+    "/ai.txt",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/api/audit",
+    "/_next/image",
+    "/.well-known/agent-card.json",
+    "/favicon.svg",
+    "/docs.md",
+    "/agents.md",
+    "/design.md",
+    "/auth.md",
+    "/missing",
+    "/admin",
+  ])("does not negotiate excluded or unknown paths: %s", (path) => {
+    const response = responseFor(`https://usegeoaeo.com${path}`, { accept: "text/markdown" });
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+  });
+
+  it.each(["POST", "OPTIONS"])("does not rewrite %s requests", (method) => {
+    const request = new NextRequest("https://usegeoaeo.com/tools", { method });
+    request.headers.set("accept", "text/markdown");
+    const response = middleware(request);
+    expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+    if (method === "OPTIONS") expect(response.headers.get("Vary")).toBe("Accept");
+  });
+
+  it("keeps Worker Preview protections on negotiated pages and ai.txt", () => {
+    vi.stubEnv("WORKER_PREVIEW", "true");
+    const response = responseFor("https://preview.example/docs", { accept: "text/markdown" });
+    expect(response.headers.get("X-Robots-Tag")).toContain("nofollow");
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
+    expect(response.headers.get("Link")).toBeNull();
+    expect(responseFor("https://preview.example/ai.txt").status).toBe(404);
+  });
+
+  it("advertises all discovery files on public pages", () => {
+    const link = responseFor("https://usegeoaeo.com/docs").headers.get("Link");
+    for (const path of ["llms.txt", "llms-full.txt", "ai.txt"]) {
+      expect(link).toContain(`</${path}>; rel="describedby"`);
+    }
+  });
+});
+
 describe("browser security headers", () => {
   const previousPreview = process.env.WORKER_PREVIEW;
 

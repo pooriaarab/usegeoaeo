@@ -1,4 +1,5 @@
 const DISCOVERY_PATHS = new Set([
+  "/ai.txt",
   "/agents.md",
   "/auth.md",
   "/design.md",
