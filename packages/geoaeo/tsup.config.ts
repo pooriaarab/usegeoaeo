@@ -7,6 +7,8 @@ export default defineConfig({
     index: "src/index.ts",
     config: "src/config.ts",
     "ai-txt": "src/generators/ai-txt.ts",
+    llms: "src/generators/llms.ts",
+    robots: "src/generators/robots.ts",
     mdmirror: "src/generators/mdmirror.ts",
     poppy: "src/generators/poppy.ts",
   },
