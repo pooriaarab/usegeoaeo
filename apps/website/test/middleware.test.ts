@@ -23,20 +23,25 @@ function responseFor(url: string, headers?: HeadersInit) {
 describe("markdown negotiation", () => {
   afterEach(() => vi.unstubAllEnvs());
 
-  it.each<[string, string | undefined, string]>([
+  it.each<[string, string | undefined, string, string?]>([
     ["/", "text/markdown", "/"],
     ["/docs/harnesses/claude-code", "text/markdown", "/docs/harnesses/claude-code"],
     ["/brand", "text/markdown", "/brand"],
     ["/docs/install.md", undefined, "/docs/install"],
     ["/index.md", undefined, "/"],
+    ["/docs/install.md", undefined, "/docs/install", "HEAD"],
+    ["/index.md", undefined, "/", "HEAD"],
+    ["/docs", "text/markdown", "/docs", "HEAD"],
     ...[
       "text/markdown",
       "text/html;q=0.5, text/markdown;q=0.9",
       "TEXT/MARKDOWN; charset=utf-8; q=0.8, text/html;q=0.2",
       "text/*;q=0.5, text/markdown;q=0.9",
     ].map((accept): [string, string, string] => ["/docs", accept, "/docs"]),
-  ])("rewrites %s with Accept %s", (path, accept, page) => {
-    const response = responseFor(`https://usegeoaeo.com${path}`, accept ? { accept } : undefined);
+  ])("rewrites %s with Accept %s", (path, accept, page, method = "GET") => {
+    const request = new NextRequest(`https://usegeoaeo.com${path}`, { method });
+    if (accept) request.headers.set("accept", accept);
+    const response = middleware(request);
     expect(response.headers.get("x-middleware-rewrite")).toBe(
       `https://usegeoaeo.com/api/markdown?path=${encodeURIComponent(page)}`,
     );
@@ -83,14 +88,12 @@ describe("markdown negotiation", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
   });
 
-  it.each(["POST", "HEAD", "OPTIONS"])("does not rewrite %s requests", (method) => {
-    const response = middleware(
-      new NextRequest("https://usegeoaeo.com/tools", {
-        method,
-        headers: { accept: "text/markdown" },
-      }),
-    );
+  it.each(["POST", "OPTIONS"])("does not rewrite %s requests", (method) => {
+    const request = new NextRequest("https://usegeoaeo.com/tools", { method });
+    request.headers.set("accept", "text/markdown");
+    const response = middleware(request);
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
+    if (method === "OPTIONS") expect(response.headers.get("Vary")).toBe("Accept");
   });
 
   it("keeps Worker Preview protections on negotiated pages and ai.txt", () => {

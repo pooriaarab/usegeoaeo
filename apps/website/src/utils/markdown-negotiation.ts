@@ -51,12 +51,10 @@ export function negotiateMarkdown(request: NextRequest) {
   if (!page) return NextResponse.next();
   let response = NextResponse.next();
   if (
-    request.method === "GET" &&
+    ["GET", "HEAD"].includes(request.method) &&
     (path.endsWith(".md") || prefersMarkdown(request.headers.get("accept")))
   ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/api/markdown";
-    url.search = "";
+    const url = new URL("/api/markdown", request.nextUrl.origin);
     url.searchParams.set("path", page);
     // Carry the selected page even when the handler sees the original URL.
     const headers = new Headers(request.headers);
