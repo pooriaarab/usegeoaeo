@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     template: "%s | geoaeo",
   },
   description,
+  other: { "ai-summary": description },
   authors: [{ name: "Pooria Arab", url: "https://github.com/pooriaarab" }],
   creator: "Pooria Arab",
   openGraph: {

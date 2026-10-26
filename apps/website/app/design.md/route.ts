@@ -1,9 +1,10 @@
+import { markdownResponse } from "../../src/utils/markdown-http";
+export { markdownOptions as OPTIONS } from "../../src/utils/markdown-http";
+
 import { designContext } from "../../src/generated/design-context.generated";
 
 export const dynamic = "force-static";
 
 export function GET() {
-  return new Response(designContext, {
-    headers: { "content-type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(designContext, "/design.md");
 }

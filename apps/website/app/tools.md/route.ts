@@ -1,3 +1,6 @@
+import { markdownResponse } from "../../src/utils/markdown-http";
+export { markdownOptions as OPTIONS } from "../../src/utils/markdown-http";
+
 export const dynamic = "force-static";
 
 const toolsMd = `# Free GEO & AEO tools
@@ -14,7 +17,5 @@ HTML version: https://usegeoaeo.com/tools
 `;
 
 export function GET() {
-  return new Response(toolsMd, {
-    headers: { "content-type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(toolsMd, "/tools");
 }

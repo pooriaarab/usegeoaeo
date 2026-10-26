@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
 
+import { negotiateMarkdown } from "./src/utils/markdown-negotiation";
 import { protectWorkerPreview } from "./src/utils/worker-preview-indexing";
 
 // Next.js App Router emits inline bootstrap scripts, and pages embed JSON-LD
@@ -47,13 +47,11 @@ function applySecurityHeaders(request: NextRequest, response: Response) {
 }
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
-  if (request.nextUrl.pathname === "/") {
-    response.headers.set(
-      "Link",
-      '</llms.txt>; rel="describedby", </.well-known/agent-card.json>; rel="service-meta"',
-    );
-  }
+  const response = negotiateMarkdown(request);
+  response.headers.set(
+    "Link",
+    '</llms.txt>; rel="describedby", </llms-full.txt>; rel="describedby", </ai.txt>; rel="describedby", </.well-known/agent-card.json>; rel="service-meta"',
+  );
   return applySecurityHeaders(request, protectWorkerPreview(request.nextUrl.pathname, response));
 }
 
