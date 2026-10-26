@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { DocsPageHeader } from "@/components/docs/docs-page-header";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@template/ui/primitives/card";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "geoaeo CLI — audit, init, gen, humanize, and mcp commands",
   description:
     "Complete reference for the geoaeo CLI. Audit any URL or directory for GEO/AEO gaps, scaffold artifacts, generate llms.txt and more, and run the MCP server.",
   alternates: pageAlternates("/docs/cli"),
-};
+});
 
 const commands = [
   { name: "audit <url-or-dir>", purpose: "Score the site 0–100 and list missing artifacts." },

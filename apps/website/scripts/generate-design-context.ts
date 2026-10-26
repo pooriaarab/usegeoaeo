@@ -25,6 +25,21 @@ await generate(
   "designContext",
 );
 
+// Bundle guide sources for the shared markdown handler on Workers.
+const guides: Record<string, string> = {
+  "/brand": await readFile(resolve(scriptDirectory, "../../../.agents/brand.md"), "utf8"),
+};
+for (const file of await readdir(resolve(scriptDirectory, "../../../docs/harnesses"))) {
+  if (!file.endsWith(".md")) continue;
+  guides[`/docs/harnesses/${file.slice(0, -3)}`] = await readFile(
+    resolve(scriptDirectory, "../../../docs/harnesses", file), "utf8",
+  );
+}
+await writeFile(
+  resolve(scriptDirectory, "../src/generated/markdown-guides.generated.ts"),
+  `export const markdownGuides: Record<string, string> = ${JSON.stringify(guides)};\n`,
+);
+
 // Operating guide for agents, served at /agents.md. Read from disk at build
 // time and bundled as a constant: the worker runtime has no repo filesystem,
 // so a request-time readFileSync 500s in production.

@@ -7,9 +7,17 @@ import type { Metadata } from "next";
 export function pageAlternates(path: string): NonNullable<Metadata["alternates"]> {
   return {
     canonical: path,
+    types: { "text/markdown": path === "/" ? "/index.md" : `${path}.md` },
     languages: {
       en: path,
       "x-default": path,
     },
+  };
+}
+
+export function withAiSummary(metadata: Metadata): Metadata {
+  return {
+    ...metadata,
+    other: Object.assign({}, metadata.other, { "ai-summary": metadata.description ?? "" }),
   };
 }

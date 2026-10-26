@@ -1,3 +1,6 @@
+import { markdownResponse } from "../../src/utils/markdown-http";
+export { markdownOptions as OPTIONS } from "../../src/utils/markdown-http";
+
 export const dynamic = "force-static";
 
 const docsMd = `# geoaeo documentation
@@ -28,7 +31,5 @@ HTML version: https://usegeoaeo.com/docs
 `;
 
 export function GET() {
-  return new Response(docsMd, {
-    headers: { "content-type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(docsMd, "/docs");
 }

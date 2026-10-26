@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "geoaeo in Windsurf — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Windsurf with the geoaeo-mcp server. Configure mcp_config.json, verify three tools, audit your site, and generate artifacts in Cascade.",
   alternates: pageAlternates("/docs/harnesses/windsurf"),
-};
+});
 
 const intro =
   "Connect the geoaeo MCP server to Windsurf. Audit a site and generate GEO and AEO artifacts from Cascade.";

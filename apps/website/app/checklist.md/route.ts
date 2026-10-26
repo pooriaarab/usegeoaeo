@@ -1,3 +1,6 @@
+import { markdownResponse } from "../../src/utils/markdown-http";
+export { markdownOptions as OPTIONS } from "../../src/utils/markdown-http";
+
 export const dynamic = "force-static";
 
 const checklistMd = `# GEO/AEO checklist
@@ -23,7 +26,5 @@ HTML version: https://usegeoaeo.com/checklist
 `;
 
 export function GET() {
-  return new Response(checklistMd, {
-    headers: { "content-type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(checklistMd, "/checklist");
 }

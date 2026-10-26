@@ -1,3 +1,6 @@
+import { markdownResponse } from "../../src/utils/markdown-http";
+export { markdownOptions as OPTIONS } from "../../src/utils/markdown-http";
+
 export const dynamic = "force-static";
 
 const examplesMd = `# Examples — three GeoWeather targets, three audit scores
@@ -20,7 +23,5 @@ HTML version: https://usegeoaeo.com/examples
 `;
 
 export function GET() {
-  return new Response(examplesMd, {
-    headers: { "content-type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(examplesMd, "/examples");
 }

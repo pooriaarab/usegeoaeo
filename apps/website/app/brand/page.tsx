@@ -6,13 +6,13 @@ import { Button } from "@template/ui/primitives/button";
 import { LogoMark } from "@/components/brand/logo";
 import { Footer } from "@/components/landing/footer";
 import { LandingHeader } from "@/components/landing/landing-header";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "Brand",
   description: "Name, mark, colors, typography, and voice rules for geoaeo.",
   alternates: pageAlternates("/brand"),
-};
+});
 
 const swatches = [
   { name: "Background", classes: "bg-background text-foreground" },
