@@ -1,6 +1,6 @@
 {
   "name": "geoaeo",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "mcpName": "io.github.pooriaarab/geoaeo",
   "description": "SEO, GEO, and AEO site audits with llms.txt, JSON-LD, sitemap generators, framework scaffolding, and MCP tools.",
   "type": "module",
@@ -19,6 +19,11 @@
       "types": "./dist/ai-txt.d.ts",
       "import": "./dist/ai-txt.js",
       "require": "./dist/ai-txt.cjs"
+    },
+    "./mdmirror": {
+      "types": "./dist/mdmirror.d.ts",
+      "import": "./dist/mdmirror.js",
+      "require": "./dist/mdmirror.cjs"
     },
     "./config": {
       "types": "./dist/config.d.ts",

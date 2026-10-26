@@ -1,4 +1,4 @@
-import { generateMdmirror } from "geoaeo";
+import { generateMdmirror } from "geoaeo/mdmirror";
 import siteConfig from "../../../geoaeo.config";
 import { GET as docs } from "../../docs.md/route";
 import { GET as checklist } from "../../checklist.md/route";

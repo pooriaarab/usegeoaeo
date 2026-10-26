@@ -1,4 +1,4 @@
-import { generateAiTxt } from "geoaeo";
+import { generateAiTxt } from "geoaeo/ai-txt";
 import siteConfig from "../../geoaeo.config";
 
 export const dynamic = "force-static";
