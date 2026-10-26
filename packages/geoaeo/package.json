@@ -1,6 +1,6 @@
 {
   "name": "geoaeo",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "mcpName": "io.github.pooriaarab/geoaeo",
   "description": "SEO, GEO, and AEO site audits with llms.txt, JSON-LD, sitemap generators, framework scaffolding, and MCP tools.",
   "type": "module",
