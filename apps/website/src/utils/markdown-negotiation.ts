@@ -2,29 +2,47 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 const CONTENT_PATHS = new Set([
-  "/", "/brand", "/docs", "/checklist", "/examples", "/tools",
-  "/docs/install", "/docs/cli", "/docs/mcp",
-  ...["claude-code", "codex", "cursor", "windsurf", "gemini-cli", "github-copilot", "continue"]
-    .map((slug) => `/docs/harnesses/${slug}`),
+  "/",
+  "/brand",
+  "/docs",
+  "/checklist",
+  "/examples",
+  "/tools",
+  "/docs/install",
+  "/docs/cli",
+  "/docs/mcp",
+  ...["claude-code", "codex", "cursor", "windsurf", "gemini-cli", "github-copilot", "continue"].map(
+    (slug) => `/docs/harnesses/${slug}`,
+  ),
 ]);
 const EXISTING_MARKDOWN = new Set([
-  "/agents.md", "/design.md", "/docs.md", "/checklist.md", "/examples.md", "/tools.md",
+  "/agents.md",
+  "/design.md",
+  "/docs.md",
+  "/checklist.md",
+  "/examples.md",
+  "/tools.md",
 ]);
 
 export function isMarkdownPage(path: string) {
   return CONTENT_PATHS.has(path);
 }
 
+function mediaQuality(range: string): [string, number] {
+  const [media, ...parameters] = range.toLowerCase().trim().split(";");
+  const value =
+    parameters
+      .map((parameter) => parameter.trim())
+      .find((parameter) => /^q\s*=/.test(parameter))
+      ?.split("=")[1]
+      ?.trim() ?? "1";
+  return [media.trim(), /^(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?)$/.test(value) ? Number(value) : 0];
+}
+
 function prefersMarkdown(accept: string | null) {
   const qualities = new Map<string, number>();
   for (const range of accept?.split(",") ?? []) {
-    const [media, ...parameters] = range.toLowerCase().trim().split(";");
-    const value = parameters
-      .map((parameter) => parameter.trim())
-      .find((parameter) => /^q\s*=/.test(parameter))
-      ?.split("=")[1]?.trim() ?? "1";
-    const quality = /^(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?)$/.test(value) ? Number(value) : 0;
-    const type = media.trim();
+    const [type, quality] = mediaQuality(range);
     qualities.set(type, Math.max(quality, qualities.get(type) ?? 0));
   }
   const markdown = qualities.get("text/markdown") ?? 0;
@@ -32,18 +50,20 @@ function prefersMarkdown(accept: string | null) {
   return markdown > html;
 }
 
+function markdownPage(path: string) {
+  if (EXISTING_MARKDOWN.has(path)) return null;
+  const page = path === "/index.md" ? "/" : path.replace(/\.md$/, "");
+  return isMarkdownPage(page) ? page : null;
+}
+
 export function negotiateMarkdown(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  if (EXISTING_MARKDOWN.has(path)) return NextResponse.next();
   if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) return NextResponse.next();
-  const suffixPath = path === "/index.md" ? "/" : path.endsWith(".md") ? path.slice(0, -3) : null;
   // The allowlist leaves real .md routes and every non-content endpoint alone.
-  const page = isMarkdownPage(path)
-    ? path
-    : suffixPath && isMarkdownPage(suffixPath) ? suffixPath : null;
+  const page = markdownPage(path);
   if (!page) return NextResponse.next();
   let response;
-  if (suffixPath || prefersMarkdown(request.headers.get("accept"))) {
+  if (path.endsWith(".md") || prefersMarkdown(request.headers.get("accept"))) {
     const url = request.nextUrl.clone();
     url.pathname = "/api/markdown";
     url.search = "";

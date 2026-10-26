@@ -38,10 +38,17 @@ describe("markdown negotiation", () => {
   });
 
   it.each([
-    undefined, "*/*", "text/*", "text/html", "text/markdown;q=0",
-    "text/markdown, text/html", "text/markdown;q=0.5, text/html;q=0.9",
-    "text/markdown;q=0.5, */*;q=0.9", "text/markdown;q=invalid",
-    "text/markdown;q=1.1", "text/markdown;q=0.8, text/html;q=1, text/html;q=0.1",
+    undefined,
+    "*/*",
+    "text/*",
+    "text/html",
+    "text/markdown;q=0",
+    "text/markdown, text/html",
+    "text/markdown;q=0.5, text/html;q=0.9",
+    "text/markdown;q=0.5, */*;q=0.9",
+    "text/markdown;q=invalid",
+    "text/markdown;q=1.1",
+    "text/markdown;q=0.8, text/html;q=1, text/html;q=0.1",
   ])("keeps HTML without a higher markdown preference: %s", (accept) => {
     const response = responseFor("https://usegeoaeo.com/docs", accept ? { accept } : undefined);
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
@@ -49,18 +56,33 @@ describe("markdown negotiation", () => {
   });
 
   it.each([
-    "/llms.txt", "/llms-full.txt", "/ai.txt", "/robots.txt", "/sitemap.xml",
-    "/api/audit", "/_next/image", "/.well-known/agent-card.json", "/favicon.svg",
-    "/docs.md", "/agents.md", "/design.md", "/auth.md", "/missing", "/admin",
+    "/llms.txt",
+    "/llms-full.txt",
+    "/ai.txt",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/api/audit",
+    "/_next/image",
+    "/.well-known/agent-card.json",
+    "/favicon.svg",
+    "/docs.md",
+    "/agents.md",
+    "/design.md",
+    "/auth.md",
+    "/missing",
+    "/admin",
   ])("does not negotiate excluded or unknown paths: %s", (path) => {
     const response = responseFor(`https://usegeoaeo.com${path}`, { accept: "text/markdown" });
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
   });
 
   it("does not rewrite POST requests", () => {
-    const response = middleware(new NextRequest("https://usegeoaeo.com/tools", {
-      method: "POST", headers: { accept: "text/markdown" },
-    }));
+    const response = middleware(
+      new NextRequest("https://usegeoaeo.com/tools", {
+        method: "POST",
+        headers: { accept: "text/markdown" },
+      }),
+    );
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
   });
 

@@ -11,8 +11,17 @@ import { GET, OPTIONS } from "../app/api/markdown/route";
 
 describe("markdown HTTP responses", () => {
   it("sets headers on all seven existing routes without changing their bodies", async () => {
-    const responses = [getDocs(), getAgents(), getDesign(), getChecklist(), getExamples(), getTools(),
-      await getSkill(new Request("https://usegeoaeo.com"), { params: Promise.resolve({ skill: "geoaeo" }) })];
+    const responses = [
+      getDocs(),
+      getAgents(),
+      getDesign(),
+      getChecklist(),
+      getExamples(),
+      getTools(),
+      await getSkill(new Request("https://usegeoaeo.com"), {
+        params: Promise.resolve({ skill: "geoaeo" }),
+      }),
+    ];
     for (const response of responses) {
       const body = await response.text();
       expect(response.headers.get("X-Markdown-Tokens")).toBe(String(Math.ceil(body.length / 4)));

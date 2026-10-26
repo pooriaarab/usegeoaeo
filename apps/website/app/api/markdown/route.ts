@@ -11,7 +11,10 @@ import { isMarkdownPage } from "../../../src/utils/markdown-negotiation";
 export { markdownOptions as OPTIONS } from "../../../src/utils/markdown-http";
 
 const mirrors: Record<string, () => Response> = {
-  "/docs": docs, "/checklist": checklist, "/examples": examples, "/tools": tools,
+  "/docs": docs,
+  "/checklist": checklist,
+  "/examples": examples,
+  "/tools": tools,
 };
 const summaries: Record<string, string> = {
   "/": siteConfig.description,
@@ -24,8 +27,10 @@ const summaries: Record<string, string> = {
 };
 
 export function GET(request: Request) {
-  const path = request.headers.get("x-geoaeo-markdown-path")
-    ?? new URL(request.url).searchParams.get("path") ?? "/";
+  const path =
+    request.headers.get("x-geoaeo-markdown-path") ??
+    new URL(request.url).searchParams.get("path") ??
+    "/";
   if (!isMarkdownPage(path)) return markdownResponse("# Not Found\n", path, 404);
   if (Object.hasOwn(mirrors, path)) return mirrors[path]();
   const body = generateMdmirror(siteConfig, {

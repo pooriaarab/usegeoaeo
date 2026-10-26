@@ -32,7 +32,8 @@ const guides: Record<string, string> = {
 for (const file of await readdir(resolve(scriptDirectory, "../../../docs/harnesses"))) {
   if (!file.endsWith(".md")) continue;
   guides[`/docs/harnesses/${file.slice(0, -3)}`] = await readFile(
-    resolve(scriptDirectory, "../../../docs/harnesses", file), "utf8",
+    resolve(scriptDirectory, "../../../docs/harnesses", file),
+    "utf8",
   );
 }
 await writeFile(
