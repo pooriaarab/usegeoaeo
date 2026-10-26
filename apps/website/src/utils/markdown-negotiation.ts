@@ -1,13 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import siteConfig from "../../geoaeo.config";
 
 const CONTENT_PATHS = new Set([
-  "/",
+  ...(siteConfig.pages ?? []),
   "/brand",
-  "/docs",
-  "/checklist",
-  "/examples",
-  "/tools",
   "/docs/install",
   "/docs/cli",
   "/docs/mcp",
@@ -15,27 +12,17 @@ const CONTENT_PATHS = new Set([
     (slug) => `/docs/harnesses/${slug}`,
   ),
 ]);
-const EXISTING_MARKDOWN = new Set([
-  "/agents.md",
-  "/design.md",
-  "/docs.md",
-  "/checklist.md",
-  "/examples.md",
-  "/tools.md",
-]);
+const EXISTING_MARKDOWN = new Set(
+  ["agents", "design", "docs", "checklist", "examples", "tools"].map((name) => `/${name}.md`),
+);
 
 export function isMarkdownPage(path: string) {
   return CONTENT_PATHS.has(path);
 }
 
 function mediaQuality(range: string): [string, number] {
-  const [media, ...parameters] = range.toLowerCase().trim().split(";");
-  const value =
-    parameters
-      .map((parameter) => parameter.trim())
-      .find((parameter) => /^q\s*=/.test(parameter))
-      ?.split("=")[1]
-      ?.trim() ?? "1";
+  const media = range.split(";")[0].trim().toLowerCase();
+  const value = range.match(/;\s*q\s*=\s*([^;]*)/i)?.[1].trim() ?? "1";
   return [media.trim(), /^(?:0(?:\.\d{0,3})?|1(?:\.0{0,3})?)$/.test(value) ? Number(value) : 0];
 }
 
@@ -62,8 +49,11 @@ export function negotiateMarkdown(request: NextRequest) {
   // The allowlist leaves real .md routes and every non-content endpoint alone.
   const page = markdownPage(path);
   if (!page) return NextResponse.next();
-  let response;
-  if (path.endsWith(".md") || prefersMarkdown(request.headers.get("accept"))) {
+  let response = NextResponse.next();
+  if (
+    request.method === "GET" &&
+    (path.endsWith(".md") || prefersMarkdown(request.headers.get("accept")))
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/api/markdown";
     url.search = "";
@@ -72,8 +62,6 @@ export function negotiateMarkdown(request: NextRequest) {
     const headers = new Headers(request.headers);
     headers.set("x-geoaeo-markdown-path", page);
     response = NextResponse.rewrite(url, { request: { headers } });
-  } else {
-    response = NextResponse.next();
   }
   response.headers.set("Vary", "Accept");
   return response;

@@ -23,15 +23,22 @@ function responseFor(url: string, headers?: HeadersInit) {
 describe("markdown negotiation", () => {
   afterEach(() => vi.unstubAllEnvs());
 
-  it.each([
-    "text/markdown",
-    "text/html;q=0.5, text/markdown;q=0.9",
-    "TEXT/MARKDOWN; charset=utf-8; q=0.8, text/html;q=0.2",
-    "text/*;q=0.5, text/markdown;q=0.9",
-  ])("rewrites an explicit markdown preference: %s", (accept) => {
-    const response = responseFor("https://usegeoaeo.com/docs?source=agent", { accept });
+  it.each<[string, string | undefined, string]>([
+    ["/", "text/markdown", "/"],
+    ["/docs/harnesses/claude-code", "text/markdown", "/docs/harnesses/claude-code"],
+    ["/brand", "text/markdown", "/brand"],
+    ["/docs/install.md", undefined, "/docs/install"],
+    ["/index.md", undefined, "/"],
+    ...[
+      "text/markdown",
+      "text/html;q=0.5, text/markdown;q=0.9",
+      "TEXT/MARKDOWN; charset=utf-8; q=0.8, text/html;q=0.2",
+      "text/*;q=0.5, text/markdown;q=0.9",
+    ].map((accept): [string, string, string] => ["/docs", accept, "/docs"]),
+  ])("rewrites %s with Accept %s", (path, accept, page) => {
+    const response = responseFor(`https://usegeoaeo.com${path}`, accept ? { accept } : undefined);
     expect(response.headers.get("x-middleware-rewrite")).toBe(
-      "https://usegeoaeo.com/api/markdown?path=%2Fdocs",
+      `https://usegeoaeo.com/api/markdown?path=${encodeURIComponent(page)}`,
     );
     expect(response.headers.get("Vary")).toContain("Accept");
     expect(response.headers.get("Content-Security-Policy")).toContain("frame-ancestors 'none'");
@@ -76,10 +83,10 @@ describe("markdown negotiation", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBeNull();
   });
 
-  it("does not rewrite POST requests", () => {
+  it.each(["POST", "HEAD", "OPTIONS"])("does not rewrite %s requests", (method) => {
     const response = middleware(
       new NextRequest("https://usegeoaeo.com/tools", {
-        method: "POST",
+        method,
         headers: { accept: "text/markdown" },
       }),
     );

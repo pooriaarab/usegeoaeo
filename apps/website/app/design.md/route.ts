@@ -6,5 +6,5 @@ import { designContext } from "../../src/generated/design-context.generated";
 export const dynamic = "force-static";
 
 export function GET() {
-  return markdownResponse(designContext, "/brand");
+  return markdownResponse(designContext, "/design.md");
 }

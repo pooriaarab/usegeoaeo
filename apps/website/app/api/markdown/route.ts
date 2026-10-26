@@ -5,7 +5,7 @@ import { GET as checklist } from "../../checklist.md/route";
 import { GET as examples } from "../../examples.md/route";
 import { GET as tools } from "../../tools.md/route";
 import { markdownGuides } from "../../../src/generated/markdown-guides.generated";
-import { markdownResponse } from "../../../src/utils/markdown-http";
+import { markdownNotFound, markdownResponse } from "../../../src/utils/markdown-http";
 import { isMarkdownPage } from "../../../src/utils/markdown-negotiation";
 
 export { markdownOptions as OPTIONS } from "../../../src/utils/markdown-http";
@@ -31,7 +31,7 @@ export function GET(request: Request) {
     request.headers.get("x-geoaeo-markdown-path") ??
     new URL(request.url).searchParams.get("path") ??
     "/";
-  if (!isMarkdownPage(path)) return markdownResponse("# Not Found\n", "/", 404);
+  if (!isMarkdownPage(path)) return markdownNotFound();
   if (Object.hasOwn(mirrors, path)) return mirrors[path]();
   const body = generateMdmirror(siteConfig, {
     path,
