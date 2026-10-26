@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "geoaeo in Gemini CLI — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Gemini CLI with the geoaeo-mcp server. Configure ~/.gemini/settings.json, verify three tools, audit your site, and generate artifacts.",
   alternates: pageAlternates("/docs/harnesses/gemini-cli"),
-};
+});
 
 const intro =
   "Connect the geoaeo MCP server to Gemini CLI. Audit a site and generate GEO and AEO artifacts from the Gemini agent.";

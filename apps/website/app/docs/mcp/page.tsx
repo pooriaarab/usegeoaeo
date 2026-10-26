@@ -3,15 +3,15 @@ import { DocsPageHeader } from "@/components/docs/docs-page-header";
 import { InstallThePlugin } from "@/components/docs/install-the-plugin";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@template/ui/primitives/card";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 import { ConfigureAHarness, SetupPrompt, Tools, Troubleshooting } from "./mcp-sections";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "geoaeo MCP Server — stdio tools for audit, gen, humanize",
   description:
     "Run geoaeo as an MCP server with the geoaeo-mcp bin. Expose audit, gen, and humanize over stdio to Claude Code, Cursor, and every supported harness.",
   alternates: pageAlternates("/docs/mcp"),
-};
+});
 
 const intro =
   "Run geoaeo as a Model Context Protocol server. The agent calls geoaeo without leaving the chat. One version feeds the library, the CLI, and the MCP server at parity.";

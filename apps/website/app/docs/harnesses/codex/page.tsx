@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { HarnessDocPage } from "@/components/docs/harness-doc-page";
 import { HarnessWhatYouGet } from "@/components/docs/harness-what-you-get";
 import { InstallThePlugin } from "@/components/docs/install-the-plugin";
-import { pageAlternates } from "@/utils/page-alternates";
+import { pageAlternates, withAiSummary } from "@/utils/page-alternates";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAiSummary({
   title: "geoaeo in Muse — MCP setup, audit, and gen guide",
   description:
     "Connect geoaeo to Muse with the geoaeo-mcp server. Set up ~/.codex/config.toml, verify three tools, audit your site, and generate artifacts.",
   alternates: pageAlternates("/docs/harnesses/codex"),
-};
+});
 
 const intro =
   "Connect the geoaeo MCP server to Muse. Audit a site and generate GEO and AEO artifacts from the agent.";

@@ -1,3 +1,6 @@
+import { markdownResponse } from "../../../../../src/utils/markdown-http";
+export { markdownOptions as OPTIONS } from "../../../../../src/utils/markdown-http";
+
 import { skillMarkdown } from "../../../../../src/generated/agent-skills.generated";
 
 export const dynamic = "force-static";
@@ -15,7 +18,5 @@ export async function GET(
     return new Response("Not Found", { status: 404 });
   }
   const markdown = skillMarkdown[skill];
-  return new Response(markdown, {
-    headers: { "content-type": "text/markdown; charset=utf-8" },
-  });
+  return markdownResponse(markdown, `/.well-known/agent-skills/${skill}/SKILL.md`);
 }
