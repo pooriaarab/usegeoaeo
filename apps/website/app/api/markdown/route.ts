@@ -31,7 +31,7 @@ export function GET(request: Request) {
     request.headers.get("x-geoaeo-markdown-path") ??
     new URL(request.url).searchParams.get("path") ??
     "/";
-  if (!isMarkdownPage(path)) return markdownResponse("# Not Found\n", path, 404);
+  if (!isMarkdownPage(path)) return markdownResponse("# Not Found\n", "/", 404);
   if (Object.hasOwn(mirrors, path)) return mirrors[path]();
   const body = generateMdmirror(siteConfig, {
     path,
