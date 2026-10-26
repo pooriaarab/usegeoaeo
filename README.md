@@ -1,6 +1,6 @@
 # geoaeo
 
-<a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.8.3"/></a>
+<a href="https://www.npmjs.com/package/geoaeo"><img src="https://img.shields.io/npm/v/geoaeo" alt="npm geoaeo 0.8.5"/></a>
 [![Downloads/month](https://img.shields.io/npm/dm/geoaeo)](https://www.npmjs.com/package/geoaeo)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit)
 
@@ -144,7 +144,7 @@ For an MCP client, use this server configuration:
 
 ## Status
 
-The package is version 0.8.3. Interfaces can change before 1.0.
+The package is version 0.8.5. Interfaces can change before 1.0.
 The library is MIT licensed. Public case studies are not yet published.
 Use the repository issue tracker for support if you have access, or consult the [public docs](https://usegeoaeo.com/docs).
 

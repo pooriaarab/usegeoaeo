@@ -24,6 +24,12 @@ const summaries: Record<string, string> = {
     "Run `npx geoaeo audit <url-or-dir>` to score a site. Use `init` to scaffold artifacts, `gen` to generate an artifact, `humanize` to check prose, and `mcp` to start the stdio server.",
   "/docs/mcp":
     "Run `npx geoaeo mcp` over stdio, or use the `geoaeo-mcp` bin. MCP tools: `audit`, `gen`, `humanize`, and `submit`.",
+  "/tools/audit":
+    "Free live URL audit for SEO, GEO, and AEO, scoring a site 0-100. The live audit fetches with an SSRF guard that needs Node, so on this host run `npx geoaeo audit <url>`.",
+  "/tools/llms":
+    "Free llms.txt generator: build a short site map for AI answer engines from site name, URL, and description.",
+  "/tools/jsonld":
+    "Free JSON-LD generator: create schema.org structured data for software, product, faq, breadcrumb, organization, website, article, howto, person, and review.",
 };
 
 export function GET(request: Request) {

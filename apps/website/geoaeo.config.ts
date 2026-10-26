@@ -34,5 +34,14 @@ export default defineConfig({
         "Yes. geoaeo is free and open source under the MIT license. Install it with npm install geoaeo.",
     },
   ],
-  pages: ["/", "/docs", "/checklist", "/examples", "/tools"],
+  pages: [
+    "/",
+    "/docs",
+    "/checklist",
+    "/examples",
+    "/tools",
+    "/tools/audit",
+    "/tools/llms",
+    "/tools/jsonld",
+  ],
 });
