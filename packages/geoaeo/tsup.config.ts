@@ -7,6 +7,7 @@ export default defineConfig({
     index: "src/index.ts",
     config: "src/config.ts",
     "ai-txt": "src/generators/ai-txt.ts",
+    mdmirror: "src/generators/mdmirror.ts",
     poppy: "src/generators/poppy.ts",
   },
   format: ["esm", "cjs"],
