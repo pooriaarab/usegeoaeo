@@ -23,7 +23,7 @@
     "node": ">=20.0.0"
   },
   "devDependencies": {
-    "turbo": "^2.8.15",
+    "turbo": "^2.11.10",
     "typescript": "^5.9.3"
   },
   "keywords": [
